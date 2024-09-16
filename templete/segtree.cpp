@@ -132,7 +132,7 @@ public:
 };
 
 //MUL SEG
-class _mseg{ // mod m ¹ÝÈ¯
+class _mseg{ // mod m ë°˜í™˜
 public:
     ll n, m; vector <ll> arr, seg;
     _mseg(ll n, ll m = 1e9 + 7) {
