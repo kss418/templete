@@ -128,7 +128,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="graph.cpp" />
-    <ClCompile Include="math.cpp" />
+    <ClCompile Include="math.cpp">
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">stdcpplatest</LanguageStandard>
+    </ClCompile>
     <ClCompile Include="segtree.cpp" />
     <ClCompile Include="string.cpp" />
     <ClCompile Include="templete.cpp" />

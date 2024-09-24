@@ -72,7 +72,7 @@ public:
         arr.resize(n + 1); rec.resize(n + 1);
     }
 
-    void add(ll n, ll idx) {
+    void add(ll idx, ll n) {
         arr[idx] = n;
     }
 
