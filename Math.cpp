@@ -6,7 +6,7 @@ using pll = pair<ll, ll>; using tll = tuple<ll, ll, ll>;
 ll n, m, k, t; string s;
 constexpr ll INF = 0x3f3f3f3f3f3f3f3f;
 
-//¿¡¶óÅä½ºÃ¼
+//ì—ë¼í† ìŠ¤ì²´
 class _es {
 public:
     ll n; vector <ll> p, pn;
@@ -26,15 +26,15 @@ public:
         }
     }
 
-    ll mp(ll n) { // ÃÖ¼Ò ¼ÒÀÎ¼ö ¹İÈ¯
+    ll mp(ll n) { // ìµœì†Œ ì†Œì¸ìˆ˜ ë°˜í™˜
         return p[n];
     }
 
-    vector<ll> ret() { // ¼Ò¼ö º¤ÅÍ ¹İÈ¯
+    vector<ll> ret() { // ì†Œìˆ˜ ë²¡í„° ë°˜í™˜
         return pn;
     }
 
-    bool prime(ll n) { // ¼Ò¼ö ÆÇº°
+    bool prime(ll n) { // ì†Œìˆ˜ íŒë³„
         if (n == 1) return 0;
         return p[n] == n;
     }
@@ -104,13 +104,13 @@ public:
         return pow_mod(a, b - 2, b);
     }
 
-    ll ret(ll a, ll b, ll m) { // (a * b^-1) % m ¹İÈ¯ m == prime
+    ll ret(ll a, ll b, ll m) { // (a * b^-1) % m ë°˜í™˜ m == prime
         return (a % m * prime_inv(b, m) % m) % m;
     }
 };
 
-//¼ø¿­
+//ìˆœì—´
 
-//Á¶ÇÕ
+//ì¡°í•©
 
 //CRT

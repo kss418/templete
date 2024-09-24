@@ -48,7 +48,7 @@ public:
     }
 };
 
-// ´ÙÀÍ
+// ë‹¤ìµ
 template <typename T = ll>
 class _dij {
 public:
@@ -64,12 +64,12 @@ public:
         adj.resize(n + 1);
     }
 
-    void add(ll st, ll en, ll c = 1) { // ¾ç¹æÇâ
+    void add(ll st, ll en, ll c = 1) { // ì–‘ë°©í–¥
         adj[st].push_back({ c,en });
         adj[en].push_back({ c,st });
     }
 
-    void addsol(ll st, ll en, ll c = 1) { // ´Ü¹æÇâ
+    void addsol(ll st, ll en, ll c = 1) { // ë‹¨ë°©í–¥
         adj[st].push_back({ c,en });
     }
 
@@ -102,19 +102,19 @@ class _lca {
 public:
     ll n; vector <ll> d;
     vector <vector<ll>> p, adj;
-    _lca(ll n) { //n °³¼ö
+    _lca(ll n) { //n ê°œìˆ˜
         this->n = n;
         p.resize(n + 1, vector<ll>(log2(n + 1) + 1, -1));
         d.resize(n + 1); adj.resize(n + 1);
         fill(d.begin(), d.end(), -1);
     }
 
-    void add(ll a, ll b) { // ¾ç¹æÇâ
+    void add(ll a, ll b) { // ì–‘ë°©í–¥
         adj[a].push_back(b);
         adj[b].push_back(a);
     }
 
-    void addsol(ll a, ll b) { // ´Ü¹æÇâ
+    void addsol(ll a, ll b) { // ë‹¨ë°©í–¥
         adj[a].push_back(b);
     }
 
@@ -160,9 +160,9 @@ public:
     }
 };
 
-// ÇÃ·ÎÀÌµå
+// í”Œë¡œì´ë“œ
 template <typename T = ll>
-class _floyd { // ret(i,j) == INF Ã³¸®ÇÏ±â
+class _floyd { // ret(i,j) == INF ì²˜ë¦¬í•˜ê¸°
 public:
     ll n; vector <vector<T>> d, nxt;
     vector <ll> tr;
@@ -173,13 +173,13 @@ public:
         nxt.resize(n + 1, vector<T>(n + 1, 0));
     }
 
-    void add(ll st, ll en, T c = 1) { //¾ç¹æÇâ
+    void add(ll st, ll en, T c = 1) { //ì–‘ë°©í–¥
         d[st][en] = min(d[st][en], c);
         d[en][st] = min(d[en][st], c);
         nxt[st][en] = en; nxt[en][st] = st;
     }
 
-    void addsol(ll st, ll en, T c = 1) { //´Ü¹æÇâ
+    void addsol(ll st, ll en, T c = 1) { //ë‹¨ë°©í–¥
         d[st][en] = min(d[st][en], c);
         nxt[st][en] = en;
     }
@@ -230,7 +230,7 @@ public:
         cnt.resize(n + 1);
     }
 
-    void addsol(ll st, ll en, T c = 1) { // ´Ü¹æÇâ
+    void addsol(ll st, ll en, T c = 1) { // ë‹¨ë°©í–¥
         adj[st].push_back({ c, en });
     }
 
@@ -259,11 +259,11 @@ public:
         return 1;
     }
 
-    T ret(ll num) { // °Å¸® ¹İÈ¯
+    T ret(ll num) { // ê±°ë¦¬ ë°˜í™˜
         return d[num];
     }
 
-    vector <ll> track(ll st, ll en) { // st -> en °æ·Î ¹İÈ¯
+    vector <ll> track(ll st, ll en) { // st -> en ê²½ë¡œ ë°˜í™˜
         vector <ll> ret;
         ll cur = en;
         while (cur != -1) {
@@ -276,11 +276,11 @@ public:
     }
 };
 
-// Èñ¼Ò ¹è¿­
+// í¬ì†Œ ë°°ì—´
 class _st {
 public:
     ll n; vector <vector<ll>> num;
-    _st(ll n, ll m) { //n °³¼ö m ±íÀÌ
+    _st(ll n, ll m) { //n ê°œìˆ˜ m ê¹Šì´
         this->n = n;
         num.resize(n + 1, vector<ll>(log2(m + 1) + 1, 0));
     }
@@ -295,7 +295,7 @@ public:
         }
     }
 
-    ll ret(ll n, ll d) { //n ³ëµå d ±íÀÌ
+    ll ret(ll n, ll d) { //n ë…¸ë“œ d ê¹Šì´
         for (int i = log2(m); i >= 0; i--) {
             if (d & (1ll << i)) n = num[n][i];
         }
@@ -345,14 +345,14 @@ public:
         return 0;
     }
 
-    void add(ll st, ll en, T c = 1) { // ¾ç¹æÇâ
+    void add(ll st, ll en, T c = 1) { // ì–‘ë°©í–¥
         adj[st].push_back({ c, en });
         adj[en].push_back({ c, st });
         pq.push({ st, en, c });
         pq.push({ en, st, c });
     }
 
-    void init(ll num = 0) { // num ¸¸Å­ Àû°Ô °£¼± ¿¬°á
+    void init(ll num = 0) { // num ë§Œí¼ ì ê²Œ ê°„ì„  ì—°ê²°
         cnt = 0; result = 0;
         while (!pq.empty()) {
             auto [st, en, c] = pq.top(); pq.pop();
@@ -371,11 +371,11 @@ public:
 class _scc { // 1-based index
 public:
     ll n, dcnt = 0, scnt = 0;
-    vector <ll> d, sn, ind; // dfsn, scc¹øÈ£, ind
-    vector<vector<ll>> adj, scc; // °£¼±, scc
+    vector <ll> d, sn, ind; // dfsn, sccë²ˆí˜¸, ind
+    vector<vector<ll>> adj, scc; // ê°„ì„ , scc
     vector <bool> fin;
     stack <ll> st;
-    vector <set <ll>> sccset; // À§»óÁ¤·Ä °£¼±
+    vector <set <ll>> sccset; // ìœ„ìƒì •ë ¬ ê°„ì„ 
 
     _scc(ll n) {
         this->n = n;
@@ -420,15 +420,15 @@ public:
         }
     }
 
-    vector <vector <ll>> ret() { // scc ¹İÈ¯
+    vector <vector <ll>> ret() { // scc ë°˜í™˜
         return scc;
     }
 
-    ll num(ll a) { // scc ¹øÈ£ ¹İÈ¯
+    ll num(ll a) { // scc ë²ˆí˜¸ ë°˜í™˜
         return sn[a];
     }
 
-    vector <ll> top() { //À§»óÁ¤·Ä
+    vector <ll> top() { //ìœ„ìƒì •ë ¬
         deque <ll> q; vector <ll> ts;
         sccset.resize(n + 1); ind.resize(n + 1);
 
@@ -466,11 +466,11 @@ public:
 class _2sat { // 1-based index
 public:
     ll n, dcnt = 0, scnt = 0;
-    vector <ll> d, sn, ind; // dfsn, scc¹øÈ£, ind
-    vector<vector<ll>> adj, scc; // °£¼±, scc
+    vector <ll> d, sn, ind; // dfsn, sccë²ˆí˜¸, ind
+    vector<vector<ll>> adj, scc; // ê°„ì„ , scc
     vector <bool> fin;
     stack <ll> st;
-    vector <set <ll>> sccset; // À§»óÁ¤·Ä °£¼±
+    vector <set <ll>> sccset; // ìœ„ìƒì •ë ¬ ê°„ì„ 
 
     _2sat(ll n) {
         this->n = n;
@@ -521,15 +521,15 @@ public:
         }
     }
 
-    vector <vector <ll>> sccret() { // scc ¹İÈ¯
+    vector <vector <ll>> sccret() { // scc ë°˜í™˜
         return scc;
     }
 
-    ll num(ll a) { // scc ¹øÈ£ ¹İÈ¯
+    ll num(ll a) { // scc ë²ˆí˜¸ ë°˜í™˜
         return sn[a];
     }
 
-    vector <ll> top() { //À§»óÁ¤·Ä
+    vector <ll> top() { //ìœ„ìƒì •ë ¬
         deque <ll> q; vector <ll> ts;
         sccset.resize(2 * n + 1); ind.resize(2 * n + 1);
 
@@ -562,7 +562,7 @@ public:
         return ts;
     }
 
-    ll ret() { // 2sat ¿©ºÎ ¹İÈ¯
+    ll ret() { // 2sat ì—¬ë¶€ ë°˜í™˜
         ll flag = 1;
         for (int i = 1; i <= n; i++) {
             if (num(i) != num(no(i))) continue;
@@ -572,7 +572,7 @@ public:
         return flag;
     }
 
-    vector <ll> val() { // Âü ÀÏ¶§ °ª ¹İÈ¯
+    vector <ll> val() { // ì°¸ ì¼ë•Œ ê°’ ë°˜í™˜
         vector <ll> ret;
         ret.resize(2 * n + 1, -1);
         vector <ll> track = top();
@@ -623,7 +623,7 @@ public:
     }
 
 
-    bool bfs(ll st, ll en) { // sink µµ´Ş ¿©ºÎ ¹İÈ¯
+    bool bfs(ll st, ll en) { // sink ë„ë‹¬ ì—¬ë¶€ ë°˜í™˜
         fill(d.begin(), d.end(), -1);
         d[st] = 0;
 
@@ -642,7 +642,7 @@ public:
         return d[en] != -1;
     }
 
-    ll dfs(ll cur, ll en, ll val) { // sink µµ´Ş ÃÖ´ë À¯·® ¹İÈ¯
+    ll dfs(ll cur, ll en, ll val) { // sink ë„ë‹¬ ìµœëŒ€ ìœ ëŸ‰ ë°˜í™˜
         if (cur == en) return val;
 
         while (w[cur] < adj[cur].size()) {
@@ -678,7 +678,7 @@ public:
     }
 };
 
-//ÀÌºĞ ¸ÅÄª
+//ì´ë¶„ ë§¤ì¹­
 class _bm { // 1-based index
 public:
     ll as, bs; vector<vector<ll>> adj;
@@ -760,7 +760,7 @@ public:
     }
 
 
-    bool bfs(ll st, ll en) { // sink µµ´Ş ¿©ºÎ ¹İÈ¯
+    bool bfs(ll st, ll en) { // sink ë„ë‹¬ ì—¬ë¶€ ë°˜í™˜
         memset(&dist[0], 0x3f, sizeof(dist[0]) * dist.size());
         memset(&in[0], 0, sizeof(in[0]) * in.size());
         dist[st] = 0; in[st] = 1;
@@ -781,7 +781,7 @@ public:
         return dist[en] < INF;
     }
 
-    ll dfs(ll cur, ll en, ll val) { // sink µµ´Ş ÃÖ´ë À¯·® ¹İÈ¯
+    ll dfs(ll cur, ll en, ll val) { // sink ë„ë‹¬ ìµœëŒ€ ìœ ëŸ‰ ë°˜í™˜
         v[cur] = 1; if (cur == en) return val;
 
         while (w[cur] < adj[cur].size()) {
@@ -801,7 +801,7 @@ public:
         return 0;
     }
 
-    pll ret(ll st, ll en) { // cost, flow ¹İÈ¯
+    pll ret(ll st, ll en) { // cost, flow ë°˜í™˜
         ll flow = 0, cost = 0;
         while (bfs(st, en)) {
             memset(&v[0], 0, sizeof(v[0]) * v.size());
@@ -818,7 +818,7 @@ public:
     }
 };
 
-//À§»ó Á¤·Ä
+//ìœ„ìƒ ì •ë ¬
 class _ts {
 public:
     ll n; vector<vector<ll>> adj;

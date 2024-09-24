@@ -1,4 +1,4 @@
-﻿#include <bits/stdc++.h>
+#include <bits/stdc++.h>
 #define fastio cin.tie(0), cout.tie(0), ios::sync_with_stdio(0);
 using namespace std; typedef long long ll;
 using ull = unsigned long long;
