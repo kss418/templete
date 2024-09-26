@@ -41,6 +41,45 @@ public:
 };
 
 //TRIE
+class _trie { // 0-based index
+public:
+    ll n, m, seq = 2;
+    vector <vector<ll>> adj;
+    vector <ll> chk;
+
+    _trie(ll k, ll n, ll m = 26) { // 문자열 개수, 문자열 길이, 문자 개수
+       this->m = m; this->n = n; 
+       chk.resize(n * k + 1); adj.resize(n * k + 1);
+    }
+
+    void insert(string& s){
+        ll cur = 1;
+        for(auto &st : s){
+            if(adj[cur].empty()) adj[cur].resize(m + 1);
+            if(!adj[cur][st - 'a']) adj[cur][st - 'a'] = seq++;
+            cur = adj[cur][st - 'a'];
+        }
+        chk[cur] = 1;
+    }
+
+    void erase(string& s){
+        ll cur = 1;
+        for(auto &st : s){
+            if(!adj[cur][st - 'a']) return;
+            cur = adj[cur][st - 'a'];
+        }
+        chk[cur] = 0;
+    }
+
+    bool find(string& s){
+        ll cur = 1;
+        for(auto &st : s){
+            if(!adj[cur][st - 'a']) return 0;
+            cur = adj[cur][st - 'a'];
+        }
+        return chk[cur];
+    }
+};
 
 //HASH
 class _hash { // 0-based index
