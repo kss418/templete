@@ -16,7 +16,7 @@ public:
        this->s = s; this->n = s.size();
     }
 
-    void init(string& m){
+    void init(string& m){ // fail 함수 계산
         ll nxt = 0; f.resize(m.size(), 0);
         for(int cur = 1;cur < m.size();cur++){
             while(nxt && m[cur] != m[nxt]) nxt = f[nxt - 1];
