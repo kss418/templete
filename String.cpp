@@ -65,6 +65,7 @@ public:
     void erase(string& s){
         ll cur = 1;
         for(auto &st : s){
+            if(adj[cur].empty()) adj[cur].resize(m + 1);
             if(!adj[cur][st - 'a']) return;
             cur = adj[cur][st - 'a'];
         }
@@ -74,6 +75,7 @@ public:
     bool find(string& s){
         ll cur = 1;
         for(auto &st : s){
+            if(adj[cur].empty()) adj[cur].resize(m + 1);
             if(!adj[cur][st - 'a']) return 0;
             cur = adj[cur][st - 'a'];
         }
