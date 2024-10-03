@@ -170,6 +170,14 @@ public:
         arr[idx] = val;
     }
 
+    ll push(ll idx){
+        return arr[idx];
+    }
+
+    ll pop(ll idx){
+        return -arr[idx];
+    }
+
     void init(){
         sort(q.begin(), q.end());
 
@@ -180,10 +188,10 @@ public:
         result[q[0].n] = cur;
 
         for(int i = 1;i < m;i++){
-            while(q[i].l > s) cur -= arr[s++];
-            while(q[i].r < e) cur -= arr[e--];
-            while(q[i].l < s) cur += arr[--s];
-            while(q[i].r > e) cur += arr[++e];
+            while(q[i].l > s) cur += pop(s++);
+            while(q[i].r < e) cur += pop(e--);
+            while(q[i].l < s) cur += push(--s);
+            while(q[i].r > e) cur += push(++e);
             result[q[i].n] = cur;
         }
     }
@@ -192,6 +200,5 @@ public:
         for(int i = 1;i <= m;i++) cout << result[i] << "\n";
     }
 };
-
 
 //삼분 탐색
