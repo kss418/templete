@@ -182,9 +182,7 @@ public:
         sort(q.begin(), q.end());
 
         ll s = q[0].l, e = q[0].r, cur = 0;
-        for(int i = s;i <= e;i++){
-            cur += arr[i];
-        }
+        for(int i = s;i <= e;i++) cur += push(i);
         result[q[0].n] = cur;
 
         for(int i = 1;i < m;i++){
