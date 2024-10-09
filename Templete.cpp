@@ -222,3 +222,25 @@ public:
 };
 
 //삼분 탐색
+class _ts { // 0-based index
+public:
+    ll l, r;
+    _ts(ll l, ll r) {
+        this->l = l; this->r = r;
+    }
+
+    ll f(ll cur) {
+       
+       return 0;
+    }
+
+    pll ret() {
+        while (r - l > 3) {
+            ll st = (2 * l + r) / 3, en = (l + 2 * r) / 3;
+            if(f(st) > f(en)) l = st;
+            else r = en;
+        }
+
+        return {l, r};
+    }
+};
