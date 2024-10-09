@@ -234,13 +234,16 @@ public:
        return 0;
     }
 
-    pll ret() {
+    ll ret() {
         while (r - l > 3) {
             ll st = (2 * l + r) / 3, en = (l + 2 * r) / 3;
-            if(f(st) > f(en)) l = st;
+            if(f(st) < f(en)) l = st;
             else r = en;
         }
 
-        return {l, r};
+        ll result = -INF;
+        for(ll cur = l; cur <= r;cur++) result = max(result, f(cur));
+
+        return result;
     }
 };
