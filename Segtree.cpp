@@ -39,8 +39,8 @@ public:
         seg[node] += val;
         if (l == r) return;
         ll mid = (l + r) >> 1;
-        add(l, mid, idx, val, node * 2);
-        add(mid + 1, r, idx, val, node * 2 + 1);
+        add(idx, val, l, mid, node * 2);
+        add(idx, val, mid + 1, r, node * 2 + 1);
     }
 
     ll update(ll idx, ll val) { return update(idx, val, 1, n); }
