@@ -116,6 +116,11 @@ public:
     _comb(ll n, ll m = 998244353){ // m == MOD && m == prime
         fac.resize(n + 1); inv.resize(n + 1);
         this->mod = m; this->n = n;
+
+        fac[0] = 1; 
+        for(int i = 1;i <= n;i++) fac[i] = fac[i - 1] * i % mod;
+        inv[n] = pow(fac[n], mod - 2, mod);
+        for(int i = n - 1;i >= 0;i--) inv[i] = inv[i + 1] * (i + 1) % mod;
     }
 
     ll pow(ll a, ll p, ll mod) {
@@ -127,13 +132,6 @@ public:
 		if (p % 2 == 0) return cur % mod;
 		return (cur * a) % mod;
 	}
-
-    void init(){
-        fac[0] = 1; 
-        for(int i = 1;i <= n;i++) fac[i] = fac[i - 1] * i % mod;
-        inv[n] = pow(fac[n], mod - 2, mod);
-        for(int i = n - 1;i >= 0;i--) inv[i] = inv[i + 1] * (i + 1) % mod;
-    }
 
     ll ret(ll n, ll m){ // return nCm
         return fac[n] * inv[m] % mod * inv[n - m] % mod;
