@@ -91,6 +91,7 @@ public:
     ll n, m, mod, key;
     vector <ll> h;
 
+    _hash() {}
     _hash(ll n, ll m, ll mod, ll key = 2) {
         this->n = n; this->m = m;
         this->mod = mod; this->key = key;
