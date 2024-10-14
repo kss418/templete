@@ -86,7 +86,7 @@ public:
 //HASH
 class _hash { // 0-based index
 public:
-    // ll mod[3] = { MOD, 998244353, 922337203685471 };
+    // ll mod[3] = { 1e9 + 7, 998244353, 922337203685471 };
     // ll key[3] = {29, 31, 26};
     ll n, m, mod, key;
     vector <ll> h;
