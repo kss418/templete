@@ -88,14 +88,29 @@ class _hash { // 0-based index
 public:
     // ll mod[3] = { 1000000007, 998244353, 922337203685471 };
     // ll key[3] = {29, 31, 26};
-    ll n, m, mod, key;
-    vector <ll> h;
+    ll mod, key, size, h;
+    deque <ll> q;
 
     _hash() {}
-    _hash(ll n, ll m, ll mod, ll key = 2) {
-        this->n = n; this->m = m;
+    _hash(ll mod, ll key = 2) {
         this->mod = mod; this->key = key;
-        h.resize(n + 1, 0);
+        this->size = 0; this->h = 0;
+    }
+
+    ll pow_mod(ll a, ll b, ll c) {
+        if (!b) return 1;
+        ll ret = pow_mod(a, b / 2, c) % c;
+
+        if (b % 2) return ((ret * ret) % c * (a % c)) % c;
+        return (ret * ret) % c;
+    }
+
+    ll prime_inv(ll a, ll b) {
+        return pow_mod(a, b - 2, b);
+    }
+
+    ll inv(ll a, ll b, ll m) { // (a * b^-1) % m 반환 m == prime
+        return (a % m * prime_inv(b, m) % m) % m;
     }
 
     ll mo(ll n) {
@@ -103,20 +118,34 @@ public:
         else return (n % mod) + mod;
     }
 
-    void init(string& arr) {
-        ll pow = 1;
-        for (int i = 0; i < m; i++) {
-            h[0] = mo(h[0] + arr[m - i - 1] * pow);
-            if (i != m - 1) pow = mo(key * pow);
-        }
-
-        for (int i = 1; i <= n - m; i++) {
-            h[i] = mo(key * mo(h[i - 1] - arr[i - 1] * pow) + arr[i + m - 1]);
-        }
+    void push_back(ll c){
+        q.push_back(c);
+        h *= key; h = mo(h);
+        h += c; h = mo(h);
+        size++;
     }
 
-    ll ret(ll a) {
-        return mo(h[a]);
+    void pop_back(){
+        ll c = q.back(); q.pop_back();
+        h -= c; h = mo(h);
+        h *= inv(1, key, mod); h = mo(h);
+        size--;
+    }
+
+    void push_front(ll c){
+        q.push_front(c);
+        h += pow_mod(key, size, mod) * c;
+        h = mo(h); size++;
+    }
+
+    void pop_front(){
+        ll c = q.front(); q.pop_front();
+        h -= pow_mod(key, size - 1, mod) * c;
+        h = mo(h); size--;
+    }
+
+    ll ret() {
+        return mo(h);
     }
 };
 
