@@ -317,6 +317,10 @@ public:
         bool operator>(const edge& ot) const {
             return c > ot.c;
         }
+
+        bool operator<(const edge& ot) const {
+            return c < ot.c;
+        }
     };
     priority_queue<edge, vector<edge>, greater<edge>> pq;
 
