@@ -12,12 +12,14 @@ constexpr ll INF = 0x3f3f3f3f3f3f3f3f;
 // 유파
 class _uf { 
 public:
-    ll n; vector <ll> p, size;
+    ll n; vector <ll> p, si;
+    
+    _uf(){}
     _uf(ll n) { 
         this->n = n;
-        p.resize(n + 1); size.resize(n + 1);
-        fill(p.begin(), p.end(), -1);
-        fill(size.begin(), size.end(), 1);
+        p.resize(n + 1); si.resize(n + 1);
+        fill(all(p), -1);
+        fill(all(si), 1);
     }
 
     ll find(ll num) { 
@@ -29,7 +31,11 @@ public:
         a = find(a); b = find(b);
         if (a == b) return;
         if (a < b) swap(a, b);
-        p[b] = a, size[a] += size[b];
+        p[b] = a, si[a] += si[b];
+    }
+
+    ll size(ll num){
+        return si[find(num)];
     }
 
     ll same(ll a, ll b) {
@@ -37,6 +43,7 @@ public:
         return 0;
     }
 };
+
 
 //이분 탐색
 class _bs { // 0-based index
