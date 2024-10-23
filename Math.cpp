@@ -60,7 +60,7 @@ public:
 		if (p == 1) return a % mod;
 
 		ll cur = ret(a, p / 2, mod);
-		cur = cur * cur % mod;
+		cur = (cur * cur) % mod;
 		if (p % 2 == 0) return cur % mod;
 		return (cur * a) % mod;
 	}
