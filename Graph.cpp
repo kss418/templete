@@ -282,27 +282,28 @@ public:
     ll n; vector <vector<ll>> num;
     _st(ll n, ll m) { //n 개수 m 깊이
         this->n = n;
-        num.resize(n + 1, vector<ll>(log2(m + 1) + 1, 0));
+        num.resize(log2(m + 1) + 1, vector<ll>(n + 1, 0));
     }
 
     void add(ll st, ll en) {
-        num[st][0] = en;
+        num[0][st] = en;
     }
 
     void init() {
         for (int i = 1; i <= log2(m); i++) {
-            for (int j = 1; j <= n; j++) num[j][i] = num[num[j][i - 1]][i - 1];
+            for (int j = 1; j <= n; j++) num[i][j] = num[i - 1][num[i - 1][j]];
         }
     }
 
     ll ret(ll n, ll d) { //n 노드 d 깊이
         for (int i = log2(m); i >= 0; i--) {
-            if (d & (1ll << i)) n = num[n][i];
+            if (d & (1ll << i)) n = num[i][n];
         }
 
         return n;
     }
 };
+
 
 // MST
 template <typename T = ll>
