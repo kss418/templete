@@ -290,13 +290,13 @@ public:
     }
 
     void init() {
-        for (int i = 1; i <= log2(m); i++) {
+        for (int i = 1; i <= log2(m + 1); i++) {
             for (int j = 1; j <= n; j++) num[i][j] = num[i - 1][num[i - 1][j]];
         }
     }
 
     ll ret(ll n, ll d) { //n 노드 d 깊이
-        for (int i = log2(m); i >= 0; i--) {
+        for (int i = log2(m + 1); i >= 0; i--) {
             if (d & (1ll << i)) n = num[i][n];
         }
 
