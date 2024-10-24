@@ -160,6 +160,43 @@ public:
 };
 
 //CRT
+class _crt{
+public:
+    _crt(){} vector <pll> arr;
+    tll gcd(ll a, ll b) {
+        if (!b) return { a, 1, 0 };
+        auto[g, x, y] = gcd(b, a % b);
+        return { g, y, x - a / b * y };
+    }
+
+    void clear(){ arr.clear(); }
+    void add(ll a, ll m){ arr.push_back({a, m}); }
+
+    ll mod(ll a, ll m){
+        a %= m; if(a >= 0) return a;
+        return a + m;
+    }
+
+    pll crt(pll a, pll b){
+        auto[g, cx, cy] = gcd(a.y, b.y);
+        ll lcd = a.y / g * b.y;
+        if((b.x - a.x) % g) return {-1, -1};
+        ll r = mod((b.x - a.x) / g, b.y); 
+        ll l = mod(cx * r, b.y); 
+        ll ret = mod(a.x + l * a.y, lcd);
+
+        return { ret, lcd };
+    }
+
+    pll ret(){
+        pll cur = arr[0];
+        for(int i = 1;i < arr.size();i++){
+            cur = crt(cur, arr[i]);
+            if(cur.x == -1) return {-1, -1};
+        }
+        return cur;
+    }
+};
 
 //이산 로그
 class _dlog{
