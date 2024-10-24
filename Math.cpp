@@ -67,7 +67,8 @@ public:
 class _pow {
 public:
 	_pow() {}
-	ll pow(ll a, ll b){
+
+	ll ret(ll a, ll b){
         ll ret = 1;
         while(b){
             if(b & 1) ret *= a;
@@ -76,28 +77,7 @@ public:
         return ret;
     }
 
-<<<<<<< HEAD
-	ll ret(ll a, ll p) {
-		if (!p) return 1;
-		if (p == 1) return a;
-
-		ll cur = ret(a, p / 2);
-		cur = cur * cur;
-		if (p % 2 == 0) return cur;
-		return cur * a;
-	}
-
-	ll ret(ll a, ll p, ll mod) {
-		if (!p) return 1;
-		if (p == 1) return a % mod;
-
-		ll cur = ret(a, p / 2, mod);
-		cur = (cur * cur) % mod;
-		if (p % 2 == 0) return cur % mod;
-		return (cur * a) % mod;
-	}
-=======
-	ll pow(ll a, ll b, ll p){
+	ll ret(ll a, ll b, ll p){
         ll ret = 1;
         while(b){
             if(b & 1) ret *= a % p, ret %= p;
@@ -105,7 +85,6 @@ public:
         }      
         return ret;
     }
->>>>>>> 066622605f18fa03aa4486109b71844a9f041185
 };
 
 //GCD, INV
@@ -113,7 +92,7 @@ class _gcd {
 public:
     _gcd() {}
 
-    tuple <ll, ll, ll> init(ll a, ll b) {
+    tll init(ll a, ll b) {
         if (!b) return { a, 1, 0 };
         auto [g, x, y] = init(b, a % b);
         return { g, y, x - a / b * y };
