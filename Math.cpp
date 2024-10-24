@@ -1,50 +1,82 @@
 #include <bits/stdc++.h>
 #define fastio cin.tie(0), cout.tie(0), ios::sync_with_stdio(0);
+#define all(x) (x).begin(), (x).end()
+#define x first 
+#define y second
 using namespace std; typedef long long ll;
+using ld = long double;
 using ull = unsigned long long;
 using pll = pair<ll, ll>; using tll = tuple<ll, ll, ll>;
 ll n, m, k, t; string s;
-constexpr ll INF = 0x3f3f3f3f3f3f3f3f;
 
 //에라토스체
-class _es {
+class _es { // flag (1 == prime / 2 == phi / 4 == mobius)
 public:
-    ll n; vector <ll> p, pn;
-    _es(ll n) {
+    ll n; vector <ll> pv, pn, mov, phiv;
+    vector <bool> v;
+    _es(ll n, ll flag = 1) {
         this->n = n;
-        p.resize(n + 1, -1);
-    }
 
-    void init() {
-        p[1] = 1;
-        for (int i = 2; i <= n; i++) {
-            if (p[i] != -1) continue; p[i] = i;
-            pn.push_back(i);
-            for (int j = 2 * i; j <= n; j += i) {
-                if (p[j] == -1) p[j] = i;
+        if(flag & 1){
+            pv.resize(n + 1, -1); pv[1] = 1;
+            for (ll i = 2;i <= n;i++) {
+                if(pv[i] != -1) continue; pv[i] = i;
+                pn.push_back(i);
+                for (int j = 2 * i; j <= n; j += i) {
+                    if(pv[j] == -1) pv[j] = i;
+                }
+            }
+        }
+
+        if(flag & 2){
+            phiv.resize(n + 1); iota(all(phiv), 0);
+            v.resize(n + 1);
+            for(ll i = 2;i <= n;i++){
+                if(v[i]) continue;
+                for(ll j = i;j <= n;j += i){
+                    phiv[j] /= i; phiv[j] *= (i - 1); v[j] = 1;
+                }
+            }
+        }
+
+        if(flag & 4){
+            mov.resize(n + 1, -2);
+            mov[0] = 0; mov[1] = 1;
+            for(ll i = 2;i <= n;i++){
+                if(mov[i] != -2) continue; mov[i] = -1;
+                for(ll j = 2 * i;j <= n;j += i) {
+                    if(mov[j] == -2) mov[j] = 1;
+                    mov[j] *= -1;
+                }
+                for(ll j = i * i;j <= n; j += i * i) mov[j] = 0;
             }
         }
     }
 
-    ll mp(ll n) { // 최소 소인수 반환
-        return p[n];
-    }
-
-    vector<ll> ret() { // 소수 벡터 반환
-        return pn;
-    }
-
+    ll mp(ll n) { return pv[n]; } // 최소 소인수 반환
+    vector<ll> ret() { return pn; } // 소수 벡터 반환
     bool prime(ll n) { // 소수 판별
         if (n == 1) return 0;
-        return p[n] == n;
+        return pv[n] == n;
     }
+    ll mobius(ll n){ return mov[n]; }
+    ll phi(ll n){ return phiv[n]; }
 };
 
 //POW
 class _pow {
 public:
 	_pow() {}
+	ll pow(ll a, ll b){
+        ll ret = 1;
+        while(b){
+            if(b & 1) ret *= a;
+            a *= a; b >>= 1;
+        }      
+        return ret;
+    }
 
+<<<<<<< HEAD
 	ll ret(ll a, ll p) {
 		if (!p) return 1;
 		if (p == 1) return a;
@@ -64,6 +96,16 @@ public:
 		if (p % 2 == 0) return cur % mod;
 		return (cur * a) % mod;
 	}
+=======
+	ll pow(ll a, ll b, ll p){
+        ll ret = 1;
+        while(b){
+            if(b & 1) ret *= a % p, ret %= p;
+            a *= a; a %= p; b >>= 1;
+        }      
+        return ret;
+    }
+>>>>>>> 066622605f18fa03aa4486109b71844a9f041185
 };
 
 //GCD, INV
@@ -138,5 +180,59 @@ public:
     }
 };
 
-
 //CRT
+
+//이산 로그
+class _dlog{
+public:
+    map<ll, ll> num; vector <ll> prime;
+    _dlog(){};
+
+    void factor(ll p){ // 소인수분해
+        prime.clear();  
+        for(ll i = 2;i * i <= p;i++){
+            if(p % i) continue;
+            prime.push_back(i);
+            if(i * i != p) prime.push_back(p / i);
+        }
+    }
+
+    ll phi(ll p){ 
+        factor(p); ll ret = p;
+        for(auto& i : prime) ret /= i, ret *= i - 1;
+        return ret;
+    }
+
+    ll sqrt(ll num){
+        ll lo = 0, hi = num;
+        while(hi > lo){
+            ll mid = (lo + hi + 1) >> 1;
+            if(mid * mid < num) lo = mid;
+            else hi = mid - 1;
+        }
+        return lo;
+    }
+
+    ll pow(ll a, ll b, ll p){
+        ll ret = 1;
+        while(b){
+            if(b & 1) ret *= a % p, ret %= p;
+            a *= a; a %= p; b >>= 1;
+        }      
+        return ret;
+    }
+    
+    ll ret(ll a, ll b, ll p) { // a^x = b (mod p), ret x
+        ll mx = sqrt(phi(p)) + 1; num.clear();
+        ll inv = pow(a, p - 2, p), cur = b;
+        for(int i = 0;i < mx;i++) {
+            if(num.find(cur) == num.end()) num[cur] = i;
+            cur *= inv; cur %= p;
+        }
+        cur = 1; for(int i = 0;i < mx;i++){
+            if(num.find(cur) != num.end()) return i * mx + num[cur];
+            cur *= pow(a, mx, p); cur %= p;
+        }
+        return -1;
+    }
+};

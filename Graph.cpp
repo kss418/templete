@@ -304,7 +304,6 @@ public:
     }
 };
 
-
 // MST
 template <typename T = ll>
 class _mst {
