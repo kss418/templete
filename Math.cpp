@@ -67,26 +67,23 @@ public:
 class _pow {
 public:
 	_pow() {}
+	ll pow(ll a, ll b){
+        ll ret = 1;
+        while(b){
+            if(b & 1) ret *= a;
+            a *= a; b >>= 1;
+        }      
+        return ret;
+    }
 
-	ll ret(ll a, ll p) {
-		if (!p) return 1;
-		if (p == 1) return a;
-
-		ll cur = ret(a, p / 2);
-		cur = cur * cur;
-		if (p % 2 == 0) return cur;
-		return cur * a;
-	}
-
-	ll ret(ll a, ll p, ll mod) {
-		if (!p) return 1;
-		if (p == 1) return a % mod;
-
-		ll cur = ret(a, p / 2, mod);
-		cur = cur * cur % mod;
-		if (p % 2 == 0) return cur % mod;
-		return (cur * a) % mod;
-	}
+	ll pow(ll a, ll b, ll p){
+        ll ret = 1;
+        while(b){
+            if(b & 1) ret *= a % p, ret %= p;
+            a *= a; a %= p; b >>= 1;
+        }      
+        return ret;
+    }
 };
 
 //GCD, INV
