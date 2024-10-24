@@ -53,27 +53,16 @@ public:
         }
     }
 
-    ll mp(ll n) { // 최소 소인수 반환
-        return pv[n];
-    }
-
-    vector<ll> ret() { // 소수 벡터 반환
-        return pn;
-    }
-
+    ll mp(ll n) { return pv[n]; } // 최소 소인수 반환
+    vector<ll> ret() { return pn; } // 소수 벡터 반환
     bool prime(ll n) { // 소수 판별
         if (n == 1) return 0;
         return pv[n] == n;
     }
-
-    ll mobius(ll n){
-        return mov[n];
-    }
-
-    ll phi(ll n){
-        return phiv[n];
-    }
+    ll mobius(ll n){ return mov[n]; }
+    ll phi(ll n){ return phiv[n]; }
 };
+
 
 //POW
 class _pow {
