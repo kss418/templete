@@ -44,7 +44,6 @@ public:
     }
 };
 
-
 //이분 탐색
 class _bs { // 0-based index
 public:

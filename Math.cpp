@@ -63,7 +63,6 @@ public:
     ll phi(ll n){ return phiv[n]; }
 };
 
-
 //POW
 class _pow {
 public:
