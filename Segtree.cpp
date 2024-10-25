@@ -53,6 +53,15 @@ public:
         seg[node] += update(idx, val, mid + 1, r, node * 2 + 1);
         return seg[node];
     }
+
+    ll cnt(ll val) { return cnt(val, 1, n); }
+    ll cnt(ll val, ll l, ll r, ll node = 1){
+        if(l == r) return r;
+        ll mid = (l + r) >> 1;
+
+        if(seg[node * 2] < val) return cnt(val - seg[node * 2], mid + 1, r, node * 2 + 1);
+        else return cnt(val, l, mid, node * 2);
+    }
 };
 
 //MIN SEG
