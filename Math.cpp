@@ -155,6 +155,7 @@ public:
 	}
 
     ll ret(ll n, ll m){ // return nCm
+        if(n < 0 || m < 0 || n < m) return 0;
         return fac[n] * inv[m] % mod * inv[n - m] % mod;
     }
 };
