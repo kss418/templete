@@ -15,12 +15,15 @@ class _ccw{
 public:
     _ccw() {}
 
+    ll ret(ll x1, ll y1, ll x2, ll y2, ll x3, ll y3){
+        return ret({x1, y1}, {x2, y2}, {x3, y3});
+    }
     ll ret(pll v1, pll v2, pll v3){
         ll num = v1.x * v2.y + v2.x * v3.y + v3.x * v1.y;
         num -= v1.y * v2.x + v2.y * v3.x + v3.y * v1.x;
 
-        if(num > 0) return 1;
-        else if(num < 0) return -1;
+        if(num > 0) return 1; // cw
+        else if(num < 0) return -1; // ccw
         return 0;
     }
 };
