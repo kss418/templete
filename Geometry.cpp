@@ -42,6 +42,9 @@ public:
         return 0;
     }
 
+    bool ret(pair<pll, pll> a, pair<pll, pll> b) {
+        return ret(a.x, a.y, b.x, b.y);
+    }
     bool ret(pll av1, pll av2, pll bv1, pll bv2){
         ll ac = ccw(av1, av2, bv1) * ccw(av1, av2, bv2);
         ll bc = ccw(bv1, bv2, av1) * ccw(bv1, bv2, av2);
