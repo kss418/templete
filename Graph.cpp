@@ -8,6 +8,7 @@ using ld = long double;
 using ull = unsigned long long;
 using pll = pair<ll, ll>; using tll = tuple<ll, ll, ll>;
 ll n, m, k, t; string s;
+constexpr ll INF = 0x3f3f3f3f3f3f3f3f;
 
 // BFS
 template <typename T = ll>
