@@ -45,11 +45,12 @@ public:
 };
 
 //TRIE
+template <typename T = ll>
 class _trie { // 0-based index
 public:
     ll n, m, seq = 2;
-    vector <vector<ll>> adj;
-    vector <ll> chk;
+    vector <vector<T>> adj;
+    vector <bool> chk;
 
     _trie(ll k, ll n, ll m = 26) { // 문자열 개수, 문자열 길이, 문자 개수
        this->m = m; this->n = n; 
