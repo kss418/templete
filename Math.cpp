@@ -161,6 +161,55 @@ public:
     }
 };
 
+//행렬 제곱
+class _ms{ //0-based index
+public:
+    ll n, m;
+    vector <vector<ll>> arr, result, tmp;
+
+    _ms(ll n, ll m = 998244353){ 
+        this->n = n; this->m = m; 
+        arr.resize(n, vector<ll>(n));
+        result.resize(n, vector<ll>(n));
+        tmp.resize(n, vector<ll>(n));
+    }
+
+    void add(ll cy, ll cx, ll num){ 
+        arr[cy][cx] = result[cy][cx] = num % m;
+    }
+
+    void cal(bool flag){
+        for(int i = 0;i < n;i++) memset(&tmp[i][0], 0, sizeof(tmp[i][0]) * tmp[i].size());
+        for(int i = 0;i < n;i++){
+            for(int j = 0;j < n;j++){
+                for(int k = 0;k < n;k++) {
+                    if(flag) tmp[i][j] += result[i][k] * arr[k][j];
+                    else tmp[i][j] += result[i][k] * result[k][j];
+                    tmp[i][j] %= m;
+                }
+            }
+        }
+
+        for(int i = 0;i < n;i++){
+            for(int j = 0;j < n;j++) result[i][j] = tmp[i][j] % m;
+        }
+    }
+    
+    void init(ll k){
+        stack <ll> com; 
+        while(k > 1){
+            com.push(k & 1);
+            if(k & 1) k--; else k >>= 1;
+        }
+        while(!com.empty()){
+            bool cur = com.top();
+            cal(cur); com.pop();
+        }
+    }
+
+    ll ret(ll cy, ll cx){ return result[cy][cx]; }
+};
+
 //CRT
 class _crt{
 public:
