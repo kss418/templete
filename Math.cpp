@@ -166,17 +166,20 @@ class _ms{ //0-based index
 public:
     ll n, m;
     vector <vector<ll>> arr, result, tmp;
+    vector <ll> num;
 
+    _ms(){}
     _ms(ll n, ll m = 998244353){ 
         this->n = n; this->m = m; 
         arr.resize(n, vector<ll>(n));
         result.resize(n, vector<ll>(n));
         tmp.resize(n, vector<ll>(n));
+        num.resize(n);
+        for(int i = 0;i < n;i++) result[i][i] = 1;
     }
 
-    void add(ll cy, ll cx, ll num){ 
-        arr[cy][cx] = result[cy][cx] = num % m;
-    }
+    void add(ll cy, ll cx, ll val){ arr[cy][cx] = val % m; }
+    void fi(ll cx, ll val){ num[cx] = val % m; }
 
     void cal(bool flag){
         for(int i = 0;i < n;i++) memset(&tmp[i][0], 0, sizeof(tmp[i][0]) * tmp[i].size());
@@ -197,13 +200,20 @@ public:
     
     void init(ll k){
         stack <ll> com; 
-        while(k > 1){
+        while(k > 0){
             com.push(k & 1);
             if(k & 1) k--; else k >>= 1;
         }
         while(!com.empty()){
             bool cur = com.top();
             cal(cur); com.pop();
+        }
+
+        for(int i = 0;i < n;i++){
+            for(int j = 0;j < n;j++){
+                result[i][j] = result[i][j] * num[j];
+                result[i][j] %= MOD;
+            }
         }
     }
 
