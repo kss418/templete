@@ -119,3 +119,61 @@ public:
 
     vector <ll> ret(){ return result; }
 };
+
+//MATRIX
+class _matrix{ //0-based index
+public:
+    ll n, m, mod;
+    vector <vector<ll>> arr;
+
+    _matrix(){}
+    _matrix(ll n, ll m, ll mod = 998244353){
+        this->n = n; this->m = m; this->mod = mod;
+        arr.resize(n, vector<ll>(m));
+    }
+    void add(ll n, ll m, ll num){ arr[n][m] += num % mod; }
+    void update(ll n, ll m, ll num){ arr[n][m] = num % mod; }
+
+    _matrix operator *(_matrix& ot){
+        _matrix ret(n, ot.m, mod);
+        for(int i = 0;i < n;i++){
+            for(int j = 0;j < ot.m;j++){
+                for(int k = 0;k < m;k++){
+                    ret.arr[i][j] += (arr[i][k] * ot.arr[k][j]) % mod;
+                    ret.arr[i][j] %= mod;
+                }
+            }
+        }
+        return ret;
+    }
+
+    _matrix operator +(_matrix &ot){
+        _matrix ret(n, m, mod);
+        for(int i = 0;i < n;i++){
+            for(int j = 0;j < m;j++) ret.arr[i][j] = arr[i][j] + ot.arr[i][j];
+        }
+        return ret;
+    }
+    
+    _matrix pow(_matrix& cur, ll k){ // n * n matrix
+        _matrix ret(n, m, mod);
+        if(!k){
+            for(int i = 0;i < n;i++) ret.arr[i][i] = 1;
+            return ret;
+        }
+
+        ret = pow(cur, k >> 1);
+        ret = ret * ret;
+        if(k & 1) ret = ret * cur;
+        return ret;
+    }
+
+    ll ret(ll n, ll m) { return arr[n][m]; }
+    friend ostream& operator<<(ostream& out, _matrix &cur){
+        for(int i = 0;i < cur.n;i++){
+            for(int j = 0;j < cur.m;j++) out << cur.arr[i][j] << " ";
+            out << "\n";
+        }
+        return out;
+    }
+};
