@@ -212,7 +212,7 @@ public:
         for(int i = 0;i < n;i++){
             for(int j = 0;j < n;j++){
                 result[i][j] = result[i][j] * num[j];
-                result[i][j] %= MOD;
+                result[i][j] %= m;
             }
         }
     }
