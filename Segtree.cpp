@@ -68,78 +68,55 @@ public:
     }
 };
 
-//MIN SEG
-class _mnseg {
+//SEG
+template <typename T = ll> // query type
+class _seg { // 구간 예외 처리하기
 public:
-    ll n; vector <ll> arr, seg;
-    _mnseg(ll n) {
+    ll n;
+    class node{
+    public:
+        ll v;
+        node() : node(0){}
+        node(ll v) {
+            this->v = v;
+        }
+
+        node operator + (node ot){ // update
+            ll now = v + ot.v;
+            return node(now);
+        }
+
+        operator T(){ // update -> query
+            return v;
+        }
+
+        node operator * (node ot){ // query
+            ll ret = v + ot;
+            return ret;
+        }
+    };
+    vector <node> seg, arr;
+
+    _seg(ll n) {
         this->n = n;
         arr.resize(n + 1); seg.resize(4 * n + 1);
     }
 
-    void con(ll idx, ll val) { arr[idx] = val; }
-
-    void init() { init(1, n); }
-    ll init(ll l, ll r, ll node = 1) {
-        if (l == r) return seg[node] = arr[l];
-        ll mid = (l + r) >> 1;
-        seg[node] = min(init(l, mid, node * 2), init(mid + 1, r, node * 2 + 1));
-        return seg[node];
-    }
-
-    ll query(ll st, ll en) { return query(st, en, 1, n); }
-    ll query(ll st, ll en, ll l, ll r, ll node = 1) {
-        if (en < l || st > r) return INF;
+    T query(ll st, ll en) { return query(st, en, 0, n); }
+    node query(ll st, ll en, ll l, ll r, ll node = 1) {
+        if (en < l || st > r) return 0;
         if (st <= l && en >= r) return seg[node];
         ll mid = (l + r) >> 1;
-        return min(query(st, en, l, mid, node * 2), query(st, en, mid + 1, r, node * 2 + 1));
+        return query(st, en, l, mid, node * 2) * query(st, en, mid + 1, r, node * 2 + 1);
     }
 
-    ll update(ll idx, ll val) { return update(idx, val, 1, n); }
-    ll update(ll idx, ll val, ll l, ll r, ll node = 1) {
+    node update(ll idx, ll val) { return update(idx, val, 0, n); }
+    node update(ll idx, ll val, ll l, ll r, ll node = 1) {
         if (idx < l || idx > r) return seg[node];
         if (l == r) return seg[node] = val;
         ll mid = (l + r) >> 1;
 
-        seg[node] = min(update(idx, val, l, mid, node * 2), update(idx, val, mid + 1, r, node * 2 + 1));
-        return seg[node];
-    }
-};
-
-//MAX SEG
-class _mxseg {
-public:
-    ll n; vector <ll> arr, seg;
-    _mxseg(ll n) {
-        this->n = n;
-        arr.resize(n + 1); seg.resize(4 * n + 1);
-    }
-
-    void con(ll idx, ll val) { arr[idx] = val; }
-
-    void init() { init(1, n); }
-    ll init(ll l, ll r, ll node = 1) {
-        if (l == r) return seg[node] = arr[l];
-        ll mid = (l + r) >> 1;
-        seg[node] = max(init(l, mid, node * 2), init(mid + 1, r, node * 2 + 1));
-        return seg[node];
-    }
-
-    ll query(ll st, ll en) { return query(st, en, 1, n); }
-    ll query(ll st, ll en, ll l, ll r, ll node = 1) {
-        if (en < l || st > r) return -INF;
-        if (st <= l && en >= r) return seg[node];
-        ll mid = (l + r) >> 1;
-        return max(query(st, en, l, mid, node * 2), query(st, en, mid + 1, r, node * 2 + 1));
-    }
-
-    ll update(ll idx, ll val) { return update(idx, val, 1, n); }
-    ll update(ll idx, ll val, ll l, ll r, ll node = 1) {
-        if (idx < l || idx > r) return seg[node];
-        if (l == r) return seg[node] = val;
-        ll mid = (l + r) >> 1;
-
-        seg[node] = max(update(idx, val, l, mid, node * 2), update(idx, val, mid + 1, r, node * 2 + 1));
+        seg[node] = update(idx, val, l, mid, node * 2) + update(idx, val, mid + 1, r, node * 2 + 1);
         return seg[node];
     }
 };
