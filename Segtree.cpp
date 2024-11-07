@@ -104,7 +104,7 @@ public:
 
     T query(ll st, ll en) { return query(st, en, 0, n); }
     node query(ll st, ll en, ll l, ll r, ll node = 1) {
-        if (en < l || st > r) return 0;
+        if (en < l || st > r) return _seg::node();
         if (st <= l && en >= r) return seg[node];
         ll mid = (l + r) >> 1;
         return query(st, en, l, mid, node * 2) * query(st, en, mid + 1, r, node * 2 + 1);
