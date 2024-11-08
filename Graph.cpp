@@ -331,9 +331,7 @@ public:
     _mst(ll n) {
         this->n = n;
         adj.resize(n + 1);
-        p.resize(n + 1); size.resize(n + 1);
-        fill(p.begin(), p.end(), -1);
-        fill(size.begin(), size.end(), 1);
+        p.resize(n + 1, -1); size.resize(n + 1, 1);
     }
 
     ll find(ll num) {
