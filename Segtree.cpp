@@ -89,11 +89,6 @@ public:
         operator T(){ // update -> query
             return v;
         }
-
-        node operator * (node ot){ // query
-            ll ret = v + ot;
-            return ret;
-        }
     };
     vector <node> seg, arr;
 
