@@ -86,12 +86,18 @@ public:
             return node(now);
         }
 
+        node operator += (T ot){ // add
+            v += ot;
+            return node(v);
+        }
+
         operator T(){ // update -> query
             return v;
         }
     };
     vector <node> seg, arr;
 
+    _seg(){}
     _seg(ll n) {
         this->n = n;
         arr.resize(n + 1); seg.resize(4 * n + 1);
@@ -102,7 +108,7 @@ public:
         if (en < l || st > r) return _seg::node();
         if (st <= l && en >= r) return seg[node];
         ll mid = (l + r) >> 1;
-        return query(st, en, l, mid, node * 2) * query(st, en, mid + 1, r, node * 2 + 1);
+        return query(st, en, l, mid, node * 2) + query(st, en, mid + 1, r, node * 2 + 1);
     }
 
     node update(ll idx, ll val) { return update(idx, val, 0, n); }
@@ -113,6 +119,17 @@ public:
 
         seg[node] = update(idx, val, l, mid, node * 2) + update(idx, val, mid + 1, r, node * 2 + 1);
         return seg[node];
+    }
+
+    void add(ll idx, ll val) { add(idx, val, 0, n); }
+    void add(ll idx, ll val, ll l, ll r, ll node = 1) {
+        if (idx < l || idx > r) return;
+        seg[node] += val;
+        if (l == r) return;
+        ll mid = (l + r) >> 1;
+
+        add(idx, val, l, mid, node * 2);
+        add(idx, val, mid + 1, r, node * 2 + 1);
     }
 };
 
