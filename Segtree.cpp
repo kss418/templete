@@ -134,7 +134,7 @@ public:
 };
 
 //LAZY PROP
-class _prop {
+class _prop { 
 public:
     vector<ll> seg, lazy, arr; ll n;
 
@@ -196,7 +196,7 @@ public:
 };
 
 template <typename T = ll> //query type
-class _hld {
+class _hld { // 구간 예외 처리하기
 public:
     vector <vector <ll>> adj;
     vector <ll> sz, top, d, in, out, p;
