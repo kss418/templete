@@ -91,10 +91,10 @@ public:
 //HASH
 class _hash { // 0-based index
 public:
-    // ll mod[3] = { 1000000007, 998244353, 100000009 };
-    // ll key[3] = {29, 31, 26};
+//  ll mod[3] = { 1000000007, 998244353, 1000000009 };
+//  ll key[3] = { 29, 31, 26 };
     ll mod, key, size, h;
-    deque <ll> q;
+    deque <ll> q, pre;
 
     _hash() {}
     _hash(ll mod, ll key = 2) {
@@ -127,14 +127,14 @@ public:
         q.push_back(c);
         h *= key; h = mo(h);
         h += c; h = mo(h);
-        size++;
+        pre.push_back(h); size++;
     }
 
     void pop_back(){
         ll c = q.back(); q.pop_back();
         h -= c; h = mo(h);
         h *= inv(1, key, mod); h = mo(h);
-        size--;
+        if(!pre.empty()) pre.pop_back(); size--;
     }
 
     void push_front(ll c){
@@ -149,9 +149,13 @@ public:
         h = mo(h); size--;
     }
 
-    ll ret() {
-        return mo(h);
+    ll ret() { return mo(h); }
+    ll ret(ll a, ll b){
+        if(a > b) swap(a, b);
+        if(!a) return ret(b);
+        return mo(pre[b] - mo(pre[a - 1] * pow_mod(key, b - a + 1, mod)));
     }
+    ll ret(ll a){ return mo(pre[a]); }
 };
 
 //AHO-CORASICK
