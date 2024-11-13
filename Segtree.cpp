@@ -133,50 +133,6 @@ public:
     }
 };
 
-//MUL SEG
-class _mseg{ // mod m 반환
-public:
-    ll n, m; vector <ll> arr, seg;
-    _mseg(ll n, ll m = 1e9 + 7) {
-        this->n = n; this->m = m;
-        arr.resize(n + 1); seg.resize(4 * n + 1);
-    }
-
-    void con(ll idx, ll val) { arr[idx] = val % m; }
-
-    void init() { init(1, n); }
-    ll init(ll l, ll r, ll node = 1) {
-        if (l == r) return seg[node] = arr[l];
-        ll mid = (l + r) >> 1;
-        seg[node] = init(l, mid, node * 2) % m;
-        seg[node] *= init(mid + 1, r, node * 2 + 1) % m; seg[node] %= m;
-        return seg[node];
-    }
-
-    ll query(ll st, ll en) { return query(st, en, 1, n); }
-    ll query(ll st, ll en, ll l, ll r, ll node = 1) {
-        if (en < l || st > r) return 1;
-        if (st <= l && en >= r) return seg[node];
-        ll mid = (l + r) >> 1;
-
-        ll fi = query(st, en, l, mid, node * 2) % m;
-        ll se = query(st, en, mid + 1, r, node * 2 + 1) % m;
-        return (fi * se) % m;
-    }
-
-    ll update(ll idx, ll val) { return update(idx, val, 1, n); }
-    ll update(ll idx, ll val, ll l, ll r, ll node = 1) {
-        if (idx < l || idx > r) return seg[node];
-        if (l == r) return seg[node] = val % m;
-        ll mid = (l + r) >> 1;
-
-        seg[node] = update(idx, val, l, mid, node * 2) % m;
-        seg[node] *= update(idx, val, mid + 1, r, node * 2 + 1) % m;
-        seg[node] %= m;
-        return seg[node];
-    }
-};
-
 //LAZY PROP
 class _prop {
 public:
@@ -236,5 +192,114 @@ public:
         ret += query(st, en, mid + 1, r, node * 2 + 1);
 
         return ret;
+    }
+};
+
+template <typename T = ll> //query type
+class _hld {
+public:
+    vector <vector <ll>> adj;
+    vector <ll> sz, top, d, in, out, p;
+    ll n, cnt = 0;
+    class node{
+    public:
+        T v;
+        node() : node(0){}
+        node(ll v) {
+            this->v = v;
+        }
+
+        node operator + (node ot){ // update, query
+            T now = max(v, ot.v);
+            return node(now);
+        }
+
+        node operator += (T ot){ // add
+            v += ot;
+            return node(v);
+        }
+
+        operator T(){ // update -> query
+            return v;
+        }
+    };
+    vector <node> seg;
+
+    _hld(ll n){
+        this->n = n;
+        adj.resize(n + 1); sz.resize(n + 1);
+        in.resize(n + 1); out.resize(n + 1);
+        d.resize(n + 1); p.resize(n + 1);
+        top.resize(n + 1); seg.resize(4 * n + 1);
+    }
+
+    void add(ll s, ll e){
+        addsol(s, e); addsol(e, s);
+    }   
+    void addsol(ll s, ll e, ll c = 1){ adj[s].push_back(e); }
+
+    void dfs1(ll cur, ll pre){
+        sz[cur] = 1;
+        for(auto& nxt : adj[cur]){
+            if(nxt == pre) continue;
+            d[nxt] = d[cur] + 1; p[nxt] = cur;
+            dfs1(nxt, cur); sz[cur] += sz[nxt];
+            if(sz[nxt] > sz[adj[cur][0]]) swap(nxt, adj[cur][0]);
+        }
+    }
+
+    void dfs2(ll cur, ll pre){
+        in[cur] = ++cnt;
+        for(auto& nxt : adj[cur]){
+            if(nxt == pre) continue;
+            top[nxt] = (nxt == adj[cur][0] ? top[cur] : nxt);
+            dfs2(nxt, cur);
+        }
+        out[cur] = cnt;
+    }
+
+    void init(ll cur = 1){
+        dfs1(cur, -1); dfs2(cur, -1);
+    }
+
+    node query(ll st, ll en, ll l, ll r, ll node = 1) {
+        if (en < l || st > r) return _hld::node();
+        if (st <= l && en >= r) return seg[node];
+        ll mid = (l + r) >> 1;
+        return query(st, en, l, mid, node * 2) + query(st, en, mid + 1, r, node * 2 + 1);
+    }
+    T query(ll st, ll en) { 
+        node ret;
+        while(top[st] != top[en]){
+            if(d[top[st]] < d[top[en]]) swap(st, en);
+            ll cur = top[st];
+            ret = ret + query(in[cur], in[st], 0, n);
+            st = p[cur];
+        }
+
+        if(d[st] > d[en]) swap(st, en);
+        ret = ret + query(in[st], in[en], 0, n);
+        return ret; 
+    }
+
+    void update(ll idx, ll val) { update(in[idx], val, 0, n); }
+    node update(ll idx, ll val, ll l, ll r, ll node = 1) {
+        if (idx < l || idx > r) return seg[node];
+        if (l == r) return seg[node] = val;
+        ll mid = (l + r) >> 1;
+
+        seg[node] = update(idx, val, l, mid, node * 2) + update(idx, val, mid + 1, r, node * 2 + 1);
+        return seg[node];
+    }
+
+    void segadd(ll idx, ll val) { segadd(in[idx], val, 0, n); }
+    void segadd(ll idx, ll val, ll l, ll r, ll node = 1) {
+        if (idx < l || idx > r) return;
+        seg[node] += val;
+        if (l == r) return;
+        ll mid = (l + r) >> 1;
+
+        segadd(idx, val, l, mid, node * 2);
+        segadd(idx, val, mid + 1, r, node * 2 + 1);
     }
 };
