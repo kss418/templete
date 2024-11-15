@@ -234,7 +234,7 @@ public:
 //SUFFIX-ARRAY
 class _sa{
 public:
-    ll n, d, k = 0; string s;
+    ll n, d, k = 0; vector <ll> arr;
     vector <ll> sa, pos, tmp, lcp;
     bool cmp(ll a, ll b){
         if(pos[a] != pos[b]) return pos[a] < pos[b];
@@ -243,12 +243,15 @@ public:
         return a > b;
     }  
 
-    void init(string& s){
-        this->s = s;
-        this->n = s.size(); tmp.resize(n);
+    void init(string& s){ for(auto& i : s) arr.push_back(i); init(); }
+    void init(vector <ll>& a){ this->arr = a; init(); }
+
+    void init(){
+        this->n = arr.size(); tmp.resize(n);
         sa.resize(n); pos.resize(n);
         iota(all(sa), 0); lcp.resize(n);
-        for(int i = 0;i < n;i++) pos[i] = s[i];
+        for(int i = 0;i < n;i++) pos[i] = arr[i];
+        get_sa(); get_lcp();
     }
 
     void get_sa(){
@@ -267,10 +270,11 @@ public:
             k = max(k - 1, 0ll);
             if(pos[cur] == n - 1) continue;
             ll nxt = sa[pos[cur] + 1];
-            while(s[cur + k] == s[nxt + k]) k++;
+            while(arr[cur + k] == arr[nxt + k]) k++;
             lcp[pos[cur]] = k;
         }
     }
 
-    _sa(string& s){ init(s); get_sa(); get_lcp(); }
+    _sa(string& s){ init(s); }
+    _sa(vector <ll>& a) { init(a); }
 };
