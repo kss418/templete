@@ -44,21 +44,22 @@ public:
 };
 
 //이분 탐색
+template <typename T = ll>
 class _bs { // 0-based index
 public:
-    ll l, r;
-    _bs(ll l, ll r) {
+    T l, r;
+    _bs(T l, T r) {
         this->l = l; this->r = r;
     }
 
-    ll f(ll cur) {
+    bool f(T cur) {
 
     }
 
-    ll ret() {
-        ll lo = l, hi = r, mid = -1;
+    T ret() {
+        T lo = l, hi = r, mid = -1;
         while (hi > lo) {
-            mid = (hi + lo + 1) >> 1ll;
+            mid = (hi + lo + 1) / (T)2;
             if (f(mid)) lo = mid;
             else hi = mid - 1;
         }
