@@ -22,8 +22,8 @@ public:
         ll num = (v2.x - v1.x) * (v3.y - v1.y);
         num -= (v3.x - v1.x) * (v2.y - v1.y);
 
-        if(num > 0) return 1; // cw
-        else if(num < 0) return -1; // ccw
+        if(num > 0) return 1; 
+        else if(num < 0) return -1; 
         return 0;
     }
 };
@@ -37,8 +37,8 @@ public:
         ll num = (v2.x - v1.x) * (v3.y - v1.y);
         num -= (v3.x - v1.x) * (v2.y - v1.y);
 
-        if(num > 0) return 1; // cw
-        else if(num < 0) return -1; // ccw
+        if(num > 0) return 1; 
+        else if(num < 0) return -1; 
         return 0;
     }
 
