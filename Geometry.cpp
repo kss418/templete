@@ -177,3 +177,20 @@ public:
         return out;
     }
 };
+
+//AREA
+class _area{
+public:
+    _area() {}
+
+    ll ret(vector <pll>& v){ // div by 2
+        ll num = 0;
+        for(int i = 0;i < v.size();i++){
+            auto [x1, y1] = v[i];
+            auto [x2, y2] = v[(i + 1) % v.size()];
+            num += x1 * y2 - x2 * y1;
+        }
+
+        return abs(num);
+    }
+};
