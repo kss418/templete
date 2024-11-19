@@ -18,7 +18,7 @@ public:
     _uf(){}
     _uf(ll n) { 
         this->n = n;
-        p.resize(n + 1, -1); si.resize(n + 1, -1);
+        p.resize(n + 1, -1); si.resize(n + 1, 1);
     }
 
     ll find(ll num) { 
