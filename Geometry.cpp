@@ -196,11 +196,11 @@ public:
 };
 
 //LINE
-class line{
+class _line{ // a >= 1e12 예외 처리 하기
 public:
     ld a, b;
-    line(){}
-    line(pld v1, pld v2){
+    _line(){}
+    _line(pld v1, pld v2){
         ld dx = v2.x - v1.x;
         ld dy = v2.y - v1.y;
         if(v2.x == v1.x) a = 1e12 + 1;
@@ -211,7 +211,7 @@ public:
     }
 
     ld integral(ld s, ld e){ return integral(e) - integral(s); }
-    ld integral(ld x){
-        return (a * x * x) / (ld)2 + b * x;
-    }
-};
+    ld integral(ld x){ return (a * x * x) / (ld)2 + b * x; }
+
+    ld f(ld x) { return a * x + b; }
+}; 
