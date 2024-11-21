@@ -4,7 +4,7 @@
 #define x first 
 #define y second
 using namespace std; typedef long long ll;
-using ld = long double;
+using ld = long double; using pld = pair<ld, ld>;
 using ull = unsigned long long;
 using pll = pair<ll, ll>; using tll = tuple<ll, ll, ll>;
 ll n, m, k, t; string s;
@@ -192,5 +192,26 @@ public:
         }
 
         return abs(num);
+    }
+};
+
+//LINE
+class line{
+public:
+    ld a, b;
+    line(){}
+    line(pld v1, pld v2){
+        ld dx = v2.x - v1.x;
+        ld dy = v2.y - v1.y;
+        if(v2.x == v1.x) a = 1e12 + 1;
+        else a = dy / dx;
+
+        if(a >= 1e12) b = 0;
+        else b = -a * v1.x + v1.y;
+    }
+
+    ld integral(ld s, ld e){ return integral(e) - integral(s); }
+    ld integral(ld x){
+        return (a * x * x) / (ld)2 + b * x;
     }
 };
