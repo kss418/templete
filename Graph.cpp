@@ -68,12 +68,12 @@ public:
         adj.resize(n + 1);
     }
 
-    void add(ll st, ll en, ll c = 1) { // 양방향
+    void add(ll st, ll en, T c = 1) { // 양방향
         adj[st].push_back({ c,en });
         adj[en].push_back({ c,st });
     }
 
-    void addsol(ll st, ll en, ll c = 1) { // 단방향
+    void addsol(ll st, ll en, T c = 1) { // 단방향
         adj[st].push_back({ c,en });
     }
 
@@ -100,7 +100,7 @@ public:
         return d[n];
     }
 };
- 
+
 // LCA
 class _lca {
 public:
