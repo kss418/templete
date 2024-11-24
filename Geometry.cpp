@@ -65,14 +65,16 @@ public:
     _ch() {}
     vector <ll> num;
     vector <pll> point;
+    ll cnt = 0;
 
     class node{
     public:
-        ll x, y, dx, dy;
-        node(pll a) : node(a.x, a.y, 1, 0) {};
-        node(ll x, ll y, ll dx, ll dy){
+        ll x, y, dx, dy, idx;
+        node(pll a, ll idx) : node(a.x, a.y, 1, 0, idx) {};
+        node(ll x, ll y, ll dx, ll dy, ll idx){
             this->x = x; this->y = y;
             this->dx = dx; this->dy = dy;
+            this->idx = idx;
         }
 
         bool operator <(node& ot){
@@ -88,13 +90,13 @@ public:
         ll num = (v2.x - v1.x) * (v3.y - v1.y);
         num -= (v3.x - v1.x) * (v2.y - v1.y);
 
-        if(num > 0) return 1; // cw
-        else if(num < 0) return -1; // ccw
+        if(num > 0) return 1;
+        else if(num < 0) return -1;
         return 0;
     }
     
     void add(ll a, ll b) { add({a, b}); }
-    void add(pll a){ arr.push_back(a); }
+    void add(pll a){ arr.push_back({a, cnt++}); }
 
     void init(){
         sort(all(arr));
