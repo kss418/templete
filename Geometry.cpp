@@ -106,7 +106,11 @@ public:
         }
         sort(arr.begin() + 1, arr.end());
 
-        num.push_back(0); num.push_back(1);
+        num.push_back(0);
+        if(arr.size() == 1) {
+            point.push_back(arr[0]); return;
+        }
+        num.push_back(1);
         ll nxt = 2;
 
         while(nxt < arr.size()){
