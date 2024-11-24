@@ -63,7 +63,8 @@ public:
 class _ch{
 public:
     _ch() {}
-    vector <ll> result;
+    vector <ll> num;
+    vector <pll> point;
 
     class node{
     public:
@@ -103,21 +104,23 @@ public:
         }
         sort(arr.begin() + 1, arr.end());
 
-        result.push_back(0); result.push_back(1);
+        num.push_back(0); num.push_back(1);
         ll nxt = 2;
 
         while(nxt < arr.size()){
-            while(result.size() >= 2){
-                ll fi = result.back(); result.pop_back();
-                ll se = result.back();
+            while(num.size() >= 2){
+                ll fi = num.back(); num.pop_back();
+                ll se = num.back();
                 ll chk = ccw(arr[se], arr[fi], arr[nxt]);
-                if(chk > 0){ result.push_back(fi); break; }
+                if(chk > 0){ num.push_back(fi); break; }
             }
-            result.push_back(nxt++);
+            num.push_back(nxt++);
         }
+
+        for(auto& i : num) point.push_back(arr[i]);
     }
 
-    vector <ll> ret(){ return result; }
+    vector <pll> ret(){ return point; } // 좌표 반환
 };
 
 //MATRIX
