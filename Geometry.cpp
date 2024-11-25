@@ -367,7 +367,7 @@ public:
         return abs(num);
     }
 
-    T dist(ptl a, ptl b) { // chk overflow
+    T d(ptl a, ptl b) { // chk overflow
         T dx = a.x - b.x, dy = a.y - b.y;
         return dx * dx + dy * dy;
     }
@@ -377,7 +377,7 @@ public:
         ll sz = point.size();
         for(int i = 0;i <= 1;i++){
             ll nxt = (r + i) % sz;
-            ll now = dist(point[l], point[nxt]);
+            ll now = d(point[l], point[nxt]);
             if(mx > now) continue;
             mx = now; result = { point[l], point[nxt] };
         }
@@ -387,11 +387,11 @@ public:
         ll sz = point.size();
         if(sz == 2) get(0, 1);
         else{
-            ll l = 0, r = 1;
+            ll l = 0, r = 1; ld now = 0;
             while(area(sz - 1, l, r) < area(sz - 1, l, r + 1)) r++;
-            while(r < sz){
+            while(r < 2 * sz && l < sz){
                 get(l, r);
-                if(area(l, l + 1, r) < area(l, l + 1, (r + 1) % sz)) r++;
+                if(area(l, l + 1, r) < area(l, l + 1, r + 1)) r++;
                 else l++;
             }
         }
