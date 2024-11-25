@@ -215,15 +215,26 @@ public:
         if(v2.x == v1.x) a = 1e12 + 1;
         else a = dy / dx;
 
-        if(a >= 1e12) b = 0;
+        if(a >= 1e12) b = v1.x;
         else b = -a * v1.x + v1.y;
+    }
+    _line(ld slope, pld v){ 
+        a = slope; 
+        b = (a >= 1e12) ? v.x : -a * v.x + v.y; 
     }
 
     ld integral(ld s, ld e){ return integral(e) - integral(s); }
     ld integral(ld x){ return (a * x * x) / (ld)2 + b * x; }
-
     ld f(ld x) { return a * x + b; }
-}; 
+    pld intersect(_line& ot){
+        if(a == ot.a) return {1e12, 1e12};
+        if(a == 1e12 + 1){ return {b, ot.f(b)}; }
+        if(ot.a == 1e12 + 1){ return {ot.b, f(ot.b)}; }
+
+        ld rx = (ot.b - b) / (a - ot.a), ry = f(rx);
+        return {rx, ry};
+    }
+};
 
 // 점 다각형 내부 판별
 class _inter{ 
