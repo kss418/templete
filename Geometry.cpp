@@ -60,31 +60,28 @@ public:
 };
 
 //CONVEX HULL
+
 class _ch{
 public:
     _ch() {}
-    vector <ll> num;
-    vector <pll> point;
-    ll cnt = 0;
+    vector <ll> num; vector <pll> p; ll cnt = 0;
 
     class node{
     public:
-        ll x, y, dx, dy, idx;
-        node(pll a, ll idx) : node(a.x, a.y, 1, 0, idx) {};
-        node(ll x, ll y, ll dx, ll dy, ll idx){
+        ll x, y, idx;
+        node(pll a, ll idx) : node(a.x, a.y, idx) {};
+        node(ll x, ll y, ll idx){
             this->x = x; this->y = y;
-            this->dx = dx; this->dy = dy;
             this->idx = idx;
-        }
-
-        bool operator <(node& ot){
-            if(dy * ot.dx != dx * ot.dy) return dy * ot.dx < dx * ot.dy;
-            if(y != ot.y) return y < ot.y;
-            return x < ot.x;
         }
         operator pll(){ return { x, y }; }
     };
-    vector <node> arr;
+    vector <node> arr, st;
+
+    ll dist(pll v1, pll v2){
+        ll dx = v1.x - v2.x, dy = v1.y - v2.y;
+        return dx * dx + dy * dy;
+    }
 
     ll ccw(pll v1, pll v2, pll v3){
         ll num = (v2.x - v1.x) * (v3.y - v1.y);
@@ -98,35 +95,27 @@ public:
     void add(ll a, ll b) { add({a, b}); }
     void add(pll a){ arr.push_back({a, cnt++}); }
 
-    void init(){
-        sort(all(arr));
-        for(int i = 1;i < arr.size();i++){
-            arr[i].dx = arr[i].x - arr[0].x;
-            arr[i].dy = arr[i].y - arr[0].y;
-        }
-        sort(arr.begin() + 1, arr.end());
+    void init(){    
+        swap(arr[0], *min_element(all(arr), [&](pll a, pll b){
+            if(a.x != b.x) return a.x < b.x;
+            return a.y < b.y;
+        }));
 
-        num.push_back(0);
-        if(arr.size() == 1) {
-            point.push_back(arr[0]); return;
-        }
-        num.push_back(1);
-        ll nxt = 2;
+        sort(arr.begin() + 1, arr.end(), [&](pll a, pll b){
+            ll dir = ccw(arr[0], {a.x, a.y}, {b.x, b.y});
+            if(dir) return dir > 0;
+            return dist(arr[0], {a.x, a.y}) < dist(arr[0], {b.x, b.y});
+        });
 
-        while(nxt < arr.size()){
-            while(num.size() >= 2){
-                ll fi = num.back(); num.pop_back();
-                ll se = num.back();
-                ll chk = ccw(arr[se], arr[fi], arr[nxt]);
-                if(chk > 0){ num.push_back(fi); break; }
-            }
-            num.push_back(nxt++);
+        for(auto& i : arr){
+            while(st.size() >= 2 && ccw(st[st.size() - 2], st.back(), i) <= 0) st.pop_back();
+            st.push_back(i);
         }
-
-        for(auto& i : num) point.push_back(arr[i]);
+        for(auto& i : st) p.push_back(i);
     }
 
-    vector <pll> ret(){ return point; } // 좌표 반환
+    vector <pll> ret(){ return p; } // 좌표 반환
+    vector <node> idx(){ return st; } // 좌표 + 인덱스 반환
 };
 
 //MATRIX
