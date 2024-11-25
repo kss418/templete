@@ -288,18 +288,20 @@ public:
 }; 
 
 //ROTATING CALIPUS
+template <typename T = ll>
 class _rc{
 public:
     _rc() {}
-    vector <ll> num;
-    vector <pll> point;
+    using ptl = pair<T, T>;
+    vector <T> num;
+    vector <ptl> point;
     ll cnt = 0;
 
     class node{
     public:
-        ll x, y, dx, dy, idx;
-        node(pll a, ll idx) : node(a.x, a.y, 1, 0, idx) {};
-        node(ll x, ll y, ll dx, ll dy, ll idx){
+        T x, y, dx, dy; ll idx;
+        node(ptl a, ll idx) : node(a.x, a.y, 1, 0, idx) {};
+        node(T x, T y, T dx, T dy, ll idx){
             this->x = x; this->y = y;
             this->dx = dx; this->dy = dy;
             this->idx = idx;
@@ -310,12 +312,12 @@ public:
             if(y != ot.y) return y < ot.y;
             return x < ot.x;
         }
-        operator pll(){ return { x, y }; }
+        operator ptl(){ return { x, y }; }
     };
     vector <node> arr;
 
-    ll ccw(pll v1, pll v2, pll v3){
-        ll num = (v2.x - v1.x) * (v3.y - v1.y);
+    ll ccw(ptl v1, ptl v2, ptl v3){
+        T num = (v2.x - v1.x) * (v3.y - v1.y);
         num -= (v3.x - v1.x) * (v2.y - v1.y);
 
         if(num > 0) return 1;
@@ -323,8 +325,8 @@ public:
         return 0;
     }
     
-    void add(ll a, ll b) { add({a, b}); }
-    void add(pll a){ arr.push_back({a, cnt++}); }
+    void add(T a, T b) { add({a, b}); }
+    void add(ptl a){ arr.push_back({a, cnt++}); }
 
     void init_ch(){
         sort(all(arr));
@@ -354,9 +356,9 @@ public:
         for(auto& i : num) point.push_back(arr[i]);
     }
 
-        ll area(ll a, ll b, ll c){ // div by 2
-        ll num = 0;
-        vector <pll> v = {point[a], point[b], point[c]};
+    T area(ll a, ll b, ll c){ // div by 2
+        T num = 0;
+        vector <ptl> v = {point[a], point[b], point[c]};
         for(int i = 0;i < v.size();i++){
             auto [x1, y1] = v[i];
             auto [x2, y2] = v[(i + 1) % v.size()];
@@ -365,17 +367,17 @@ public:
         return abs(num);
     }
 
-    ld dist(pld a, pld b) { 
-        ld dx = a.x - b.x, dy = a.y - b.y;
-        return sqrtl(dx * dx + dy * dy);
+    T dist(ptl a, ptl b) { // chk overflow
+        T dx = a.x - b.x, dy = a.y - b.y;
+        return dx * dx + dy * dy;
     }
 
-    ld mx = 0; pair <pld, pld> result;
+    ll mx = 0; pair <ptl, ptl> result;
     void get(ll l, ll r){
         ll sz = point.size();
         for(int i = 0;i <= 1;i++){
             ll nxt = (r + i) % sz;
-            ld now = dist(point[l], point[nxt]);
+            ll now = dist(point[l], point[nxt]);
             if(mx > now) continue;
             mx = now; result = { point[l], point[nxt] };
         }
@@ -396,6 +398,6 @@ public:
     }
 
     void init() { init_ch(); init_rc(); }
-    pair <pld, pld> ret(){ return result; }
-    ld dist(){ return mx; }
+    pair <ptl, ptl> ret(){ return result; }
+    ld dist(){ return sqrtl(mx); }
 };
