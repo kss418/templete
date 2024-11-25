@@ -387,7 +387,7 @@ public:
         ll sz = point.size();
         if(sz == 2) get(0, 1);
         else{
-            ll l = 0, r = 1; ld now = 0;
+            ll l = 0, r = 1;
             while(area(sz - 1, l, r) < area(sz - 1, l, r + 1)) r++;
             while(r < 2 * sz && l < sz){
                 get(l, r);
