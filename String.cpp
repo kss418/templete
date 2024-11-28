@@ -45,48 +45,63 @@ public:
 };
 
 //TRIE
-template <typename T = ll>
 class _trie { // 0-based index
 public:
     ll n, m, seq = 2;
-    vector <vector<T>> adj;
+    vector <vector<ll>> adj;
     vector <bool> chk;
+    vector <ll> num;
 
+    _trie(){}
     _trie(ll k, ll n, ll m = 26) { // 문자열 개수, 문자열 길이, 문자 개수
        this->m = m; this->n = n; 
        chk.resize(n * k + 1); adj.resize(n * k + 1);
+       num.resize(n * k + 1);
     }
 
-    void insert(string& s){
+    void insert(string& s) { insert(move(tf(s))); }
+    void insert(const vector <ll>& a){
         ll cur = 1;
-        for(auto &st : s){
+        for(auto &i : a){
             if(adj[cur].empty()) adj[cur].resize(m + 1);
-            if(!adj[cur][st - 'a']) adj[cur][st - 'a'] = seq++;
-            cur = adj[cur][st - 'a'];
+            if(!adj[cur][i]) adj[cur][i] = seq++;
+            cur = adj[cur][i]; num[cur] = i;
         }
         chk[cur] = 1;
     }
 
-    void erase(string& s){
+    void erase(string& s) { erase(move(tf(s))); }
+    void erase(const vector <ll>& a){
         ll cur = 1;
-        for(auto &st : s){
+        for(auto &i : a){
             if(adj[cur].empty()) adj[cur].resize(m + 1);
-            if(!adj[cur][st - 'a']) return;
-            cur = adj[cur][st - 'a'];
+            if(!adj[cur][i]) return;
+            cur = adj[cur][i]; num[cur] = -INF;
         }
         chk[cur] = 0;
     }
 
-    bool find(string& s){
+    bool find(string& s) { return find(move(tf(s))); }
+    bool find(const vector <ll>& a){
         ll cur = 1;
-        for(auto &st : s){
+        for(auto &i : a){
             if(adj[cur].empty()) adj[cur].resize(m + 1);
-            if(!adj[cur][st - 'a']) return 0;
-            cur = adj[cur][st - 'a'];
+            if(!adj[cur][i]) return 0;
+            cur = adj[cur][i];
         }
         return chk[cur];
     }
+
+    vector <ll> tf(string& s){  
+        vector <ll> ret;
+        for(auto& i : s) {
+            if(i >= 'a') ret.push_back(i - 'a');
+            else ret.push_back(i - 'A');
+        }
+        return ret;
+    }
 };
+
 
 //HASH
 class _hash { // 0-based index
