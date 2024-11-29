@@ -13,27 +13,27 @@ constexpr ll INF = 0x3f3f3f3f3f3f3f3f;
 //KMP
 class _kmp { // 0-based index
 public:
-    string s; ll n;
-    vector <ll> f;
+    vector <ll> f, v; ll n;
 
-    _kmp(string& s) {
-       this->s = s; this->n = s.size();
-    }
+    _kmp(){}
+    _kmp(string& s) : _kmp(move(tf(s))){};
+    _kmp(const vector <ll>& v){ this->v = v; this->n = v.size(); }
 
-    void init(string& m){ // fail 함수 계산
-        ll nxt = 0; f.resize(m.size(), 0);
+    void init(const vector <ll>& m){ // fail 함수 계산
+        ll nxt = 0; f.clear(); f.resize(m.size(), 0);
         for(int cur = 1;cur < m.size();cur++){
             while(nxt && m[cur] != m[nxt]) nxt = f[nxt - 1];
             if(m[cur] == m[nxt]) f[cur] = ++nxt;
         }
     }
-
-    vector <ll> ret(string& m){ // index 반환
+    
+    vector <ll> ret(string& s){ return ret(move(tf(s)));}
+    vector <ll> ret(const vector <ll>& m){ // index 반환
         init(m); vector <ll> r;
         ll nxt = 0;
         for(int cur = 0;cur < n;cur++){
-            while(nxt && s[cur] != m[nxt]) nxt = f[nxt - 1];
-            if(s[cur] == m[nxt]) nxt++;
+            while(nxt && v[cur] != m[nxt]) nxt = f[nxt - 1];
+            if(v[cur] == m[nxt]) nxt++;
             if(nxt == m.size()){
                 r.push_back(cur - nxt + 1);
                 nxt = f[nxt - 1];
@@ -41,6 +41,12 @@ public:
         }
 
         return r;
+    }
+
+    vector <ll> tf(string& s){
+        vector <ll> ret;
+        for(auto& i : s) ret.push_back(i);
+        return ret;
     }
 };
 
@@ -101,7 +107,6 @@ public:
         return ret;
     }
 };
-
 
 //HASH
 class _hash { // 0-based index
