@@ -285,7 +285,7 @@ class _st {
 public:
     ll n; vector <vector<ll>> num;
     _st(ll n, ll m) { //n 개수 m 깊이
-        this->n = n;
+        this->n = n; this->m = m;
         num.resize(log2(m + 1) + 1, vector<ll>(n + 1, 0));
     }
 
