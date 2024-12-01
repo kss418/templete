@@ -298,3 +298,45 @@ public:
     _sa(string& s){ init(s); }
     _sa(vector <ll>& a) { init(a); }
 };
+
+//MANACHER
+class _mnc { // 0-based index
+public:
+    vector <ll> dp, v; ll n, sum = 0, m = 0;
+
+    _mnc(){}
+    _mnc(string& s) : _mnc(move(tf(s))){};
+    _mnc(const vector <ll>& v){ init(v); }
+    
+    void init(const vector <ll>& arr){
+        for(auto& i : arr){
+            v.push_back(INF);
+            v.push_back(i);
+        }
+        v.push_back(INF); this->n = v.size();
+        dp.resize(n + 1, 0); cal();
+    }
+
+    void cal(){
+        ll r = -1, c = -1;
+        for(int i = 0;i < n;i++){
+            if(i <= r) dp[i] = min(r - i, dp[2 * c - i]);
+            while(i + dp[i] + 1 < n && i - dp[i] - 1 >= 0){
+                if(v[i + dp[i] + 1] == v[i - dp[i] - 1]) dp[i]++;
+                else break;
+            }
+            if(i + dp[i] > r) c = i, r = i + dp[i];
+            sum += dp[i] / 2 + 1;
+            m = max(m, dp[i]);
+        }
+    }
+
+    ll cnt(){ return sum; } // 팰린드롬 개수
+    ll mx(){ return m; } // 가장 긴 팰린드롬 길이
+
+    vector <ll> tf(string& s){
+        vector <ll> ret;
+        for(auto& i : s) ret.push_back(i);
+        return ret;
+    }
+};
