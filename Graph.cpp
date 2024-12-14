@@ -11,45 +11,49 @@ ll n, m, k, t; string s;
 constexpr ll INF = 0x3f3f3f3f3f3f3f3f;
 
 // BFS
-template <typename T = ll>
-class _bfs {
+class _bfs { // 0-based index
 public:
-    ll n, m; vector <vector<T>> dp;
-    ll dx[4] = { 0, 0, 1, -1 }, dy[4] = { 1, -1, 0, 0 };
+    ll n, m;
+    ll dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
     // ll dx[8] = { 1, 1, 1, 0, 0, -1, -1, -1 };
     // ll dy[8] = { -1, 0, 1, -1, 1, -1, 0, 1 };
 
     class node {
     public:
         ll y, x;
-        T d;
+        bool operator <(const node& ot) const{ 
+            if(y != ot.y) return y < ot.y;
+            if(x != ot.x) return x < ot.x;
+        }
     };
-    deque <node> q;
+    deque <pair <node, ll>> q; map <node, ll> v;
+    _bfs(){}
+    _bfs(ll n, ll m) { this->n = n; this->m = m; }
 
-    _bfs(ll n, ll m) {
-        this->n = n; this->m = m;
-        dp.resize(n, vector<T>(m, INF));
-    };
+    bool outrange(node cur){
+        auto[cy, cx] = cur;
+        if(cy < 0 || cx < 0 || cy >= n || cx >= m) return 1;
+        return 0;
+    }
 
-    void init() {
+    void init(node st) {
+        q.push_back({st, 0});
         while (!q.empty()) {
-            auto [cy, cx, cd] = q.front(); q.pop_front();
-            if (dp[cy][cx] <= cd) continue;
-            dp[cy][cx] = cd;
+            auto [cur, cc] = q.front(); q.pop_front();
+            auto [cy, cx] = cur;
+            if (!v.count(cur)) v[cur] = INF;
+            if (v[cur] <= cc) continue; v[cur] = cc;
 
-            for (int i = 0; i < 4; i++) {
+            for(int i = 0;i < 4;i++){
                 ll nx = cx + dx[i], ny = cy + dy[i];
-                ll nd = cd + 1;
-                if (nx < 1 || ny < 1 || nx > m || ny > n) continue;
-
-                q.push_back({ ny,nx, nd });
+                node nxt = {ny, nx};
+                if (outrange(nxt)) break;
+                q.push_back({nxt, cc + 1});
             }
         }
     }
 
-    ll ret(ll n, ll m) {
-        return dp[n][m];
-    }
+    ll ret(node cur) { return v[cur]; }
 };
 
 // 다익
