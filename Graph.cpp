@@ -47,7 +47,7 @@ public:
             for(int i = 0;i < 4;i++){
                 ll nx = cx + dx[i], ny = cy + dy[i];
                 node nxt = {ny, nx};
-                if (outrange(nxt)) break;
+                if (outrange(nxt)) continue;
                 q.push_back({nxt, cc + 1});
             }
         }
