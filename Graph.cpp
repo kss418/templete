@@ -23,7 +23,7 @@ public:
         ll y, x;
         bool operator <(const node& ot) const{ 
             if(y != ot.y) return y < ot.y;
-            if(x != ot.x) return x < ot.x;
+            return x < ot.x;
         }
     };
     deque <pair <node, ll>> q; map <node, ll> v;
