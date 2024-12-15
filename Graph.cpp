@@ -21,14 +21,16 @@ public:
     class node {
     public:
         ll y, x;
-        bool operator <(const node& ot) const{ 
-            if(y != ot.y) return y < ot.y;
-            return x < ot.x;
+        ll num() const{
+            return y * 200 + x;
         }
     };
-    deque <pair <node, ll>> q; map <node, ll> v;
+    deque <pair <node, ll>> q; vector <ll> v;
     _bfs(){}
-    _bfs(ll n, ll m) { this->n = n; this->m = m; }
+    _bfs(ll n, ll m) { 
+        this->n = n; this->m = m; 
+        v.resize(n * m + 1, INF);
+    }
 
     bool outrange(node cur){
         auto[cy, cx] = cur;
@@ -41,8 +43,7 @@ public:
         while (!q.empty()) {
             auto [cur, cc] = q.front(); q.pop_front();
             auto [cy, cx] = cur;
-            if (!v.count(cur)) v[cur] = INF;
-            if (v[cur] <= cc) continue; v[cur] = cc;
+            if (v[cur.num()] <= cc) continue; v[cur.num()] = cc;
 
             for(int i = 0;i < 4;i++){
                 ll nx = cx + dx[i], ny = cy + dy[i];
@@ -53,7 +54,7 @@ public:
         }
     }
 
-    ll ret(node cur) { return v[cur]; }
+    ll ret(node cur) { return v[cur.num()]; }
 };
 
 // 다익
