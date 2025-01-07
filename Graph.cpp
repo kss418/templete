@@ -180,7 +180,7 @@ public:
 };
 
 // 플로이드
-template <typename T = ll>
+template <typename T = ll> // 1-based index
 class _floyd { // ret(i,j) == INF 처리하기
 public:
     ll n; vector <vector<T>> d, nxt;
