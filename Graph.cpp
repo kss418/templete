@@ -108,7 +108,8 @@ public:
                 node pl = nn + cn;
         
                 if (d[nxt] <= pl) continue;
-                pre[nxt] = cur; pq.push({ pl, nxt });
+                d[nxt] = pl; pre[nxt] = cur; 
+                pq.push({ pl, nxt });
             }
         }
     }
