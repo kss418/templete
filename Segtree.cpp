@@ -136,21 +136,11 @@ public:
 //LAZY PROP
 class _prop { 
 public:
-    vector<ll> seg, lazy, arr; ll n;
+    vector<ll> seg, lazy; ll n;
 
     _prop(ll n) {
-        this->n = n; arr.resize(n + 1);
+        this->n = n; 
         seg.resize(4 * n + 1); lazy.resize(4 * n + 1);
-    }
-
-    void con(ll idx, ll val) { arr[idx] = val; }
-
-    void init() { init(1, n); }
-    ll init(ll l, ll r, ll node = 1) {
-        if (l == r) return seg[node] = arr[l];
-        ll mid = (l + r) >> 1;
-        seg[node] = init(l, mid, node * 2) + init(mid + 1, r, node * 2 + 1);
-        return seg[node];
     }
 
     void propagate(ll l, ll r, ll node) {
@@ -163,7 +153,7 @@ public:
         lazy[node] = 0;
     }
 
-    void add(ll st, ll en, ll val) { add(st, en, val, 1, n); }
+    void add(ll st, ll en, ll val) { add(st, en, val, 0, n); }
     void add(ll st, ll en, ll val, ll l, ll r, ll node = 1) {
         propagate(l, r, node);
 
@@ -180,7 +170,7 @@ public:
         seg[node] = seg[node * 2] + seg[node * 2 + 1];
     }
 
-    ll query(ll st, ll en) { return query(st, en, 1, n); }
+    ll query(ll st, ll en) { return query(st, en, 0, n); }
     ll query(ll st, ll en, ll l, ll r, ll node = 1) {
         propagate(l, r, node);
 
@@ -194,7 +184,6 @@ public:
         return ret;
     }
 };
-
 template <typename T = ll> //query type
 class _hld { // 구간 예외 처리하기
 public:
