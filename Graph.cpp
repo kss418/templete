@@ -97,11 +97,11 @@ public:
 
     void init(ll st) {
         pq.push({ mn(), st });
+        d[st] = mn();
 
         while (!pq.empty()) {
             auto [cn, cur] = pq.top(); pq.pop();
-            if (d[cur] <= cn) continue;
-            d[cur] = cn;
+            if(cn > d[cur]) continue;
             
             for (auto& i : adj[cur]) {
                 auto [nn, nxt] = i;
