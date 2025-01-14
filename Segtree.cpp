@@ -19,16 +19,6 @@ public:
         arr.resize(n + 1); seg.resize(4 * n + 1);
     }
 
-    void con(ll idx, ll val) { arr[idx] = val; }
-
-    void init() { init(1, n); }
-    ll init(ll l, ll r, ll node = 1) {
-        if (l == r) return seg[node] = arr[l];
-        ll mid = (l + r) >> 1;
-        seg[node] = init(l, mid, node * 2) + init(mid + 1, r, node * 2 + 1);
-        return seg[node];
-    }
-
     ll query(ll st, ll en) { return query(st, en, 1, n); }
     ll query(ll st, ll en, ll l, ll r, ll node = 1) {
         if (en < l || st > r) return 0;
@@ -184,6 +174,7 @@ public:
         return ret;
     }
 };
+
 template <typename T = ll> //query type
 class _hld { // 구간 예외 처리하기
 public:
