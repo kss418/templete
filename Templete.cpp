@@ -298,3 +298,43 @@ public:
     ll prv(ll num){ return find(l[find(num)] - 1); }
     ll nxt(ll num){ return find(r[find(num)] + 1); }
 };
+
+// LINEAR CHT
+class _cht { 
+public:
+    class line{
+        public:
+        ll a, b;
+        // max line() : line(0, MINF){}
+        line() : line(0, INF){}
+        line(ll a, ll b) : a(a), b(b){}
+        ll f(ll x){ return a * x + b; }
+    };
+
+    _cht(){}
+    vector <line> v; ll idx = 0;
+
+    bool chk(const line& a, const line& b, const line& c) const{
+        return (__int128_t)(a.b - b.b) * (c.a - b.a) >= (__int128_t)(b.b - c.b) * (b.a - a.a);
+    }
+    bool chk(const line& a, const line& b, ll c) const{
+        return (__int128_t)c * (b.a - a.a) <= a.b - b.b;
+        // max return (__int128_t)c * (b.a - a.a) >= a.b - b.b;
+    }
+
+    void add(ll a, ll b){
+        line cur = {a, b};
+        if(idx < v.size() && v.back().a == cur.a){
+            if(cur.b < v.back().b) cur = v.back();
+            v.pop_back();
+        }
+
+        while(v.size() >= idx + 2 && chk(v[v.size() - 2], v.back(), cur)) v.pop_back();
+        v.push_back(cur); 
+    }
+
+    ll query(ll x){
+        while(idx + 1 < v.size() && chk(v[idx], v[idx + 1], x)) idx++;
+        return v[idx].f(x);
+    }
+};
