@@ -705,7 +705,7 @@ public:
 class _bm { // 1-based index
 public:
     ll as, bs; vector<vector<ll>> adj;
-    vector<ll> av, bv; vector<bool> v;
+    vector<ll> av, bv, v;
 
     _bm(ll a, ll b) {
         as = a; bs = b;
