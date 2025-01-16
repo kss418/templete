@@ -14,9 +14,10 @@ constexpr ll INF = 0x3f3f3f3f3f3f3f3f;
 class _sseg {
 public:
     ll n; vector <ll> seg;
+    _sseg(){}
     _sseg(ll n) { this->n = n; seg.resize(4 * n + 1); }
 
-    ll query(ll st, ll en) { return query(st, en, 1, n); }
+    ll query(ll st, ll en) { return query(st, en, 0, n); }
     ll query(ll st, ll en, ll l, ll r, ll node = 1) {
         if (en < l || st > r) return 0;
         if (st <= l && en >= r) return seg[node];
@@ -24,7 +25,7 @@ public:
         return query(st, en, l, mid, node * 2) + query(st, en, mid + 1, r, node * 2 + 1);
     }
 
-    void add(ll idx, ll val) { add(idx, val, 1, n); }
+    void add(ll idx, ll val) { add(idx, val, 0, n); }
     void add(ll idx, ll val, ll l, ll r, ll node = 1) {
         if (idx < l || idx > r) return;
         seg[node] += val;
@@ -34,7 +35,7 @@ public:
         add(idx, val, mid + 1, r, node * 2 + 1);
     }
 
-    ll update(ll idx, ll val) { return update(idx, val, 1, n); }
+    ll update(ll idx, ll val) { return update(idx, val, 0, n); }
     ll update(ll idx, ll val, ll l, ll r, ll node = 1) {
         if (idx < l || idx > r) return seg[node];
         if (l == r) return seg[node] = val;
@@ -45,7 +46,7 @@ public:
         return seg[node];
     }
 
-    ll cnt(ll val) { return cnt(val, 1, n); }
+    ll cnt(ll val) { return cnt(val, 0, n); }
     ll cnt(ll val, ll l, ll r, ll node = 1){
         if(l == r) return r;
         ll mid = (l + r) >> 1;
