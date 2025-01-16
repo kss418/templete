@@ -13,11 +13,8 @@ constexpr ll INF = 0x3f3f3f3f3f3f3f3f;
 //SUM SEG
 class _sseg {
 public:
-    ll n; vector <ll> arr, seg;
-    _sseg(ll n) {
-        this->n = n;
-        arr.resize(n + 1); seg.resize(4 * n + 1);
-    }
+    ll n; vector <ll> seg;
+    _sseg(ll n) { this->n = n; seg.resize(4 * n + 1); }
 
     ll query(ll st, ll en) { return query(st, en, 1, n); }
     ll query(ll st, ll en, ll l, ll r, ll node = 1) {
