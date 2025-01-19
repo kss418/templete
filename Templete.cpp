@@ -162,7 +162,7 @@ public:
 
     _mos(ll n, ll m){ // 배열 크기, 쿼리 크기
         sq = sqrt(n); arr.resize(n + 1);
-        result.resize(m + 1);
+        result.resize(m + 1); this->m = m;
     }
 
     void add(ll l, ll r, ll n){ // 쿼리 추가
