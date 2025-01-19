@@ -149,7 +149,7 @@ public:
 //MO's
 class _mos{
 public:
-    ll sq; vector <ll> result, arr;
+    ll sq, m; vector <ll> result, arr;
     class query{
     public:
         ll l, r, n, sq;
