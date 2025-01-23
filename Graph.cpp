@@ -70,8 +70,9 @@ public:
         bool operator>(const node& ot) const{ return num() > ot.num(); }
         bool operator==(const node& ot) const{ return num() == ot.num(); }
         bool operator<=(const node& ot) const{ return num() <= ot.num(); }
-        bool operator>=(const node& ot) const{ return num() >= ot.num(); }
-        node operator+(const node& ot) const{ return {d + ot.d}; }
+        node operator+(const node& ot) const{
+            return {d + ot.d};
+        }
         operator ll(){ return d; }
     };
     node mx(){ return {INF}; }
@@ -84,11 +85,7 @@ public:
     priority_queue <ptl, vector<ptl>, greater<ptl>> pq;
 
     _dij(){}
-    _dij(ll n) {
-        this->n = n;
-        d.resize(n + 1, mx());
-        pre.resize(n + 1, -1); adj.resize(n + 1);
-    }
+    _dij(ll n) { this->n = n; }
 
     void add(ll st, ll en, node c) { // 양방향
         adj[st].push_back({ c,en });
@@ -99,7 +96,8 @@ public:
     }
 
     void init(ll st) {
-        pq.push({ mn(), st });
+        d.resize(n + 1, mx()); pre.resize(n + 1, -1); 
+        adj.resize(n + 1); pq.push({ mn(), st });
         d[st] = mn();
 
         while (!pq.empty()) {
@@ -119,6 +117,7 @@ public:
 
     node ret(ll n) { return d[n]; }
 };
+
 // LCA
 class _lca {
 public:
