@@ -96,6 +96,7 @@ public:
     }
 
     void init(ll st) {
+        d.clear(); pre.clear();
         d.resize(n + 1, mx()); pre.resize(n + 1, -1); 
         pq.push({ mn(), st });
         d[st] = mn();
