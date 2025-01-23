@@ -63,14 +63,16 @@ public:
     class node{
     public:
         ll d;
+        node() : node(0){}
+        node(ll d) : d(d){}
         ll num() const{ return d; }
         bool operator<(const node& ot) const{ return num() < ot.num(); }
         bool operator>(const node& ot) const{ return num() > ot.num(); }
         bool operator==(const node& ot) const{ return num() == ot.num(); }
         bool operator<=(const node& ot) const{ return num() <= ot.num(); }
-        node operator+(const node& ot) const{
-            return {d + ot.d};
-        }
+        bool operator>=(const node& ot) const{ return num() >= ot.num(); }
+        node operator+(const node& ot) const{ return {d + ot.d}; }
+        operator ll(){ return d; }
     };
     node mx(){ return {INF}; }
     node mn(){ return {0}; }
@@ -117,7 +119,6 @@ public:
 
     node ret(ll n) { return d[n]; }
 };
-
 // LCA
 class _lca {
 public:
