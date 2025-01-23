@@ -85,7 +85,7 @@ public:
     priority_queue <ptl, vector<ptl>, greater<ptl>> pq;
 
     _dij(){}
-    _dij(ll n) { this->n = n; }
+    _dij(ll n) { this->n = n; adj.resize(n + 1); }
 
     void add(ll st, ll en, node c) { // 양방향
         adj[st].push_back({ c,en });
@@ -97,7 +97,7 @@ public:
 
     void init(ll st) {
         d.resize(n + 1, mx()); pre.resize(n + 1, -1); 
-        adj.resize(n + 1); pq.push({ mn(), st });
+        pq.push({ mn(), st });
         d[st] = mn();
 
         while (!pq.empty()) {
