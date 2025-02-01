@@ -55,7 +55,7 @@ public:
     }
 
     ll mp(ll n) { return pv[n]; } // 최소 소인수 반환
-    vector<ll> ret() { return pn; } // 소수 벡터 반환
+    vector<ll>& ret() { return pn; } // 소수 벡터 반환
     bool prime(ll n) { // 소수 판별
         if (n == 1) return 0;
         return pv[n] == n;
