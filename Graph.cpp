@@ -843,11 +843,11 @@ public:
 };
 
 //위상 정렬
-class _ts {
+class _tsort {
 public:
     ll n; vector<vector<ll>> adj;
     vector<ll> ind, sort;
-    _ts(ll n) {
+    _tsort(ll n) {
         this->n = n; adj.resize(n + 1);
         ind.resize(n + 1);
     }
