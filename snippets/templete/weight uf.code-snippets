@@ -1,0 +1,43 @@
+{
+	"wuf": {
+  "prefix": ">>wuf",
+  "body": [
+    "class _uf { ",
+    "public:",
+    "    ll n; vector <ll> p, d, dis;",
+    "    ",
+    "    _uf(){}",
+    "    _uf(ll n) { ",
+    "        this->n = n; dis.resize(n + 1);",
+    "        p.resize(n + 1, -1); d.resize(n + 1); ",
+    "    }",
+    "",
+    "    pll find(ll num) { ",
+    "        if (p[num] == -1) return { num, 0ll };",
+    "        auto [pa, diff] = find(p[num]);",
+    "        p[num] = pa; d[num] += diff;",
+    "        return { p[num], d[num] };",
+    "    }",
+    "",
+    "    void merge(ll a, ll b, ll c) {",
+    "        auto [pa, da] = find(a);",
+    "        auto [pb, db] = find(b);",
+    "        if (pa == pb) { dis[pb] |= (db - da - c != 0); return; }",
+    "        p[pa] = pb; dis[pb] |= dis[pa];",
+    "        d[pa] = db - da - c; ",
+    "    }",
+    "",
+    "    pll diff(ll a, ll b){",
+    "        auto [pa, da] = find(a);",
+    "        auto [pb, db] = find(b);",
+    "        if(pa == pb && !dis[pa]) return { 1, db - da };",
+    "        else if(pa == pb && dis[pa]) return { 0, -1 };",
+    "        else return { 0, 0 };",
+    "    }",
+    "",
+    "    bool same(ll a, ll b) { return find(a) == find(b); }",
+    "};"
+  ],
+  "description": "wuf"
+}
+}

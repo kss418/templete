@@ -1,0 +1,39 @@
+{
+	"ufset": {
+  "prefix": ">>ufset",
+  "body": [
+    "class _uf { ",
+    "public:",
+    "    ll n; vector <ll> p, si, l, r;",
+    "    ",
+    "    _uf(){}",
+    "    _uf(ll n) { ",
+    "        this->n = n;",
+    "        p.resize(n + 1, -1); si.resize(n + 1, 1);",
+    "        l.resize(n + 1); r.resize(n + 1);",
+    "        iota(all(l), 0); iota(all(r), 0);",
+    "    }",
+    "",
+    "    ll find(ll num) { ",
+    "        if (p[num] == -1) return num;",
+    "        return p[num] = find(p[num]);",
+    "    }",
+    "",
+    "    void merge(ll a, ll b) {",
+    "        a = find(a); b = find(b);",
+    "        if (a == b) return;",
+    "        if (size(a) < size(b)) swap(a, b);",
+    "        p[b] = a, si[a] += si[b];",
+    "        l[a] = min(l[a], l[b]);",
+    "        r[a] = max(r[a], r[b]);",
+    "    }",
+    "",
+    "    ll size(ll num){ return si[find(num)]; }",
+    "    bool same(ll a, ll b) { return find(a) == find(b); }",
+    "    ll prv(ll num){ return find(l[find(num)] - 1); }",
+    "    ll nxt(ll num){ return find(r[find(num)] + 1); }",
+    "};"
+  ],
+  "description": "ufset"
+}
+}

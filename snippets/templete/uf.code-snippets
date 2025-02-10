@@ -1,0 +1,33 @@
+{
+	"uf": {
+  "prefix": ">>uf",
+  "body": [
+    "class _uf { ",
+    "public:",
+    "    ll n; vector <ll> p, si;",
+    "    ",
+    "    _uf(){}",
+    "    _uf(ll n) { ",
+    "        this->n = n;",
+    "        p.resize(n + 1, -1); si.resize(n + 1, 1);",
+    "    }",
+    "",
+    "    ll find(ll num) { ",
+    "        if (p[num] == -1) return num;",
+    "        return p[num] = find(p[num]);",
+    "    }",
+    "",
+    "    void merge(ll a, ll b) {",
+    "        a = find(a); b = find(b);",
+    "        if (a == b) return;",
+    "        if (size(a) < size(b)) swap(a, b);",
+    "        p[b] = a, si[a] += si[b];",
+    "    }",
+    "",
+    "    ll size(ll num){ return si[find(num)]; }",
+    "    bool same(ll a, ll b) { return find(a) == find(b); }",
+    "};"
+  ],
+  "description": "uf"
+}
+}
