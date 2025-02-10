@@ -259,18 +259,19 @@ public:
 class _fft{
 public:
     const ld PI = acos(-1);
-    using cpd = complex <ld>;
+    using cpd = complex <double>;
 
     void fft(vector <cpd>& v, bool inv = 0){
         ll n = v.size();
         for(int i = 1,j = 0;i < n;i++){
-            ll num = n >> 1ll;
-            while(!((j ^= num) & num)) num >>= 1ll;
+            ll bit = n >> 1ll;
+            for(;j >= bit;bit >>= 1ll) j -= bit;
+            j += bit;
             if(i < j) swap(v[i], v[j]);
         }
 
         for(int k = 1;k < n;k <<= 1ll){
-            ld a = PI / k * (inv ? 1 : -1);
+            double a = PI / k * (inv ? 1 : -1);
             cpd w(cos(a), sin(a));
             for(int i = 0;i < n;i += 2 * k){
                 cpd wp(1, 0);
@@ -286,50 +287,35 @@ public:
         if(inv) for(int i = 0;i < n;i++) v[i] /= n;
     }  
         
-    vector <cpd> mul(vector <cpd>& a, vector <cpd>& b){
-        ll n = 1;
-        while(n < a.size() + 1 || n < b.size() + 1) n <<= 1;
-        n <<= 1; a.resize(n); b.resize(n); vector <cpd> ret(n);
-        fft(a); fft(b);
-        
-        for(int i = 0;i < n;i++) ret[i] = a[i] * b[i];
-        fft(ret, 1);
+    vector <ll> mul(vector <ll>& a, vector <ll>& b){
+        vector<cpd> av(all(a)), bv(all(b));
+        ll n = 2;
+        while(n < a.size() + b.size()) n <<= 1;
+        av.resize(n); bv.resize(n);
+        fft(av); fft(bv);
+        for(int i = 0;i < n;i++) av[i] *= bv[i];
+        fft(av, 1);
+
+        vector <ll> ret(n);
+        for(int i = 0;i < n;i++) ret[i] = round(av[i].real());
     
         return ret;
     }
         
-    vector <ll> carry(vector <cpd>& a, vector <cpd>& b){
+    vector <ll> carry(vector <ll>& a, vector <ll>& b){
         reverse(all(a)); reverse(all(b));
-        vector <cpd> c = mul(a, b);
-        ll carry = 0, i = 0; vector <ll> r;
-        for(i = 0;i < c.size();i++){
-            ll tmp = (ll)round(c[i].real()) + carry;
-            r.push_back(tmp % 10);
-            carry = tmp / 10;
+        vector <ll> ret = mul(a, b);
+
+        for(int i = 0;i < ret.size();i++){
+            if(ret[i] < 10) continue;
+            if(i < ret.size() - 1) ret[i + 1] += ret[i] / 10;
+            else ret.push_back(ret[i] / 10);
+            ret[i] %= 10;
         }
-    
-        while(carry > 0){
-            r.push_back(carry % 10);
-            carry /= 10;
-        }
-    
-        for(i = r.size() - 1;i >= 0 && !r[i];--i);
-        if(i < 0) return vector<ll>(1, 0);
-        while(r.size() > i + 1) r.pop_back();
-        reverse(all(r));
-    
-        return r;
-    }
         
-    vector <cpd> tf(string& a){
-        vector <cpd> ret;
-        for(auto& i : a) ret.push_back({i - '0', 0});
-        return ret;
-    }
-        
-    vector <cpd> tf(vector <ll>& a){
-        vector <cpd> ret;
-        for(auto& i : a) ret.push_back({i, 0});
+        while(!ret.empty() && !ret.back()) ret.pop_back();
+        if(ret.empty()) return vector<ll>(1, 0);
+        reverse(all(ret));
         return ret;
     }
 };
