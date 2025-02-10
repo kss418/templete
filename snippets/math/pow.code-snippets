@@ -1,0 +1,30 @@
+{
+	"pow": {
+  "prefix": ">>pow",
+  "body": [
+    "class _pow {",
+    "public:",
+    "	_pow() {}",
+    "",
+    "	ll ret(ll a, ll b){",
+    "        ll ret = 1;",
+    "        while(b){",
+    "            if(b & 1) ret *= a;",
+    "            a *= a; b >>= 1;",
+    "        }      ",
+    "        return ret;",
+    "    }",
+    "",
+    "	ll ret(ll a, ll b, ll p){",
+    "        ll ret = 1;",
+    "        while(b){",
+    "            if(b & 1) ret *= a % p, ret %= p;",
+    "            a *= a; a %= p; b >>= 1;",
+    "        }      ",
+    "        return ret;",
+    "    }",
+    "};"
+  ],
+  "description": "pow"
+}
+}
