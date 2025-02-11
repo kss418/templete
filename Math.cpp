@@ -288,7 +288,7 @@ public:
         if(inv) for(int i = 0;i < n;i++) v[i] /= n;
     }  
         
-    vector <T> mul(const vector <T>& a,const  vector <T>& b){
+    vector <T> mul(const vector <T>& a,const vector <T>& b){
         vector<cpd> av(all(a)), bv(all(b));
         ll n = 2;
         while(n < a.size() + b.size()) n <<= 1;
