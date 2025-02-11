@@ -256,6 +256,7 @@ public:
 };
 
 //FFT
+template <typename T = ll>
 class _fft{
 public:
     const ld PI = acos(-1);
@@ -287,7 +288,7 @@ public:
         if(inv) for(int i = 0;i < n;i++) v[i] /= n;
     }  
         
-    vector <ll> mul(vector <ll>& a, vector <ll>& b){
+    vector <T> mul(const vector <T>& a,const  vector <T>& b){
         vector<cpd> av(all(a)), bv(all(b));
         ll n = 2;
         while(n < a.size() + b.size()) n <<= 1;
@@ -296,15 +297,15 @@ public:
         for(int i = 0;i < n;i++) av[i] *= bv[i];
         fft(av, 1);
 
-        vector <ll> ret(n);
+        vector <T> ret(n);
         for(int i = 0;i < n;i++) ret[i] = round(av[i].real());
     
         return ret;
     }
         
-    vector <ll> carry(vector <ll>& a, vector <ll>& b){
+    vector <T> carry(vector <T>& a, vector <T>& b){
         reverse(all(a)); reverse(all(b));
-        vector <ll> ret = mul(a, b);
+        vector <T> ret = mul(a, b);
 
         for(int i = 0;i < ret.size();i++){
             if(ret[i] < 10) continue;
@@ -314,7 +315,7 @@ public:
         }
         
         while(!ret.empty() && !ret.back()) ret.pop_back();
-        if(ret.empty()) return vector<ll>(1, 0);
+        if(ret.empty()) return vector<T>(1, 0);
         reverse(all(ret));
         return ret;
     }
