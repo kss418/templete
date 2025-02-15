@@ -60,7 +60,6 @@ public:
 };
 
 //CONVEX HULL
-
 class _ch{
 public:
     _ch() {}
