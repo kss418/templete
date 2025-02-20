@@ -340,3 +340,33 @@ public:
         return ret;
     }
 };
+
+class _z { // 0-based index
+    public:
+        vector <ll> result, a; ll n;
+        ll l = 0, r = 0;
+        
+        _z(){}
+        _z(string& s) : _z(move(tf(s))){};
+        _z(const vector <ll>& a){ 
+            this->a = a; this->n = a.size();
+            result.resize(n); init(); 
+        }
+    
+        void init(){ // z array 계산
+            result[0] = n;
+            for(int i = 1;i < n;i++){
+                if(i <= r) result[i] = min(r - i, result[i - l]);
+                while(i + result[i] < n && a[i + result[i]] == a[result[i]]) result[i]++;
+                if(i > r) l = i; r = max(r, i + result[i] - 1);
+            }
+        }
+        
+        vector <ll> tf(string& s){
+            vector <ll> ret;
+            for(auto& i : s) ret.push_back(i);
+            return ret;
+        }
+    
+        vector <ll> ret(){ return result; }
+    };
