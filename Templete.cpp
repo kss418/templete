@@ -263,7 +263,7 @@ public:
         else return { 0, 0 };
     }
 
-    bool same(ll a, ll b) { return find(a) == find(b); }
+    bool same(ll a, ll b) { return find(a).x == find(b).x; }
 };
 
 // UNION FIND SET
