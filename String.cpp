@@ -341,6 +341,7 @@ public:
     }
 };
 
+//z
 class _z { // 0-based index
 public:
     vector <ll> result, a; ll n;
