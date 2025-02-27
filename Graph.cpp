@@ -299,7 +299,7 @@ public:
 };
 
 // 희소 배열
-class _st {
+class _st { // 1-base index
 public:
     ll n, m; vector <vector<ll>> num;
     _st(ll n, ll m) { //n 개수 m 깊이
