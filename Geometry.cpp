@@ -128,16 +128,19 @@ public:
         this->n = n; this->m = m; this->mod = mod;
         arr.resize(n, vector<ll>(m));
     }
-    void add(ll n, ll m, ll num){ arr[n][m] += num % mod; }
+    void add(ll n, ll m, ll num){ 
+        arr[n][m] += num % mod; 
+        arr[n][m] %= mod;
+    }
     void update(ll n, ll m, ll num){ arr[n][m] = num % mod; }
 
     _matrix operator *(_matrix& ot){
         _matrix ret(n, ot.m, mod);
         for(int i = 0;i < n;i++){
-            for(int j = 0;j < ot.m;j++){
-                for(int k = 0;k < m;k++){
-                    ret.arr[i][j] += (arr[i][k] * ot.arr[k][j]) % mod;
-                    ret.arr[i][j] %= mod;
+            for(int k = 0;k < m;k++){
+                ll now = arr[i][k];
+                for(int j = 0;j < ot.m;j++){
+                    ret.arr[i][j] = (ret.arr[i][j] + now * ot.arr[k][j]) % mod;
                 }
             }
         }
@@ -154,14 +157,12 @@ public:
     
     _matrix pow(_matrix& cur, ll k){ // n * n matrix
         _matrix ret(n, m, mod);
-        if(!k){
-            for(int i = 0;i < n;i++) ret.arr[i][i] = 1;
-            return ret;
+        for(int i = 0;i < n;i++) ret.arr[i][i] = 1;
+        while(k > 0){
+            if(k & 1) ret = ret * cur;
+            cur = cur * cur;
+            k >>= 1ll;
         }
-
-        ret = pow(cur, k >> 1);
-        ret = ret * ret;
-        if(k & 1) ret = ret * cur;
         return ret;
     }
 
@@ -174,6 +175,7 @@ public:
         return out;
     }
 };
+
 
 //AREA
 class _area{
