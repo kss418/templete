@@ -119,23 +119,57 @@ public:
 };
 
 //LAZY PROP
-class _prop { 
+template <typename T = ll> // query type
+class _prop { // 구간 예외 처리하기
 public:
-    vector<ll> seg, lazy; ll n;
+    class node{
+    public:
+        ll v;
+        node() : node(0){}
+        node(ll v) : v(v) {}
+        
+        node operator += (node ot){ // add
+            return this->v += ot;
+        }
 
+        operator T(){ // update -> query
+            return v;
+        }
+    };
+    vector<node> seg, lazy; ll n;
+
+    node merge(node l, node r){
+        return{
+            l.v + r.v
+        };
+    }
+
+    bool empty(node lazy){
+        return lazy == 0;
+    }
+
+    void prop(node& s, node p){
+        s.v += p.v;
+    }
+
+    void erase(node& lazy){
+        lazy = 0;
+    }
+
+    _prop() {}
     _prop(ll n) {
         this->n = n; 
-        seg.resize(4 * n + 1); lazy.resize(4 * n + 1);
+        seg.resize(4 * n + 1, node()); lazy.resize(4 * n + 1, 0);
     }
 
     void propagate(ll l, ll r, ll node) {
-        if (!lazy[node]) return;
+        if (empty(lazy[node])) return;
         if (l != r) {
-            lazy[node * 2] += lazy[node];
-            lazy[node * 2 + 1] += lazy[node];
+            prop(lazy[node * 2], lazy[node]);
+            prop(lazy[node * 2 + 1], lazy[node]);
         }
         seg[node] += lazy[node] * (r - l + 1);
-        lazy[node] = 0;
+        erase(lazy[node]);
     }
 
     void add(ll st, ll en, ll val) { add(st, en, val, 0, n); }
@@ -152,21 +186,18 @@ public:
         add(st, en, val, l, mid, node * 2);
         add(st, en, val, mid + 1, r, node * 2 + 1);
 
-        seg[node] = seg[node * 2] + seg[node * 2 + 1];
+        seg[node] = merge(seg[node * 2], seg[node * 2 + 1]);
     }
 
-    ll query(ll st, ll en) { return query(st, en, 0, n); }
-    ll query(ll st, ll en, ll l, ll r, ll node = 1) {
+    T query(ll st, ll en) { return query(st, en, 0, n); }
+    node query(ll st, ll en, ll l, ll r, ll node = 1) {
         propagate(l, r, node);
 
         if (st > r || en < l) return 0;
         if (l >= st && r <= en) return seg[node];
 
         ll mid = (l + r) >> 1;
-        ll ret = query(st, en, l, mid, node * 2);
-        ret += query(st, en, mid + 1, r, node * 2 + 1);
-
-        return ret;
+        return merge(query(st, en, l, mid, node * 2), query(st, en, mid + 1, r, node * 2 + 1));
     }
 };
 
