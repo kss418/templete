@@ -124,42 +124,53 @@ class _prop { // 구간 예외 처리하기
 public:
     class node{
     public:
-        ll v;
-        node() : node(0){}
-        node(ll v) : v(v) {}
+        ll v, len;
+        node() : node(0, 1){}
+        node(ll v, ll len) : v(v), len(len){}
         
         node operator += (node ot){ // add
-            return this->v += ot;
+            return node();
         }
 
         operator T(){ // update -> query
             return v;
         }
     };
-    vector<node> seg, lazy; ll n;
 
-    node merge(node l, node r){
-        return{
-            l.v + r.v
-        };
+    class lazy_type{
+    public:
+        ll v;
+        lazy_type() : lazy_type(0){}
+        lazy_type(ll v) : v(v){}
+    };
+
+    vector<node> seg; ll n;
+    vector<lazy_type> lazy;
+
+    node merge(node l, node r){ 
+        return { l.v + r.v, l.len + r.len };
     }
 
-    bool empty(node lazy){
-        return lazy == 0;
+    bool empty(lazy_type lazy){ // prop 시 return 여부 결정
+        return !lazy.v;
     }
 
-    void prop(node& s, node p){
+    void prop(lazy_type& s, lazy_type p){ // lazy -> lazy prop 연산
         s.v += p.v;
     }
 
-    void erase(node& lazy){
+    void cal(lazy_type lazy, node& seg){ //lazy로 인한 seg 값 계산
+        seg.v += lazy.v * seg.len;
+    }
+
+    void erase(lazy_type& lazy){ // lazy값 초기화
         lazy = 0;
     }
 
     _prop() {}
     _prop(ll n) {
         this->n = n; 
-        seg.resize(4 * n + 1, node()); lazy.resize(4 * n + 1, 0);
+        seg.resize(4 * n + 1, node()); lazy.resize(4 * n + 1, lazy_type());
     }
 
     void propagate(ll l, ll r, ll node) {
@@ -168,9 +179,10 @@ public:
             prop(lazy[node * 2], lazy[node]);
             prop(lazy[node * 2 + 1], lazy[node]);
         }
-        seg[node] += lazy[node] * (r - l + 1);
+        cal(lazy[node], seg[node]);
         erase(lazy[node]);
     }
+
 
     void add(ll st, ll en, ll val) { add(st, en, val, 0, n); }
     void add(ll st, ll en, ll val, ll l, ll r, ll node = 1) {
@@ -178,7 +190,7 @@ public:
 
         if (st > r || en < l) return;
         if (l >= st && r <= en) {
-            lazy[node] += val; propagate(l, r, node);
+            lazy[node].v += val; propagate(l, r, node);
             return;
         }
 
@@ -193,7 +205,7 @@ public:
     node query(ll st, ll en, ll l, ll r, ll node = 1) {
         propagate(l, r, node);
 
-        if (st > r || en < l) return 0;
+        if (st > r || en < l) return _prop::node();
         if (l >= st && r <= en) return seg[node];
 
         ll mid = (l + r) >> 1;
