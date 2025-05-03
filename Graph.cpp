@@ -264,7 +264,7 @@ public:
             ll cur = q.front(); q.pop_front();
             in[cur] = 0; cnt[cur]++;
             ll cd = d[cur];
-            if (cnt[cur] >= n) return 0;
+            if (cnt[cur] > n) return 0;
 
             for (auto& nn : adj[cur]) {
                 auto [nd, nxt] = nn;
