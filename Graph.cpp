@@ -876,3 +876,119 @@ public:
 
     vector <ll> ret() { return sort; }
 };
+
+//BCC
+class _bcc{ // 1-based index
+public:
+    vector <vector <ll>> adj;
+    vector <ll> mn, seq;
+    ll n, cnt;
+    stack <pll> st;
+
+    _bcc(ll n) : n(n) {
+        adj.resize(n + 1);
+    }
+
+    void add(ll s, ll e){
+        adj[s].push_back(e);
+        adj[e].push_back(s);
+    }
+
+    void clear(){
+        seq.clear(); mn.clear(); cnt = 0;
+        seq.resize(n + 1); mn.resize(n + 1);
+    }
+
+    void dfs_point(vector <ll>& arr, ll cur, ll pre = -1){
+        bool flag = 0; ll now = 0;
+        seq[cur] = mn[cur] = ++cnt;
+
+        for(auto& nxt : adj[cur]){
+            if(nxt == pre) continue;
+            
+            if(seq[nxt]) mn[cur] = min(mn[cur], seq[nxt]);
+            else{   
+                dfs_point(arr, nxt, cur); now++;
+                mn[cur] = min(mn[cur], mn[nxt]);
+                if(pre != -1 && mn[nxt] >= seq[cur]) flag = 1, num[cur]++;
+            }
+        }
+
+        if(pre == -1 && now >= 2) flag = 1, num[cur] = now;
+        if(flag) arr.push_back(cur);
+    }
+
+    void dfs_line(vector <pll>& arr, ll cur, ll pre = -1){
+        seq[cur] = mn[cur] = ++cnt;
+
+        for(auto& nxt : adj[cur]){
+            if(nxt == pre) continue;
+            
+            if(seq[nxt]) mn[cur] = min(mn[cur], seq[nxt]);
+            else{   
+                dfs_line(arr, nxt, cur);
+                mn[cur] = min(mn[cur], mn[nxt]);
+                ll l = min(cur, nxt), r = max(cur, nxt);
+                if(mn[nxt] > seq[cur]) arr.push_back({l, r});
+            }
+        }
+    }
+
+    void dfs_ret(vector<vector <pll>>& arr, ll cur, ll pre = -1){
+        seq[cur] = mn[cur] = ++cnt;
+
+        for(auto& nxt : adj[cur]){
+            if(nxt == pre) continue;
+            
+            if(seq[cur] > seq[nxt]) st.push({cur, nxt});
+            if(seq[nxt]) mn[cur] = min(mn[cur], seq[nxt]);
+            else{   
+                dfs_ret(arr, nxt, cur); 
+                mn[cur] = min(mn[cur], mn[nxt]);
+                if(mn[nxt] >= seq[cur]){
+                    vector <pll> now;
+                    while(st.top() != pll(cur, nxt)){
+                        now.push_back(st.top());
+                        st.pop();
+                    }
+                    now.push_back({cur, nxt});
+                    st.pop();
+                    arr.push_back(now);
+                }
+            }
+        }
+    }
+
+    // 단절점 반환
+    vector <ll> point(){
+        vector <ll> ret; clear();
+        for(int i = 1;i <= n;i++){
+            if(seq[i]) continue;
+            dfs_point(ret, i);
+        }
+
+        return ret;
+    }
+
+    // 단절선 반환
+    vector <pll> line(){
+        vector <pll> ret; clear();
+        for(int i = 1;i <= n;i++){
+            if(seq[i]) continue;
+            dfs_line(ret, i);
+        }
+
+        return ret;
+    }
+
+    // bcc 반환, 테스트 해봐야 함
+    vector <vector <pll>> ret(){
+        vector <vector <pll>> ret; clear();
+        for(int i = 1;i <= n;i++){
+            if(seq[i]) continue;
+            dfs_ret(ret, i);
+        }
+
+        return ret;
+    }
+};
