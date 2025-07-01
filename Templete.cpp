@@ -299,7 +299,7 @@ public:
     ll nxt(ll num){ return find(r[find(num)] + 1); }
 };
 
-// LINEAR CHT
+// CHT
 class _cht { 
 public:
     class line{
@@ -333,8 +333,19 @@ public:
         v.push_back(cur); 
     }
 
-    ll query(ll x){
+    ll ls(ll x){ // linear search
         while(idx + 1 < v.size() && chk(v[idx], v[idx + 1], x)) idx++;
         return v[idx].f(x);
+    }
+
+    ll bs(ll x){ // binary search
+        ll lo = 0, hi = v.size() - 1;
+        while(lo < hi){
+            ll mid = (lo + hi) >> 1ll;
+            if(chk(v[mid], v[mid + 1], x)) lo = mid + 1;
+            else hi = mid;
+        }
+
+        return v[lo].f(x);
     }
 };
