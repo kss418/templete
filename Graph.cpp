@@ -195,13 +195,19 @@ public:
         }
     }
 
+    ll shift(ll a, ll diff){
+        if(diff <= 0) return a;
+        for (int i = log2(diff); i >= 0; i--) {
+            if (diff & (1ll << i)) a = p[i][a];
+        }
+
+        return a;
+    }
+
     ll ret(ll a, ll b) {
         if (d[a] < d[b]) swap(a, b);
 
-        ll diff = d[a] - d[b];
-        if (diff) for (int i = log2(diff); i >= 0; i--) {
-            if (diff & (1ll << i)) a = p[i][a];
-        }
+        a = shift(a, d[a] - d[b]);
         if (a == b) return a;
 
         for (int i = log2(n); i >= 0; i--) {
