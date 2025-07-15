@@ -450,6 +450,8 @@ public:
             result += c; cnt++;
             if (cnt == n - 1 - num) break;
         }
+
+        if(cnt != n - 1 - num) result = MINF;
     }
 
     T ret() {
