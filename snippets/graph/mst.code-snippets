@@ -52,7 +52,6 @@
     "        for(auto& i : adj) {",
     "            auto [st, en, c] = i;",
     "            if (same(st, en)) continue; merge(st, en);",
-    "            lca.add(st, en, c);",
     "            result += c; cnt++;",
     "            if (cnt == n - 1 - num) break;",
     "        }",
