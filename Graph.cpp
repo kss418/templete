@@ -400,7 +400,6 @@ public:
 template <typename T = ll>
 class _mst {
 public:
-    vector<vector<pair<T, ll>>> adj;
     vector<ll> p, size; T result = 0;
     ll n, cnt = 0;
     class edge {
@@ -414,11 +413,10 @@ public:
             return c < ot.c;
         }
     };
-    priority_queue<edge, vector<edge>, greater<edge>> pq;
+    vector <edge> adj;
 
     _mst(ll n) {
         this->n = n;
-        adj.resize(n + 1);
         p.resize(n + 1, -1); size.resize(n + 1, 1);
     }
 
@@ -440,16 +438,14 @@ public:
     }
 
     void add(ll st, ll en, T c = 1) { // 양방향
-        adj[st].push_back({ c, en });
-        adj[en].push_back({ c, st });
-        pq.push({ st, en, c });
-        pq.push({ en, st, c });
+        adj.push_back({ st, en, c });
     }
 
     void init(ll num = 0) { // num 만큼 적게 간선 연결
         cnt = 0; result = 0;
-        while (!pq.empty()) {
-            auto [st, en, c] = pq.top(); pq.pop();
+        sort(all(adj));
+        for(auto& i : adj) {
+            auto [st, en, c] = i;
             if (same(st, en)) continue; merge(st, en);
             result += c; cnt++;
             if (cnt == n - 1 - num) break;
