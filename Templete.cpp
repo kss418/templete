@@ -350,3 +350,51 @@ public:
         return v[lo].f(x);
     }
 };
+
+// PBS
+class _pbs{
+public:
+    ll n;
+    vector <ll> l, r;
+    vector <pll> arr;
+
+    _pbs(){}
+    _pbs(ll n, ll a, ll b) : n(n){
+        l.resize(n, a); r.resize(n, b);
+    };
+
+    class query{ 
+    public:
+        ll v;
+    }; vector <query> q;
+    void add(query a){ q.push_back(a); }
+
+    void clear(){ 
+        arr.clear();
+    }
+
+    bool f(ll cur, ll idx){ // 결정 함수
+        query& now = q[idx];
+
+        return 0;
+    }
+
+    void init(){
+        while(1){
+            clear();
+            for(int i = 0;i < q.size();i++){
+                if(l[i] >= r[i]) continue;
+                ll mid = (l[i] + r[i] + 1) >> 1ll;
+                arr.push_back({mid, i});
+            }
+            if(arr.empty()) break;
+            sort(all(arr));
+
+            for(auto& [mid, idx] : arr){
+
+                if(f(mid, idx)) l[idx] = mid;
+                else r[idx] = mid - 1;
+            }
+        }
+    }
+};
