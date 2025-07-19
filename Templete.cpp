@@ -13,12 +13,12 @@ constexpr ll INF = 0x3f3f3f3f3f3f3f3f;
 // UNION FIND
 class _uf { 
 public:
-    ll n; vector <ll> p, si;
+    ll n; vector <ll> p, sz;
     
     _uf(){}
-    _uf(ll n) { 
+    _uf(ll n) {  
         this->n = n;
-        p.resize(n + 1, -1); si.resize(n + 1, 1);
+        p.resize(n + 1, -1); sz.resize(n + 1, 1);
     }
 
     ll find(ll num) { 
@@ -30,12 +30,13 @@ public:
         a = find(a); b = find(b);
         if (a == b) return;
         if (size(a) < size(b)) swap(a, b);
-        p[b] = a, si[a] += si[b];
+        p[b] = a, sz[a] += sz[b];
     }
 
-    ll size(ll num){ return si[find(num)]; }
+    ll size(ll num){ return sz[find(num)]; }
     bool same(ll a, ll b) { return find(a) == find(b); }
-};
+    void clear(){ p.assign(n + 1, -1); sz.assign(n + 1, 1); }
+}; 
 
 //BINARY SEARCH
 template <typename T = ll>
