@@ -354,14 +354,12 @@ public:
 // PBS
 class _pbs{
 public:
-    ll n;
+    ll lo, hi;
     vector <ll> l, r;
-    vector <pll> arr;
+    vector <vector <ll>> arr;
 
     _pbs(){}
-    _pbs(ll n, ll a, ll b) : n(n){
-        l.resize(n, a); r.resize(n, b);
-    };
+    _pbs(ll lo, ll hi) : lo(lo), hi(hi){}
 
     class query{ 
     public:
@@ -369,8 +367,8 @@ public:
     }; vector <query> q;
     void add(query a){ q.push_back(a); }
 
-    void clear(){ 
-        arr.clear();
+    void clear(){
+        for(ll i = lo;i <= hi;i++) arr[i].clear();
     }
 
     bool f(ll cur, ll idx){ // 결정 함수
@@ -380,20 +378,24 @@ public:
     }
 
     void init(){
+        arr.resize(hi + 1);
+        l.resize(q.size(), lo); r.resize(q.size(), hi);
+
         while(1){
-            clear();
+            clear(); bool flag = 0;
             for(int i = 0;i < q.size();i++){
                 if(l[i] >= r[i]) continue;
                 ll mid = (l[i] + r[i] + 1) >> 1ll;
-                arr.push_back({mid, i});
+                arr[mid].push_back(i); flag = 1;
             }
-            if(arr.empty()) break;
-            sort(all(arr));
+            if(!flag) break;
 
-            for(auto& [mid, idx] : arr){
-
-                if(f(mid, idx)) l[idx] = mid;
-                else r[idx] = mid - 1;
+            ll num = 0;
+            for(ll mid = lo;mid <= hi;mid++){
+                for(auto& idx : arr[mid]){
+                    if(f(mid, idx)) l[idx] = mid;
+                    else r[idx] = mid - 1;
+                }
             }
         }
     }
