@@ -150,50 +150,54 @@ public:
 //MO's
 class _mos{
 public:
-    ll sq, m; vector <ll> result, arr;
+    ll sq, n, m; vector <ll> result, arr;
     class query{
     public:
         ll l, r, n, sq;
-        bool operator <(query& ot){
+        bool operator <(const query& ot) const{
             if((l / sq) == (ot.l / sq)) return r < ot.r;
             return (l / sq < ot.l / sq);
         }
     };
     vector <query> q;
 
-    _mos(ll n, ll m){ // 배열 크기, 쿼리 크기
+    _mos(){}
+    _mos(ll n, ll m) : n(n), m(m){ // 배열 크기, 쿼리 크기
         sq = sqrt(n); arr.resize(n + 1);
-        result.resize(m + 1); this->m = m;
+        result.resize(m + 1);
     }
 
     void add(ll l, ll r, ll n){ // 쿼리 추가
         q.push_back({l, r, n, sq});
     }
 
-    void con(ll idx, ll val){ // 배열 삽입
+    void set(ll idx, ll val){ // 배열 삽입
         arr[idx] = val;
     }
 
-    ll push(ll idx){
-        return arr[idx];
-    }
+    void push(ll idx){
 
-    ll pop(ll idx){
-        return -arr[idx];
+    }   
+
+    void pop(ll idx){
+
     }
 
     void init(){
-        sort(q.begin(), q.end());
+        if(q.empty()) return;
+        sort(all(q));
 
-        ll s = q[0].l, e = q[0].r, cur = 0;
-        for(int i = s;i <= e;i++) cur += push(i);
+        ll s = q[0].l, e = s - 1;
+        while (e < q[0].r) push(++e);
+        while (s > q[0].l) push(--s);
+        while (s < q[0].l) pop(s++);
         result[q[0].n] = cur;
 
         for(int i = 1;i < m;i++){
-            while(q[i].l > s) cur += pop(s++);
-            while(q[i].r < e) cur += pop(e--);
-            while(q[i].l < s) cur += push(--s);
-            while(q[i].r > e) cur += push(++e);
+            while(q[i].l < s) push(--s);
+            while(q[i].r > e) push(++e);
+            while(q[i].l > s) pop(s++);
+            while(q[i].r < e) pop(e--);
             result[q[i].n] = cur;
         }
     }
