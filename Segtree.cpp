@@ -65,7 +65,7 @@ public:
     public:
         ll v;
         node() : node(0){} // identity
-        node(int v) : v(v) {}
+        node(ll v) : v(v) {}
         
         node operator += (node ot){ // add
             v += ot.v;
@@ -91,8 +91,8 @@ public:
     }
 
     node query(ll st, ll en) {
+        st = max(1ll, st); en = min(n, en);
         if(st > en) return _seg::node();
-        st = max(0ll, st); en = min(n, en);
 
         node l = _seg::node(), r = _seg::node();
         st += sz - 1; en += sz - 1;
@@ -106,7 +106,7 @@ public:
     }
 
     void set(ll idx, node val){
-        if(idx < 0 || idx > n) return;
+        if(idx < 1 || idx > n) return;
         ll p = idx + sz - 1;
         seg[p] = val;
         for(p >>= 1ll; p; p >>= 1){
@@ -115,7 +115,7 @@ public:
     }
 
     void add(ll idx, node val){
-        if(idx < 0 || idx > n) return;
+        if(idx < 1 || idx > n) return;
         ll p = idx + sz - 1;
         seg[p].v += val;
         for(p >>= 1; p; p >>= 1){
