@@ -117,7 +117,7 @@ public:
     void add(ll idx, node val){
         if(idx < 1 || idx > n) return;
         ll p = idx + sz - 1;
-        seg[p].v += val;
+        seg[p] += val;
         for(p >>= 1; p; p >>= 1){
             seg[p] = merge(seg[p << 1], seg[p << 1 | 1]);
         }
