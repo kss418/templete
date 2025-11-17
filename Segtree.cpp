@@ -249,7 +249,6 @@ public:
     }
 };
 
-
 template <typename T = ll> //query type
 class _hld { // m = 0 정점, m = 1 간선
 public:
