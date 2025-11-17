@@ -127,121 +127,128 @@ public:
 };
 
 //LAZY PROP
-template <typename T = ll> // query type
 class _prop { // 구간 예외 처리하기
 public:
+    ll n, sz, h;
     class node{
     public:
-        ll v, len;
-        node() : node(0, 0){}
-        node(ll v, ll len) : v(v), len(len){}
-        
-        node& operator += (node ot){ // add
-            return *this;
-        }
-
-        operator T(){ // node -> query
+        ll v, c;
+        node() : node(0, 0){} // identity
+        node(ll v, ll c) : v(v), c(c) {}
+        operator ll(){ // query
             return v;
         }
-    };
+    }; vector <node> seg;
 
-    class lazy_type{
+    class lazy{
     public:
         ll v;
-        lazy_type() : lazy_type(0){}
-        lazy_type(ll v) : v(v){}
+        lazy() : lazy(0){} // identity
+        lazy(ll v) : v(v){}
+        bool is_id(){ return !v; }
+    }; vector <lazy> lz;
 
-        lazy_type& operator += (lazy_type ot){ // add
-            v += ot.v;
-            return *this;
+    _prop(){}
+    _prop(ll n) : n(n){ 
+        sz = 1; while(sz < n + 1) sz <<= 1ll;
+        h = __lg(sz);
+        seg.assign(2 * sz, node());
+        lz.assign(2 * sz, lazy());
+    }
+
+    void build(ll idx){
+        while(idx > 1){
+            idx >>= 1;
+            seg[idx] = merge(seg[idx << 1], seg[idx << 1 | 1]);
+            if(lz[idx].is_id()) continue;
+            prop(seg[idx], lz[idx]);
         }
-    };
-
-    vector<node> seg, tmp; ll n;
-    vector<lazy_type> lazy;
-
-    node merge(node l, node r){ 
-        return { l.v + r.v, l.len + r.len };
     }
 
-    bool empty(lazy_type lazy){ // prop 시 return 여부 결정
-        return !lazy.v;
-    }
-
-    void prop(lazy_type& s, lazy_type p){ // lazy -> lazy prop 연산
-        s += p;
-    }
-
-    void cal(lazy_type lazy, node& seg){ //lazy로 인한 seg 값 계산
-        seg.v += seg.len * lazy.v;
-    }
-
-    void erase(lazy_type& lazy){ // lazy값 초기화
-        lazy = 0;
-    }
-
-    _prop() {}
-    _prop(ll n) {
-        this->n = n; seg.resize(4 * n + 1, node()); 
-        lazy.resize(4 * n + 1, lazy_type());
-        tmp.resize(4 * n + 1, node()); 
-    }
-
-    void propagate(ll l, ll r, ll node) {
-        if (empty(lazy[node])) return;
-        if (l != r) {
-            prop(lazy[node * 2], lazy[node]);
-            prop(lazy[node * 2 + 1], lazy[node]);
+    void push(ll idx){
+        for(int i = h;i > 0;i--){
+            ll cur = idx >> i;
+            if(lz[cur].is_id()) continue;
+            apply(cur << 1, lz[cur]);
+            apply(cur << 1 | 1, lz[cur]);
+            lz[cur] = lazy();
         }
-        cal(lazy[node], seg[node]);
-        erase(lazy[node]);
     }
 
-    void add(ll st, ll en, lazy_type val) { add(st, en, val, 0, n); }
-    void add(ll st, ll en, lazy_type val, ll l, ll r, ll node = 1) {
-        propagate(l, r, node);
-
-        if (st > r || en < l) return;
-        if (l >= st && r <= en) {
-            lazy[node] += val; propagate(l, r, node);
-            return;
-        }
-
-        ll mid = (l + r) >> 1;
-        add(st, en, val, l, mid, node * 2);
-        add(st, en, val, mid + 1, r, node * 2 + 1);
-
-        seg[node] = merge(seg[node * 2], seg[node * 2 + 1]);
+    void apply(ll idx, lazy& now){
+        prop(seg[idx], now);
+        if(idx < sz) comp(lz[idx], now); 
     }
 
-    T query(ll st, ll en) { return query(st, en, 0, n); }
-    node query(ll st, ll en, ll l, ll r, ll node = 1) {
-        propagate(l, r, node);
-
-        if (st > r || en < l) return _prop::node();
-        if (l >= st && r <= en) return seg[node];
-
-        ll mid = (l + r) >> 1;
-        return merge(query(st, en, l, mid, node * 2), query(st, en, mid + 1, r, node * 2 + 1));
-    }
-    
-    void set(ll idx, node val){
-        tmp[idx] = val;
+    node merge(node& l, node& r){ // node + node
+        return{
+            l.v + r.v,
+            l.c + r.c
+        };
     }
 
-    void init(){ init(0, n); }
-    void init(ll l, ll r, ll node = 1){
-        if(l == r){
-            seg[node] = tmp[l];
-            return;
+    void prop(node& seg, lazy& lz){ // lazy -> node
+        seg.v += lz.v * seg.c;
+    }
+
+    void comp(lazy& s, lazy& p){ // lazy -> lazy
+        s.v += p.v;
+    }
+
+    node query(ll idx){ return query(idx, idx); }
+    node query(ll st, ll en) {
+        st = max(0ll, st); en = min(n, en);
+        if(st > en) return node();
+
+        ll l = st + sz, r = en + sz;
+        push(l); push(r);
+
+        node nl, nr;
+        while(l <= r){
+            if(l & 1) nl = merge(nl, seg[l++]);
+            if(!(r & 1)) nr = merge(seg[r--], nr);
+            l >>= 1; r >>= 1;
         }
 
-        ll mid = (l + r) >> 1ll;
-        init(l, mid, node * 2);
-        init(mid + 1, r, node * 2 + 1);
-        seg[node] = merge(seg[node * 2], seg[node * 2 + 1]);
+        return merge(nl, nr);
+    }
+
+    void update(ll idx, lazy lz){ update(idx, idx, lz); }
+    void update(ll st, ll en, lazy lz){
+        st = max(0ll, st); en = min(n, en);
+        if(st > en) return;
+
+        ll l = st + sz, r = en + sz;
+        ll tl = l, tr = r;
+        push(l); push(r);
+
+        while(l <= r){
+            if(l & 1) apply(l++, lz);
+            if(!(r & 1)) apply(r--, lz);
+            l >>= 1; r >>= 1l;
+        }
+        
+        build(tl); build(tr);
+    }
+
+    void set(ll idx, node now){
+        if(idx < 0 || idx > n) return;
+        idx += sz;
+        seg[idx] = now;
+    }
+
+    void init(){
+        for(int i = sz - 1;i >= 1;i--){
+            seg[i] = merge(seg[i << 1], seg[i << 1 | 1]);
+        }
+    }
+
+    void clear(){ 
+        fill(all(seg), node()); 
+        fill(all(lz), lazy());
     }
 };
+
 
 template <typename T = ll> //query type
 class _hld { // m = 0 정점, m = 1 간선
