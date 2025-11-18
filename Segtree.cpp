@@ -370,3 +370,48 @@ public:
         return ret;
     }
 };
+
+class _fw{
+public:
+    ll n; _fw(){}
+    _fw(ll n) : n(n){ bit.assign(n + 1, node()); }
+
+    class node{
+    public:
+        ll v;
+        node() : node(0){} // identity
+        node(ll v) : v(v){}
+        operator ll(){ // query type
+            return v;
+        }
+    }; vector <node> bit;
+
+    node merge(const node& l, const node& r){
+        return{
+            l.v + r.v
+        };
+    }
+
+    node inv(const node& a){
+        return{
+            -a.v
+        };
+    }
+
+    // range query -> need inv
+    node query(ll l, ll r){ 
+        if(l > r) return node();
+        return merge(inv(query(l - 1)), query(r)); 
+    }
+
+    // return 1 ~ idx
+    node query(ll idx){
+        node ret = node();
+        for(int i = idx;i > 0;i -= i & -i) ret = merge(ret, bit[i]);
+        return ret;
+    }
+
+    void add(ll idx, ll v){
+        for(int i = idx;i <= n;i += i & -i) bit[i] = merge(bit[i], v);
+    }
+};
