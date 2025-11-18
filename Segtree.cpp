@@ -57,7 +57,6 @@ public:
 };
 
 //SEG
-template <typename T = ll> // query type
 class _seg { // 구간 예외 처리하기
 public:
     ll n, sz;
@@ -66,17 +65,11 @@ public:
         ll v;
         node() : node(0){} // identity
         node(ll v) : v(v) {}
-        
-        node operator += (node ot){ // add
-            v += ot.v;
-            return *this;
-        }
 
-        operator T(){ // query
+        operator ll(){ // query
             return v;
         }
-    };
-    vector <node> seg;
+    }; vector <node> seg;
 
     _seg(){}
     _seg(ll n) : n(n){ 
@@ -110,15 +103,6 @@ public:
         ll p = idx + sz;
         seg[p] = val;
         for(p >>= 1ll; p; p >>= 1){
-            seg[p] = merge(seg[p << 1], seg[p << 1 | 1]);
-        }
-    }
-
-    void add(ll idx, node val){
-        if(idx < 0 || idx > n) return;
-        ll p = idx + sz;
-        seg[p] += val;
-        for(p >>= 1; p; p >>= 1){
             seg[p] = merge(seg[p << 1], seg[p << 1 | 1]);
         }
     }
