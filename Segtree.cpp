@@ -415,3 +415,64 @@ public:
         for(int i = idx;i <= n;i += i & -i) bit[i] = merge(bit[i], v);
     }
 };
+
+class _fw2d{
+public:
+    ll n, m; _fw2d(){}
+    _fw2d(ll n, ll m) : n(n), m(m){ 
+        bit.assign(n + 1, vector<node>(m + 1, node())); 
+    }
+
+    class node{
+    public:
+        ll v;
+        node() : node(0){} // identity
+        node(ll v) : v(v){}
+        operator ll(){ // query type
+            return v;
+        }
+    }; vector <vector<node>> bit;
+
+    node merge(const node& l, const node& r){
+        return{
+            l.v + r.v
+        };
+    }
+
+    node inv(const node& a){
+        return{
+            -a.v
+        };
+    }
+
+    // range query -> need inv
+    node query(ll x, ll y){ return query(x, y, x, y); }
+    node query(ll x1, ll y1, ll x2, ll y2){ 
+        if(x1 > x2 || y1 > y2) return node();
+        node a = cal(x2, y2), b = cal(x1 - 1, y2);
+        node c = cal(x2, y1 -1), d = cal(x1 - 1, y1 - 1);
+
+        node ab = merge(a, inv(b)), cd = merge(inv(c), d);
+        return merge(ab, cd); 
+    }
+
+    // return (1, 1) ~ (cx, cy)
+    node cal(ll cx, ll cy){
+        node ret = node();
+        for(int i = cx;i > 0;i -= i & -i){
+            for(int j = cy;j > 0;j -= j & -j){
+                ret = merge(ret, bit[i][j]);
+            }
+        }
+
+        return ret;
+    }
+
+    void add(ll cx, ll cy, ll v){
+        for(int i = cx;i <= n;i += i & -i){
+            for(int j = cy;j <= m;j += j & -j){
+                bit[i][j] = merge(bit[i][j], v);
+            }
+        }
+    }
+};
