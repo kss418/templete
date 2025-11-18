@@ -399,13 +399,14 @@ public:
     }
 
     // range query -> need inv
+    node query(ll idx){ return query(idx, idx); }
     node query(ll l, ll r){ 
         if(l > r) return node();
-        return merge(inv(query(l - 1)), query(r)); 
+        return merge(inv(cal(l - 1)), cal(r)); 
     }
 
     // return 1 ~ idx
-    node query(ll idx){
+    node cal(ll idx){
         node ret = node();
         for(int i = idx;i > 0;i -= i & -i) ret = merge(ret, bit[i]);
         return ret;
