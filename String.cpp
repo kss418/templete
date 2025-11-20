@@ -357,9 +357,10 @@ public:
     void init(){ // z array 계산
         result[0] = n;
         for(int i = 1;i < n;i++){
-            if(i <= r) result[i] = min(r - i, result[i - l]);
+            if(i <= r) result[i] = min(r - i + 1, result[i - l]);
+            else result[i] = 0;
             while(i + result[i] < n && a[i + result[i]] == a[result[i]]) result[i]++;
-            if(i > r) l = i; r = max(r, i + result[i] - 1);
+            if(i + result[i] - 1 > r){ l = i; r = i + result[i] - 1; }
         }
     }
         
