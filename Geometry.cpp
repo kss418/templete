@@ -372,3 +372,17 @@ public:
     pair <pll, pll> ret(){ return result; }
     ld dist(){ return sqrtl(mx); }
 };
+
+class _dot{
+public:
+    _dot() {} 
+    // ret > 0 -> angle < 90, ret < 0 -> angle > 90, ret == 0 -> angle == 90
+    ll ret(ll x1, ll y1, ll x2, ll y2, ll x3, ll y3){
+        return ret({x1, y1}, {x2, y2}, {x3, y3});
+    }
+    ll ret(pll l, pll m, pll r){
+        pll a = {m.x - l.x, m.y - l.y};
+        pll b = {m.x - r.x, m.y - r.y};
+        return a.x * b.x + a.y * b.y;
+    }
+};
