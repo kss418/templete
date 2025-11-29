@@ -446,18 +446,19 @@ public:
         sort(all(adj));
         for(auto& i : adj) {
             auto [st, en, c] = i;
+            if (cnt >= n - 1 - num) break;
             if (same(st, en)) continue; merge(st, en);
             result += c; cnt++;
-            if (cnt == n - 1 - num) break;
         }
 
-        if(cnt != n - 1 - num) result = MINF;
+        if(cnt < n - 1 - num) result = MINF;
     }
 
     T ret() {
         return result;
     }
 };
+
 
 //SCC
 class _scc { // 1-based index
