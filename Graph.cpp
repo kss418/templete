@@ -459,7 +459,6 @@ public:
     }
 };
 
-
 //SCC
 class _scc { // 1-based index
 public:
@@ -1099,4 +1098,50 @@ public:
 
         return c;
     } 
-}; _3cycle cy;
+};
+
+class _4cycle{ // 1-based index
+public:
+    vector <vector<ll>> adj;
+    vector <ll> cnt;
+    ll n;
+
+    _4cycle(){}
+    _4cycle(ll n) : n(n){
+        adj.resize(n + 1); cnt.resize(n + 1);
+    }
+
+    void addsol(ll st, ll en){
+        adj[st].push_back(en);
+    }
+
+    void add(ll st, ll en){
+        addsol(st, en);
+        addsol(en, st);
+    }
+
+    bool less(ll a, ll b){
+        if(adj[a].size() < adj[b].size()) return 1;
+        return adj[a].size() == adj[b].size() && a <= b;
+    }
+
+    ll ret(ll mod = 0){ // Counting 4-Cycle
+        ll c = 0;
+        for(int i = 1;i <= n;i++){
+            vector <ll> use;
+            for(auto& j : adj[i]){
+                if(less(i, j)) continue;
+                for(auto& k : adj[j]){
+                    if(less(i, k)) continue;
+                    if(!cnt[k]) use.push_back(k);
+                    c += cnt[k]++;
+                    if(mod) c %= mod;
+                }
+            }
+
+            for(auto& j : use) cnt[j] = 0;
+        }
+
+        return c;
+    } 
+};
