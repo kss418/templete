@@ -338,7 +338,7 @@ public:
         return 1;
     }
 
-    u64 f(u64 x, u64 c, u64 mod){ return (mul_mod(x, x, mod) + c) % mod; }
+    u64 f(u64 x, u64 c, u64 mod){ return ((u128)mul_mod(x, x, mod) + c) % mod; }
     u64 pollard(u64 n){ // 임의의 소인수 반환
         for(u64 i : {2ULL, 3ULL, 5ULL, 7ULL, 11ULL, 13ULL, 17ULL, 19ULL, 23ULL, 29ULL, 31ULL, 37ULL}){
             if(n % i == 0) return i;
@@ -375,6 +375,54 @@ public:
         dnc(n, ret);
         sort(all(ret));
         return ret;
+    }
+
+    vector <pair<u64, int>> factorize_cnt(u64 n){
+        auto f = factorize(n);
+        vector<pair<u64, int>> ret;
+        for(u64& p : f){
+            if(ret.empty() || ret.back().x != p) ret.push_back({p, 1});
+            else ret.back().y++;
+        }
+        return ret;
+    }
+
+    u64 phi(u64 n){
+        if(!n) return 0;
+        auto fc = factorize_cnt(n);
+        u128 ret = n;
+        for(auto& [p, c] : fc) ret = ret / p * (p - 1);
+        return (u64)ret;
+    }
+
+    int mobius(u64 x){
+        if(n == 0 || n == 1) return n;
+        auto fc = factorize_cnt(n);
+        for(auto& [p, c] : fc) if(c >= 2) return 0;
+        return fc.size() % 2 ? -1 : 1;
+    }
+
+    u64 divisor_num(u64 n){
+        if(!n) return 0;
+        auto fc = factorize_cnt(n);
+        u128 ret = 1;
+        for(auto& [p, c] : fc) ret *= c + 1;
+        return (u64)ret;
+    }
+
+    u64 divisor_sum(u64 n){
+        if(!n) return 0;
+        auto fc = factorize_cnt(n);
+        u128 ret = 1;
+        for(auto& [p, c] : fc){
+            u128 now = 1, cur = 1;
+            for(int i = 0;i < c;i++){
+                cur *= p;
+                now += cur;
+            }
+            ret *= now;
+        }
+        return (u64)ret;
     }
 };
 
