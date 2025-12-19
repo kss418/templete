@@ -526,6 +526,23 @@ public:
         return ret;
     }
 
+    vector <ll> divisor(int x){
+        if(!x) return {};
+        if(x == 1) return {1};
+        auto fc = factorize_cnt(x);
+        vector <ll> ret = {1};
+        for(auto& [p, c] : fc){
+            ll mul = 1, sz = ret.size();
+            for(ll k = 1;k <= c;k++){
+                mul *= p;
+                for(int i = 0;i < sz;i++) ret.push_back(ret[i] * mul);
+            }
+        }
+
+        sort(all(ret));
+        return ret;
+    }
+
     ll phi(int x) const { return vphi[x]; } // 오일러 피
     ll mobius(int x) const { return vmu[x]; } // 뫼비우스
 };
