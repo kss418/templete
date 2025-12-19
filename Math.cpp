@@ -435,3 +435,75 @@ public:
         return cal(n % mod, r % mod) * ret(n / mod, r / mod) % mod;
     }
 };
+
+class _ls{
+public:
+    vector <int> lp, prime, vphi, vmu; int n, flag; 
+    _ls(){}
+    _ls(int n, int flag = 0) : n(n), flag(flag){ init(); }
+    
+    void init(){
+        lp.assign(n + 1, 0);
+        if(n >= 3) prime.reserve((int)(n / log((ld)n)) + 10);
+        if(flag & 1) vphi.assign(n + 1, 0), vphi[1] = 1;
+        if(flag & 2) vmu.assign(n + 1, 0), vmu[1] = 1;
+
+        for(int i = 2;i <= n;i++){
+            if(!lp[i]){
+                lp[i] = i;
+                prime.push_back(i);
+                if(flag & 1) vphi[i] = i - 1;
+                if(flag & 2) vmu[i]  = -1;
+            }
+
+            for(auto& p : prime){
+                ll x = 1ll * p * i;
+                if(x > n) break;
+                lp[x] = p;
+                
+                if(i % p == 0){
+                    if(flag & 1) vphi[x] = vphi[i] * p;
+                    if(flag & 2) vmu[x] = 0;
+                    break;
+                }
+                else{
+                    if(flag & 1) vphi[x] = vphi[i] * (p - 1);
+                    if(flag & 2) vmu[x] = -vmu[i];
+                }
+            }
+        }
+    }
+
+    bool is_prime(int x) const{ return x >= 2 && lp[x] == x; }
+    vector <ll> factorize(int x){ // 소인수분해
+        vector <ll> ret;
+        while(x != 1){
+            ret.push_back(lp[x]);
+            x /= lp[x];
+        }
+        return ret;
+    }
+
+    vector <pll> factorize_cnt(int x){ // p^c 꼴로 소인수분해
+        vector <pll> ret;
+        while(x != 1){
+            ll p = lp[x], c = 0;
+            while(x % p == 0) x /= p, c++;
+            ret.push_back({p, c});
+        }
+        return ret;
+    }
+
+    ll divisor_num(int x){ // 약수의 개수
+        ll ret = 1;
+        while(x != 1){
+            ll p = lp[x], c = 0;
+            while(x % p == 0) x /= p, c++;
+            ret *= c + 1;
+        }
+        return ret;
+    }
+
+    ll phi(int x) const { return vphi[x]; } // 오일러 피
+    ll mobius(int x) const { return vmu[x]; } // 뫼비우스
+};
