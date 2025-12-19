@@ -380,6 +380,7 @@ public:
     vector <pair<u64, int>> factorize_cnt(u64 n){
         auto f = factorize(n);
         vector<pair<u64, int>> ret;
+        if(n == 1) { ret.push_back({1, 1}); return ret; }
         for(u64& p : f){
             if(ret.empty() || ret.back().x != p) ret.push_back({p, 1});
             else ret.back().y++;
@@ -395,7 +396,7 @@ public:
         return (u64)ret;
     }
 
-    int mobius(u64 x){
+    int mobius(u64 n){
         if(n == 0 || n == 1) return n;
         auto fc = factorize_cnt(n);
         for(auto& [p, c] : fc) if(c >= 2) return 0;
