@@ -138,9 +138,10 @@ class _crt{
 public:
     _crt(){} vector <pll> arr;
     void add(ll a, ll m){ arr.push_back({norm(a, m), m}); }
+    void add(pll a){ arr.push_back({norm(a.x, a.y), a.y}); }
     void clear(){ arr.clear(); }
-    ll norm(ll a, ll m){ a %= m; return a < 0 ? a + m : a; }
-    ll mul(ll a, ll b, ll m){ return (ll)((i128)norm(a, m) * norm(b, m) % m); }
+    static ll norm(ll a, ll m){ a %= m; return a < 0 ? a + m : a; }
+    static ll mul(ll a, ll b, ll m){ return (ll)((i128)norm(a, m) * norm(b, m) % m); }
 
     tll gcd(ll a, ll b){
         if(!b) return {a, 1, 0};
@@ -166,6 +167,14 @@ public:
         }
         return cur;
     }
+
+    /*
+    void add(const _mint& a){ arr.push_back({norm(a.v, a.mod), a.mod}); }
+    _mint ret_mint(){
+        auto [r, m] = ret();
+        return _mint(m, r);
+    }
+    */
 };
 
 //이산 로그
