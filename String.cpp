@@ -108,73 +108,56 @@ public:
 };
 
 //HASH
-class _hash { // 0-based index
+class _hash { // 0-based index, Require _mint
 public:
 //  ll mod[3] = { 1000000007, 998244353, 1000000009 };
 //  ll key[3] = { 29, 31, 26 };
-    ll mod, key, size, h;
-    deque <ll> q, pre;
+    ll mod, size;
+    _mint key, inv_key, h;
+    deque <ll> q;
+    deque <_mint> pre;
 
     _hash() {}
     _hash(ll mod, ll key = 2) {
-        this->mod = mod; this->key = key;
-        this->size = 0; this->h = 0;
-    }
-
-    ll pow_mod(ll a, ll b, ll c) {
-        if (!b) return 1;
-        ll ret = pow_mod(a, b / 2, c) % c;
-
-        if (b % 2) return ((ret * ret) % c * (a % c)) % c;
-        return (ret * ret) % c;
-    }
-
-    ll prime_inv(ll a, ll b) {
-        return pow_mod(a, b - 2, b);
-    }
-
-    ll inv(ll a, ll b, ll m) { // (a * b^-1) % m 반환 m == prime
-        return (a % m * prime_inv(b, m) % m) % m;
-    }
-
-    ll mo(ll n) {
-        if (n % mod >= 0) return n % mod;
-        else return (n % mod) + mod;
+        this->mod = mod; this->size = 0;
+        this->key = _mint(mod, key);
+        this->inv_key = this->key.inv();
+        this->h = _mint(mod, 0);
     }
 
     void push_back(ll c){
         q.push_back(c);
-        h *= key; h = mo(h);
-        h += c; h = mo(h);
+        h *= key;
+        h += c;
         pre.push_back(h); size++;
     }
 
     void pop_back(){
         ll c = q.back(); q.pop_back();
-        h -= c; h = mo(h);
-        h *= inv(1, key, mod); h = mo(h);
+        h -= c;
+        h *= inv_key;
         if(!pre.empty()) pre.pop_back(); size--;
     }
 
     void push_front(ll c){
         q.push_front(c);
-        h += pow_mod(key, size, mod) * c;
-        h = mo(h); size++;
+        h += key.pow(size) * c;
+        size++;
     }
 
     void pop_front(){
         ll c = q.front(); q.pop_front();
-        h -= pow_mod(key, size - 1, mod) * c;
-        h = mo(h); size--;
+        h -= key.pow(size - 1) * c;
+        size--;
     }
 
-    ll ret() { return mo(h); }
+    ll ret() { return h.v; }
     ll ret(ll a, ll b){
         if(a > b) swap(a, b);
         if(!a) return ret(b);
-        return mo(pre[b] - mo(pre[a - 1] * pow_mod(key, b - a + 1, mod)));
+        return (pre[b] - pre[a - 1] * key.pow(b - a + 1)).v;
     }
-    ll ret(ll a){ return mo(pre[a]); }
+    ll ret(ll a){ return pre[a].v; }
 };
 
 //AHO-CORASICK
