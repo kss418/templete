@@ -137,33 +137,29 @@ public:
 class _crt{
 public:
     _crt(){} vector <pll> arr;
-    tll gcd(ll a, ll b) {
-        if (!b) return { a, 1, 0 };
-        auto[g, x, y] = gcd(b, a % b);
-        return { g, y, x - a / b * y };
-    }
-
+    void add(ll a, ll m){ arr.push_back({norm(a, m), m}); }
     void clear(){ arr.clear(); }
-    void add(ll a, ll m){ arr.push_back({a, m}); }
+    ll norm(ll a, ll m){ a %= m; return a < 0 ? a + m : a; }
+    ll mul(ll a, ll b, ll m){ return (ll)((i128)norm(a, m) * norm(b, m) % m); }
 
-    ll mod(ll a, ll m){
-        a %= m; if(a >= 0) return a;
-        return a + m;
+    tll gcd(ll a, ll b){
+        if(!b) return {a, 1, 0};
+        auto [g, x, y] = gcd(b, a % b);
+        return {g, y, x - (a / b) * y}; 
     }
 
     pll crt(pll a, pll b){
         auto[g, cx, cy] = gcd(a.y, b.y);
-        ll lcd = a.y / g * b.y;
-        if((b.x - a.x) % g) return {-1, -1};
-        ll r = mod((b.x - a.x) / g, b.y); 
-        ll l = mod(cx * r, b.y); 
-        ll ret = mod(a.x + l * a.y, lcd);
+        ll lcm = (ll)((i128)a.y / g * b.y), diff = b.x - a.x;
+        if(diff % g) return {-1, -1}; b.y /= g;
 
-        return { ret, lcd };
+        ll r = norm(diff / g, b.y), l = norm(mul(cx, r, b.y), b.y);
+        ll ret = norm(norm(a.x, lcm) + mul(l, a.y, lcm), lcm);
+        return { ret, lcm };
     }
 
     pll ret(){
-        pll cur = arr[0];
+        if(arr.empty()) return {0, 1}; pll cur = arr[0];
         for(int i = 1;i < arr.size();i++){
             cur = crt(cur, arr[i]);
             if(cur.x == -1) return {-1, -1};
@@ -690,4 +686,121 @@ public:
     }
 
     void clear(){ l.clear(); c.clear(); }
+};
+
+// Prime Tower
+class _pt{
+public:
+    vector <ll> arr; 
+    void add(ll v){ 
+        if(!arr.empty() && arr.back() <= 1) return;
+        arr.push_back(v); 
+    }
+
+    void add_mod(ll p, ll e){ 
+        ll mod = pw.ret(p, e);
+        crt.add(cal(0, p, e, mod), mod); 
+    }
+
+    void add_mod(ll m){
+        for(ll i = 2;i * i <= m;i++){
+            if(m % i) continue; ll c = 0;
+            while(m % i == 0) m /= i, c++;
+            add_mod(i, c);
+        }
+        if(m > 1) add_mod(m, 1);
+    }
+
+    class _pow {
+    public:
+        _pow() {}
+        ll ret(ll a, ll b){
+            ll ret = 1;
+            while(b){
+                if(b & 1) ret *= a;
+                a *= a; b >>= 1;
+            }      
+            return ret;
+        }
+
+        ll ret(ll a, ll b, ll p){
+            ll ret = 1;
+            while(b){
+                if(b & 1) ret *= a % p, ret %= p;
+                a *= a; a %= p; b >>= 1;
+            }      
+            return ret;
+        }
+    }; _pow pw;
+
+    ll cal_phi(ll x){
+        ll ret = x;
+        for(ll i = 2;i * i <= x;i++){
+            if(x % i) continue;
+            while(x % i == 0) x /= i;
+            ret *= i - 1; ret /= i;
+        }
+        if(x > 1) ret *= x - 1, ret /= x;
+        return ret;
+    }
+
+    class _crt{
+    public:
+        _crt(){} vector <pll> arr;
+        void add(ll a, ll m){ arr.push_back({norm(a, m), m}); }
+        void clear(){ arr.clear(); }
+        ll norm(ll a, ll m){ a %= m; return a < 0 ? a + m : a; }
+        ll mul(ll a, ll b, ll m){ return (ll)((i128)norm(a, m) * norm(b, m) % m); }
+
+        tll gcd(ll a, ll b){
+            if(!b) return {a, 1, 0};
+            auto [g, x, y] = gcd(b, a % b);
+            return {g, y, x - (a / b) * y}; 
+        }
+
+        pll crt(pll a, pll b){
+            auto[g, cx, cy] = gcd(a.y, b.y);
+            ll lcm = (ll)((i128)a.y / g * b.y), diff = b.x - a.x;
+            if(diff % g) return {-1, -1}; b.y /= g;
+
+            ll r = norm(diff / g, b.y), l = norm(mul(cx, r, b.y), b.y);
+            ll ret = norm(norm(a.x, lcm) + mul(l, a.y, lcm), lcm);
+            return { ret, lcm };
+        }
+
+        pll ret(){
+            if(arr.empty()) return {0, 1}; pll cur = arr[0];
+            for(int i = 1;i < arr.size();i++){
+                cur = crt(cur, arr[i]);
+                if(cur.x == -1) return {-1, -1};
+            }
+            return cur;
+        }
+    }; _crt crt;
+
+    ll cal_exact(ll cur){
+        if(cur + 1 == arr.size()) return arr[cur];
+        return pw.ret(arr[cur], cal_exact(cur + 1));
+    }
+
+    bool tower_le(ll cur, ll num){
+        if((ll)arr.size() - cur >= 4) return 0;
+        ll now = arr.back();
+        for(int i = arr.size() - 2;i >= cur + 1;i--){
+            if(now >= num) return 0;
+            now = pw.ret(arr[i], now);
+        }
+        return now < num;
+    }
+
+    ll cal(ll cur, ll p, ll q, ll mod){
+        if(mod == 1) return 0;
+        if(arr[cur] == 1) return 1;
+        if(cur + 1 == arr.size()) return arr[cur] % mod;
+        if(tower_le(cur + 1, q)) return pw.ret(arr[cur], cal_exact(cur + 1), mod);
+        ll phi = cal_phi(mod), e = cal(cur + 1, p, q, phi) + q * phi;
+        return pw.ret(arr[cur], e, mod);
+    }
+
+    ll ret(){ return crt.ret().x; } // a^()
 };
