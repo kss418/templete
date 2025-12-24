@@ -802,5 +802,5 @@ public:
         return pw.ret(arr[cur], e, mod);
     }
 
-    ll ret(){ return crt.ret().x; } // a^()
+    ll ret(){ return crt.ret().x; } 
 };
