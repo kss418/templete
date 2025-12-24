@@ -804,3 +804,68 @@ public:
 
     ll ret(){ return crt.ret().x; } 
 };
+
+class _mint{
+public:
+    ll mod, v;
+    _mint(ll mod = 1, ll v = 0) : mod(mod), v(norm(v, mod)) {}
+    static ll norm(ll x, ll m){ x %= m; return x < 0 ? x + m : x; }
+    static tll gcd(ll a, ll b){
+        if (b == 0) return {a, 1, 0};
+        auto [g, x, y] = gcd(b, a % b);
+        return {g, y, x - (a / b) * y};
+    }
+
+    _mint inv() const{
+        assert(v);
+        auto [g, x, y] = gcd(v, mod);
+        assert(g == 1 || g == -1);
+        if(g == -1) x *= -1;
+        return _mint(mod, x);
+    }
+
+    _mint pow(ll e) const{
+        assert(e >= 0);
+        _mint base = *this, ret(mod, 1);
+        while(e){
+            if(e & 1) ret *= base;
+            base *= base; e >>= 1ll;
+        }
+        return ret;
+    }
+
+    _mint& operator+=(const _mint& ot){
+        assert(mod == ot.mod);
+        v += ot.v;
+        if (v >= mod) v -= mod;
+        return *this;
+    }
+
+    _mint& operator-=(const _mint& ot){
+        assert(mod == ot.mod);
+        v -= ot.v;
+        if (v < 0) v += mod;
+        return *this;
+    }
+
+    _mint& operator*=(const _mint& ot){
+        assert(mod == ot.mod);
+        v = (ll)((i128)v * ot.v % mod);
+        return *this;
+    }
+    _mint& operator/=(const _mint& ot){ return (*this) *= ot.inv(); }
+
+    friend _mint operator+(_mint a, const _mint& b){ return a += b; }
+    friend _mint operator-(_mint a, const _mint& b){ return a -= b; }
+    friend _mint operator*(_mint a, const _mint& b){ return a *= b; }
+    friend _mint operator/(_mint a, const _mint& b){ return a /= b; }
+    _mint& operator+=(ll b){ return (*this) += _mint(mod, b); }
+    _mint& operator-=(ll b){ return (*this) -= _mint(mod, b); }
+    _mint& operator*=(ll b){ return (*this) *= _mint(mod, b); }
+    _mint& operator/=(ll b){ return (*this) /= _mint(mod, b); }
+    friend _mint operator+(_mint a, ll b){ return a += b; }
+    friend _mint operator-(_mint a, ll b){ return a -= b; }
+    friend _mint operator*(_mint a, ll b){ return a *= b; }
+    friend _mint operator/(_mint a, ll b){ return a /= b; }
+    friend ostream& operator<<(ostream& os, const _mint& a){ return os << a.v; }
+};
