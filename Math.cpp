@@ -699,7 +699,7 @@ public:
 
     void add_mod(ll p, ll e){ 
         ll mod = pw.ret(p, e);
-        crt.add(cal(0, p, e, mod), mod); 
+        crt.add(cal(0, p, mod), mod); 
     }
 
     void add_mod(ll m){
@@ -793,12 +793,12 @@ public:
         return now < num;
     }
 
-    ll cal(ll cur, ll p, ll q, ll mod){
+    ll cal(ll cur, ll p, ll mod){
         if(mod == 1) return 0;
         if(arr[cur] == 1) return 1;
         if(cur + 1 == arr.size()) return arr[cur] % mod;
-        if(tower_le(cur + 1, q)) return pw.ret(arr[cur], cal_exact(cur + 1), mod);
-        ll phi = cal_phi(mod), e = cal(cur + 1, p, q, phi) + q * phi;
+        if(tower_le(cur + 1, 100)) return pw.ret(arr[cur], cal_exact(cur + 1), mod);
+        ll phi = cal_phi(mod), e = cal(cur + 1, p, phi) + 100 * phi;
         return pw.ret(arr[cur], e, mod);
     }
 
