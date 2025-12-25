@@ -103,33 +103,88 @@ public:
     }
 };
 
+class _mint{
+public:
+    ll mod, v;
+    _mint(ll mod = 1, ll v = 0) : mod(mod), v(norm(v, mod)) {}
+    static ll norm(ll x, ll m){ x %= m; return x < 0 ? x + m : x; }
+    static tll gcd(ll a, ll b){
+        if (b == 0) return {a, 1, 0};
+        auto [g, x, y] = gcd(b, a % b);
+        return {g, y, x - (a / b) * y};
+    }
+
+    _mint inv() const{
+        assert(v);
+        auto [g, x, y] = gcd(v, mod);
+        assert(g == 1 || g == -1);
+        if(g == -1) x *= -1;
+        return _mint(mod, x);
+    }
+
+    _mint pow(ll e) const{
+        assert(e >= 0);
+        _mint base = *this, ret(mod, 1);
+        while(e){
+            if(e & 1) ret *= base;
+            base *= base; e >>= 1ll;
+        }
+        return ret;
+    }
+
+    _mint& operator+=(const _mint& ot){
+        assert(mod == ot.mod);
+        v += ot.v;
+        if (v >= mod) v -= mod;
+        return *this;
+    }
+
+    _mint& operator-=(const _mint& ot){
+        assert(mod == ot.mod);
+        v -= ot.v;
+        if (v < 0) v += mod;
+        return *this;
+    }
+
+    _mint& operator*=(const _mint& ot){
+        assert(mod == ot.mod);
+        v = (ll)((i128)v * ot.v % mod);
+        return *this;
+    }
+    _mint& operator/=(const _mint& ot){ return (*this) *= ot.inv(); }
+
+    friend _mint operator+(_mint a, const _mint& b){ return a += b; }
+    friend _mint operator-(_mint a, const _mint& b){ return a -= b; }
+    friend _mint operator*(_mint a, const _mint& b){ return a *= b; }
+    friend _mint operator/(_mint a, const _mint& b){ return a /= b; }
+    _mint& operator+=(ll b){ return (*this) += _mint(mod, b); }
+    _mint& operator-=(ll b){ return (*this) -= _mint(mod, b); }
+    _mint& operator*=(ll b){ return (*this) *= _mint(mod, b); }
+    _mint& operator/=(ll b){ return (*this) /= _mint(mod, b); }
+    friend _mint operator+(_mint a, ll b){ return a += b; }
+    friend _mint operator-(_mint a, ll b){ return a -= b; }
+    friend _mint operator*(_mint a, ll b){ return a *= b; }
+    friend _mint operator/(_mint a, ll b){ return a /= b; }
+    friend ostream& operator<<(ostream& os, const _mint& a){ return os << a.v; }
+};
+
 //조합
 class _comb{
 public:
-    vector <ll> fac, inv; ll n, mod;
+    vector <_mint> fac, inv; ll n, mod;
     _comb(ll n, ll m = 998244353){ // m == MOD && m == prime
         fac.resize(n + 1); inv.resize(n + 1);
         this->mod = m; this->n = n;
 
-        fac[0] = 1; 
-        for(int i = 1;i <= n;i++) fac[i] = fac[i - 1] * i % mod;
-        inv[n] = pow(fac[n], mod - 2, mod);
-        for(int i = n - 1;i >= 0;i--) inv[i] = inv[i + 1] * (i + 1) % mod;
+        fac[0] = _mint(mod, 1);
+        for(int i = 1;i <= n;i++) fac[i] = fac[i - 1] * i;
+        inv[n] = fac[n].pow(mod - 2);
+        for(int i = n - 1;i >= 0;i--) inv[i] = inv[i + 1] * (i + 1);
     }
-
-    ll pow(ll a, ll p, ll mod) {
-		if (!p) return 1;
-		if (p == 1) return a % mod;
-
-		ll cur = pow(a, p / 2, mod);
-		cur = cur * cur % mod;
-		if (p % 2 == 0) return cur % mod;
-		return (cur * a) % mod;
-	}
 
     ll ret(ll n, ll m){ // return nCm
         if(n < 0 || m < 0 || n < m) return 0;
-        return fac[n] * inv[m] % mod * inv[n - m] % mod;
+        return (fac[n] * inv[m] * inv[n - m]).v;
     }
 };
 
@@ -433,32 +488,24 @@ public:
 
 class _lucas{ // mod == prime
 public:
-    ll mod; vector <ll> fac, inv;
-    ll pow(ll a, ll b){
-        ll ret = 1;
-        while(b){
-            if(b & 1) ret *= a % mod, ret %= mod;
-            a *= a; a %= mod; b >>= 1;
-        }      
-        return ret;
-    }
+    ll mod; vector <_mint> fac, inv;
 
     _lucas(ll mod) : mod(mod), fac(mod), inv(mod){
-        fac[0] = 1;
-        for(int i = 1;i < mod;i++) fac[i] = fac[i - 1] * i % mod;
-        inv[mod - 1] = pow(fac[mod - 1], mod - 2);
-        for(int i = mod - 2;i >= 0;i--) inv[i] = inv[i + 1] * (i + 1) % mod;
+        fac[0] = _mint(mod, 1);
+        for(int i = 1;i < mod;i++) fac[i] = fac[i - 1] * i;
+        inv[mod - 1] = fac[mod - 1].pow(mod - 2);
+        for(int i = mod - 2;i >= 0;i--) inv[i] = inv[i + 1] * (i + 1);
     }
 
     ll cal(ll n, ll r){
         if(n < r) return 0;
-        return fac[n] * inv[r] % mod * inv[n - r] % mod;
+        return (fac[n] * inv[r] * inv[n - r]).v;
     }
 
     ll ret(ll n, ll r){
         if(n < r || n < 0 || r < 0) return 0;
         if(!n || !r || n == r) return 1;
-        return cal(n % mod, r % mod) * ret(n / mod, r / mod) % mod;
+        return ( _mint(mod, cal(n % mod, r % mod)) * ret(n / mod, r / mod) ).v;
     }
 };
 
@@ -812,69 +859,4 @@ public:
     }
 
     ll ret(){ return crt.ret().x; } 
-};
-
-class _mint{
-public:
-    ll mod, v;
-    _mint(ll mod = 1, ll v = 0) : mod(mod), v(norm(v, mod)) {}
-    static ll norm(ll x, ll m){ x %= m; return x < 0 ? x + m : x; }
-    static tll gcd(ll a, ll b){
-        if (b == 0) return {a, 1, 0};
-        auto [g, x, y] = gcd(b, a % b);
-        return {g, y, x - (a / b) * y};
-    }
-
-    _mint inv() const{
-        assert(v);
-        auto [g, x, y] = gcd(v, mod);
-        assert(g == 1 || g == -1);
-        if(g == -1) x *= -1;
-        return _mint(mod, x);
-    }
-
-    _mint pow(ll e) const{
-        assert(e >= 0);
-        _mint base = *this, ret(mod, 1);
-        while(e){
-            if(e & 1) ret *= base;
-            base *= base; e >>= 1ll;
-        }
-        return ret;
-    }
-
-    _mint& operator+=(const _mint& ot){
-        assert(mod == ot.mod);
-        v += ot.v;
-        if (v >= mod) v -= mod;
-        return *this;
-    }
-
-    _mint& operator-=(const _mint& ot){
-        assert(mod == ot.mod);
-        v -= ot.v;
-        if (v < 0) v += mod;
-        return *this;
-    }
-
-    _mint& operator*=(const _mint& ot){
-        assert(mod == ot.mod);
-        v = (ll)((i128)v * ot.v % mod);
-        return *this;
-    }
-    _mint& operator/=(const _mint& ot){ return (*this) *= ot.inv(); }
-
-    friend _mint operator+(_mint a, const _mint& b){ return a += b; }
-    friend _mint operator-(_mint a, const _mint& b){ return a -= b; }
-    friend _mint operator*(_mint a, const _mint& b){ return a *= b; }
-    friend _mint operator/(_mint a, const _mint& b){ return a /= b; }
-    _mint& operator+=(ll b){ return (*this) += _mint(mod, b); }
-    _mint& operator-=(ll b){ return (*this) -= _mint(mod, b); }
-    _mint& operator*=(ll b){ return (*this) *= _mint(mod, b); }
-    _mint& operator/=(ll b){ return (*this) /= _mint(mod, b); }
-    friend _mint operator+(_mint a, ll b){ return a += b; }
-    friend _mint operator-(_mint a, ll b){ return a -= b; }
-    friend _mint operator*(_mint a, ll b){ return a *= b; }
-    friend _mint operator/(_mint a, ll b){ return a /= b; }
-    friend ostream& operator<<(ostream& os, const _mint& a){ return os << a.v; }
 };
