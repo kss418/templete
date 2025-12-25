@@ -1,6 +1,6 @@
 {
-"deque_hash": {
-  "prefix": ">>deque_hash",
+"hash": {
+  "prefix": ">>hash",
   "body": [
     "class _hash{ // 0-based index",
     "public:",
@@ -64,6 +64,6 @@
     "    }",
     "};"
   ],
-  "description": "deque_hash"
+  "description": "hash"
 }
 }
