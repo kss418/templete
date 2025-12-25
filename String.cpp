@@ -118,7 +118,7 @@ public:
         _core(ll key, ll mod) : mod(mod), key(mod, key){ // O(n)
             assert(mod > 1); assert(this->key.v > 0);
             inv = this->key.inv();
-            pw.push_back(_mint(mod, 1)); ipw.push_back(_mint(mod, 1));
+            pw.push_back(_mint(1, mod)); ipw.push_back(_mint(1, mod));
         }
 
         void ensure_pw(int k){ 
@@ -130,7 +130,7 @@ public:
 
         int size() const{ return (int)pre.size(); }
         void push_back(ll v){ // O(1)
-            _mint now = _mint(mod, v); ensure_pw(size());
+            _mint now = _mint(v, mod); ensure_pw(size());
             if(pre.empty()) pre.push_back(now);
             else pre.push_back(pre.back() + now * pw[size()]);
         }
@@ -376,8 +376,8 @@ public:
             assert(mod > 1); assert(this->key.v > 0);
             inv = this->key.inv();
             n = 2 * n + 5, s = n / 2; e = s - 1; this->n = n;
-            bit.assign(n, _mint(mod, 0)); arr.assign(n, _mint(mod, 0));
-            pw.assign(n, _mint(mod, 1)); ipw.assign(n, _mint(mod, 1));
+            bit.assign(n, _mint(0, mod)); arr.assign(n, _mint(0, mod));
+            pw.assign(n, _mint(1, mod)); ipw.assign(n, _mint(1, mod));
             
             for(int i = 1;i < n;i++){
                 pw[i] = pw[i - 1] * this->key;
@@ -386,18 +386,18 @@ public:
         }       
 
         void set(int idx, ll v){ // O(log n)
-            _mint now(mod, v), diff = now - arr[idx];
+            _mint now(v, mod), diff = now - arr[idx];
             arr[idx] = now; add(idx, diff * pw[idx]);
         }
 
         void clear(int idx){ // O(log n)
-            _mint diff = _mint(mod, 0) - arr[idx]; 
-            arr[idx] = _mint(mod, 0); add(idx, diff * pw[idx]);
+            _mint diff = _mint(0, mod) - arr[idx]; 
+            arr[idx] = _mint(0, mod); add(idx, diff * pw[idx]);
         }
 
         void add(int idx, _mint v){ for(int i = idx;i < n;i = (i | (i + 1))) bit[i] += v; } // O(log n)
         _mint sum(int idx) const{ // O(log n)
-            _mint ret(mod, 0);
+            _mint ret(0, mod);
             for(int i = idx;i >= 0;i = (i & (i + 1)) - 1) ret += bit[i];
             return ret;
         }
