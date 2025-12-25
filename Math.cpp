@@ -109,7 +109,7 @@ public:
     vector <_mint> fac, inv; int n; ll m; // m == prime
     _comb(int n, ll m = 998244353) : n(n), m(m), fac(n + 1), inv(n + 1){ 
         assert(n < m);
-        fac[0] = _mint(m, 1);
+        fac[0] = _mint(1, m);
         for(int i = 1;i <= n;i++) fac[i] = fac[i - 1] * i;
         inv[n] = fac[n].pow(m - 2);
         for(int i = n - 1;i >= 0;i--) inv[i] = inv[i + 1] * (i + 1);
@@ -136,9 +136,9 @@ public:
         ll lcm = (ll)((i128)a.mod / g * b.mod), diff = b.v - a.v;
         if(diff % g) return 0;
 
-        _mint k = _mint(b.mod / g, diff / g) * cx;
-        ret = _mint(lcm, a.v);
-        ret += _mint(lcm, a.mod) * _mint(lcm, k.v);
+        _mint k = _mint(diff / g, b.mod / g) * cx;
+        ret = _mint(a.v, lcm);
+        ret += _mint(a.mod, lcm) * _mint(k.v, lcm);
         return 1;
     }
 
@@ -152,8 +152,8 @@ public:
         return {cur.v, cur.mod};
     }
 
-    void add(ll a, ll m){ arr.emplace_back(m, a); }
-    void add(pll a){ arr.push_back({a.y, a.x}); }
+    void add(ll a, ll m){ arr.emplace_back(a, m); }
+    void add(pll a){ arr.push_back({a.x, a.y}); }
     void add(const _mint& a){ arr.push_back(a); }
     void clear(){ arr.clear(); }
 };
@@ -416,14 +416,14 @@ class _lucas{ // mod == prime
 public:
     int mod; vector <_mint> fac, inv;
     _lucas(int mod) : mod(mod), fac(mod), inv(mod){ // O(mod)
-        fac[0] = _mint(mod, 1);
+        fac[0] = _mint(1, mod);
         for(int i = 1;i < mod;i++) fac[i] = fac[i - 1] * i;
         inv[mod - 1] = fac[mod - 1].pow(mod - 2);
         for(int i = mod - 2;i >= 0;i--) inv[i] = inv[i + 1] * (i + 1);
     }
 
     _mint cal(ll n, ll r){ // O(1)
-        if(n < r) return _mint(mod, 0);
+        if(n < r) return _mint(0, mod);
         return fac[n] * inv[r] * inv[n - r];
     }
 
@@ -546,7 +546,7 @@ public:
         vector <_mint> pre; ll p, e, mod = 1; 
         _comb(ll prime, ll exp) : p(prime), e(exp){
             for(int i = 1;i <= e;i++) mod *= p;
-            pre.assign(mod + 1, _mint(mod, 1));
+            pre.assign(mod + 1, _mint(1, mod));
             for(ll i = 1;i <= mod;i++){
                 pre[i] = pre[i - 1];
                 if(i % p) pre[i] *= i;
@@ -560,9 +560,9 @@ public:
         }
 
         _mint f(ll n) const{ // p^e = p^k * f(n)
-            if(!n) return _mint(mod, 1);
-            ll div = n / mod, rem = n % mod; _mint ret(mod, 1);
-            if(p % 2) ret = div & 1 ? ret *= _mint(mod, mod - 1) : _mint(mod, 1);
+            if(!n) return _mint(1, mod);
+            ll div = n / mod, rem = n % mod; _mint ret(1, mod);
+            if(p % 2) ret = div & 1 ? ret *= _mint(mod - 1, mod) : _mint(1, mod);
             else ret *= pre[mod].pow(div);
             ret *= pre[rem]; ret *= f(n / p);
             return ret;
@@ -574,7 +574,7 @@ public:
             if(now >= e) return 0;
 
             _mint div = f(r) * f(n - r), inv = div.inv();
-            return (f(n) * inv * _mint(mod, p).pow(now)).v;
+            return (f(n) * inv * _mint(p, mod).pow(now)).v;
         }
     }; 
 
@@ -641,7 +641,7 @@ public:
         return ret;
     }
 
-    ll pow_mod(ll a, ll b, ll p){ return _mint(p, a).pow(b).v; }
+    ll pow_mod(ll a, ll b, ll p){ return _mint(a, p).pow(b).v; }
     ll cal_phi(ll x){
         ll ret = x;
         for(ll i = 2;i * i <= x;i++){
@@ -671,7 +671,7 @@ public:
     ll cal(int cur, ll mod){
         if(mod == 1) return 0;
         if(arr[cur] == 1) return 1;
-        if(cur + 1 == arr.size()) return _mint(mod, arr[cur]).v;
+        if(cur + 1 == arr.size()) return _mint(arr[cur], mod).v;
         if(tower_le(cur + 1, 100)) return pow_mod(arr[cur], cal_exact(cur + 1), mod);
         ll phi = cal_phi(mod), e = cal(cur + 1, phi) + 100 * phi;
         return pow_mod(arr[cur], e, mod);
@@ -683,7 +683,7 @@ public:
 class _mint{
 public:
     ll mod, v;
-    _mint(ll mod = 1, ll v = 0) : mod(mod), v(norm(v, mod)) {}
+    _mint(ll v, ll mod) : mod(mod), v(norm(v, mod)) {}
     static ll norm(ll x, ll m){ x %= m; return x < 0 ? x + m : x; }
     static tll gcd(ll a, ll b){
         if (b == 0) return {a, 1, 0};
@@ -696,12 +696,12 @@ public:
         auto [g, x, y] = gcd(v, mod);
         assert(g == 1 || g == -1);
         if(g == -1) x *= -1;
-        return _mint(mod, x);
+        return _mint(x, mod);
     }
 
     _mint pow(ll e) const{
         assert(e >= 0);
-        _mint base = *this, ret(mod, 1);
+        _mint base = *this, ret(1, mod);
         while(e){
             if(e & 1) ret *= base;
             base *= base; e >>= 1ll;
@@ -734,10 +734,10 @@ public:
     friend _mint operator-(_mint a, const _mint& b){ return a -= b; }
     friend _mint operator*(_mint a, const _mint& b){ return a *= b; }
     friend _mint operator/(_mint a, const _mint& b){ return a /= b; }
-    _mint& operator+=(ll b){ return (*this) += _mint(mod, b); }
-    _mint& operator-=(ll b){ return (*this) -= _mint(mod, b); }
-    _mint& operator*=(ll b){ return (*this) *= _mint(mod, b); }
-    _mint& operator/=(ll b){ return (*this) /= _mint(mod, b); }
+    _mint& operator+=(ll b){ return (*this) += _mint(b, mod); }
+    _mint& operator-=(ll b){ return (*this) -= _mint(b, mod); }
+    _mint& operator*=(ll b){ return (*this) *= _mint(b, mod); }
+    _mint& operator/=(ll b){ return (*this) /= _mint(b, mod); }
     friend _mint operator+(_mint a, ll b){ return a += b; }
     friend _mint operator-(_mint a, ll b){ return a -= b; }
     friend _mint operator*(_mint a, ll b){ return a *= b; }

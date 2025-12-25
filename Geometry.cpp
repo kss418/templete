@@ -121,16 +121,16 @@ public:
     int n, m; ll mod; vector<_mint> arr;
     _mod_matrix() : n(0), m(0), mod(1){}
     _mod_matrix(int n, int m, ll mod = 998244353)
-        : n(n), m(m), mod(mod), arr(1LL * n * m, _mint(mod, 0)) {}
+        : n(n), m(m), mod(mod), arr(1LL * n * m, _mint(0, mod)) {}
 
     _mint& at(int i, int j){ return arr[1LL * i * m + j]; }
     const _mint& at(int i, int j) const{ return arr[1LL * i * m + j]; }
     void add(int i, int j, ll v){ at(i, j) += v; }
-    void set(int i, int j, ll v){ at(i, j) = _mint(mod, v); }
+    void set(int i, int j, ll v){ at(i, j) = _mint(v, mod); }
 
     static _mod_matrix id(int n, ll mod){
         _mod_matrix ret(n, n, mod);
-        for(int i = 0; i < n; i++) ret.at(i, i) = _mint(mod, 1);
+        for(int i = 0; i < n; i++) ret.at(i, i) = _mint(1, mod);
         return ret;
     }
 
