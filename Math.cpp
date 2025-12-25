@@ -421,32 +421,23 @@ public:
 
 class _lucas{ // mod == prime
 public:
-    ll mod; vector <ll> fac, inv;
-    ll pow(ll a, ll b){
-        ll ret = 1;
-        while(b){
-            if(b & 1) ret *= a % mod, ret %= mod;
-            a *= a; a %= mod; b >>= 1;
-        }      
-        return ret;
+    int mod; vector <_mint> fac, inv;
+    _lucas(int mod) : mod(mod), fac(mod), inv(mod){ // O(mod)
+        fac[0] = _mint(mod, 1);
+        for(int i = 1;i < mod;i++) fac[i] = fac[i - 1] * i;
+        inv[mod - 1] = fac[mod - 1].pow(mod - 2);
+        for(int i = mod - 2;i >= 0;i--) inv[i] = inv[i + 1] * (i + 1);
     }
 
-    _lucas(ll mod) : mod(mod), fac(mod), inv(mod){
-        fac[0] = 1;
-        for(int i = 1;i < mod;i++) fac[i] = fac[i - 1] * i % mod;
-        inv[mod - 1] = pow(fac[mod - 1], mod - 2);
-        for(int i = mod - 2;i >= 0;i--) inv[i] = inv[i + 1] * (i + 1) % mod;
+    _mint cal(ll n, ll r){ // O(1)
+        if(n < r) return _mint(mod, 0);
+        return fac[n] * inv[r] * inv[n - r];
     }
 
-    ll cal(ll n, ll r){
-        if(n < r) return 0;
-        return fac[n] * inv[r] % mod * inv[n - r] % mod;
-    }
-
-    ll ret(ll n, ll r){
+    int ret(ll n, ll r){ // O(log n)
         if(n < r || n < 0 || r < 0) return 0;
         if(!n || !r || n == r) return 1;
-        return cal(n % mod, r % mod) * ret(n / mod, r / mod) % mod;
+        return (cal(n % mod, r % mod) * ret(n / mod, r / mod)).v;
     }
 };
 
