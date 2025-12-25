@@ -365,21 +365,21 @@ public:
     vector <ll> ret(){ return result; }
 };
 
-class _deque_hash{
+class _deque_hash{ // 0-based index
 public:
-    class _core{ // 1-based index
+    class _core{ 
     public:
         vector <_mint> bit, arr, pw, ipw;
         _mint key, inv; ll mod; int n, s, e;
-        _core() : mod(1), key(1, 0), inv(1, 0), n(0), s(0), e(0){}
+        _core() : mod(1), key(1, 0), inv(1, 0), n(0), s(0), e(-1){}
         _core(int n, ll key, ll mod) : n(n), mod(mod), key(mod, key) { // mod == prime
             assert(mod > 1); assert(this->key.v > 0);
             inv = this->key.inv();
             n = 2 * n + 5, s = n / 2; e = s - 1; this->n = n;
-            bit.assign(n + 1, _mint(mod, 0)); arr.assign(n + 1, _mint(mod, 0));
-            pw.assign(n + 1, _mint(mod, 1)); ipw.assign(n + 1, _mint(mod, 1));
+            bit.assign(n, _mint(mod, 0)); arr.assign(n, _mint(mod, 0));
+            pw.assign(n, _mint(mod, 1)); ipw.assign(n, _mint(mod, 1));
             
-            for(int i = 1;i <= n;i++){
+            for(int i = 1;i < n;i++){
                 pw[i] = pw[i - 1] * this->key;
                 ipw[i] = ipw[i - 1] * inv;
             }
@@ -395,10 +395,10 @@ public:
             arr[idx] = _mint(mod, 0); add(idx, diff * pw[idx]);
         }
 
-        void add(int idx, _mint v){ for(int i = idx;i <= n;i += i & -i) bit[i] += v; } // O(log n)
+        void add(int idx, _mint v){ for(int i = idx;i < n;i = (i | (i + 1))) bit[i] += v; } // O(log n)
         _mint sum(int idx) const{ // O(log n)
             _mint ret(mod, 0);
-            for(int i = idx;i > 0;i -= i & -i) ret += bit[i];
+            for(int i = idx;i >= 0;i = (i & (i + 1)) - 1) ret += bit[i];
             return ret;
         }
 
@@ -410,7 +410,9 @@ public:
 
         ll ret(int l, int r) const{ // O(log n)
             l += s; r += s;
-            return ((sum(r) - sum(l - 1)) * ipw[l]).v;
+            _mint ret = sum(r);
+            if(l) ret -= sum(l - 1);
+            return (ret * ipw[l]).v;
         }
     };
 
