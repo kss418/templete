@@ -2,12 +2,12 @@
 	"ufset": {
   "prefix": ">>ufset",
   "body": [
-    "class _uf { ",
+    "class _ufset { ",
     "public:",
     "    ll n; vector <ll> p, si, l, r;",
     "    ",
-    "    _uf(){}",
-    "    _uf(ll n) { ",
+    "    _ufset(){}",
+    "    _ufset(ll n) { ",
     "        this->n = n;",
     "        p.resize(n + 1, -1); si.resize(n + 1, 1);",
     "        l.resize(n + 1); r.resize(n + 1);",
