@@ -14,15 +14,6 @@
     "        }      ",
     "        return ret;",
     "    }",
-    "",
-    "	ll ret(ll a, ll b, ll p){",
-    "        ll ret = 1;",
-    "        while(b){",
-    "            if(b & 1) ret *= a % p, ret %= p;",
-    "            a *= a; a %= p; b >>= 1;",
-    "        }      ",
-    "        return ret;",
-    "    }",
     "};"
   ],
   "description": "pow"

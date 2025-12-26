@@ -49,15 +49,6 @@ public:
         }      
         return ret;
     }
-
-	ll ret(ll a, ll b, ll p){
-        ll ret = 1;
-        while(b){
-            if(b & 1) ret *= a % p, ret %= p;
-            a *= a; a %= p; b >>= 1;
-        }      
-        return ret;
-    }
 };
 
 //GCD, INV
@@ -79,27 +70,6 @@ public:
         auto [g, x, y] = init(a, mod);
         if (!a || g != 1) return -1;
         return (x < 0 ? x + mod : x);
-    }
-};
-
-//p*q-1
-class _inv {
-public:
-    _inv() {}
-    ll pow_mod(ll a, ll b, ll c) {
-        if (!b) return 1;
-        ll ret = pow_mod(a, b / 2, c) % c;
-
-        if (b % 2) return ((ret * ret) % c * (a % c)) % c;
-        return (ret * ret) % c;
-    }
-
-    ll prime_inv(ll a, ll b) {
-        return pow_mod(a, b - 2, b);
-    }
-
-    ll ret(ll a, ll b, ll m) { // (a * b^-1) % m 반환 m == prime
-        return (a % m * prime_inv(b, m) % m) % m;
     }
 };
 
