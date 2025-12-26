@@ -9,7 +9,71 @@ using pll = pair<ll, ll>; using tll = tuple<ll, ll, ll>;
 constexpr ll INF = 0x3f3f3f3f3f3f3f3f;
 constexpr ll MINF = 0xc0c0c0c0c0c0c0c0;
 
-//에라토스체
+class _mint{
+public:
+    ll mod, v;
+    _mint(ll v, ll mod) : mod(mod), v(norm(v, mod)) {}
+    static ll norm(ll x, ll m){ x %= m; return x < 0 ? x + m : x; }
+    static tll gcd(ll a, ll b){
+        if (b == 0) return {a, 1, 0};
+        auto [g, x, y] = gcd(b, a % b);
+        return {g, y, x - (a / b) * y};
+    }
+
+    _mint inv() const{
+        assert(v);
+        auto [g, x, y] = gcd(v, mod);
+        assert(g == 1 || g == -1);
+        if(g == -1) x *= -1;
+        return _mint(x, mod);
+    }
+
+    _mint pow(ll e) const{
+        assert(e >= 0);
+        _mint base = *this, ret(1, mod);
+        while(e){
+            if(e & 1) ret *= base;
+            base *= base; e >>= 1ll;
+        }
+        return ret;
+    }
+
+    _mint& operator+=(const _mint& ot){
+        assert(mod == ot.mod);
+        v += ot.v;
+        if (v >= mod) v -= mod;
+        return *this;
+    }
+
+    _mint& operator-=(const _mint& ot){
+        assert(mod == ot.mod);
+        v -= ot.v;
+        if (v < 0) v += mod;
+        return *this;
+    }
+
+    _mint& operator*=(const _mint& ot){
+        assert(mod == ot.mod);
+        v = (ll)((i128)v * ot.v % mod);
+        return *this;
+    }
+    _mint& operator/=(const _mint& ot){ return (*this) *= ot.inv(); }
+
+    friend _mint operator+(_mint a, const _mint& b){ return a += b; }
+    friend _mint operator-(_mint a, const _mint& b){ return a -= b; }
+    friend _mint operator*(_mint a, const _mint& b){ return a *= b; }
+    friend _mint operator/(_mint a, const _mint& b){ return a /= b; }
+    _mint& operator+=(ll b){ return (*this) += _mint(b, mod); }
+    _mint& operator-=(ll b){ return (*this) -= _mint(b, mod); }
+    _mint& operator*=(ll b){ return (*this) *= _mint(b, mod); }
+    _mint& operator/=(ll b){ return (*this) /= _mint(b, mod); }
+    friend _mint operator+(_mint a, ll b){ return a += b; }
+    friend _mint operator-(_mint a, ll b){ return a -= b; }
+    friend _mint operator*(_mint a, ll b){ return a *= b; }
+    friend _mint operator/(_mint a, ll b){ return a /= b; }
+    friend ostream& operator<<(ostream& os, const _mint& a){ return os << a.v; }
+};
+
 template <size_t n>
 class _es {
 public:
@@ -36,7 +100,6 @@ public:
     }
 };
 
-//POW
 class _pow {
 public:
 	_pow() {}
@@ -51,7 +114,6 @@ public:
     }
 };
 
-//GCD, INV
 class _gcd {
 public:
     _gcd() {}
@@ -73,25 +135,6 @@ public:
     }
 };
 
-//조합
-class _comb{
-public:
-    vector <_mint> fac, inv; int n; ll m; // m == prime
-    _comb(int n, ll m = 998244353) : n(n), m(m), fac(n + 1), inv(n + 1){ 
-        assert(n < m);
-        fac[0] = _mint(1, m);
-        for(int i = 1;i <= n;i++) fac[i] = fac[i - 1] * i;
-        inv[n] = fac[n].pow(m - 2);
-        for(int i = n - 1;i >= 0;i--) inv[i] = inv[i + 1] * (i + 1);
-    }
-
-    ll ret(ll n, ll r){
-        if(n < 0 || r < 0 || n < r) return 0;
-        return (fac[n] * inv[r] * inv[n - r]).v;
-    }
-};
-
-//CRT
 class _crt{ // Require _mint
 public:
     _crt(){} vector <_mint> arr;
@@ -180,72 +223,6 @@ public:
             cur *= pow(a, mx, p); cur %= p;
         }
         return -1;
-    }
-};
-
-//FFT
-template <typename T = ll>
-class _fft{
-public:
-    const ld PI = acos(-1);
-    using cpd = complex <double>;
-
-    void fft(vector <cpd>& v, bool inv = 0){
-        ll n = v.size();
-        for(int i = 1,j = 0;i < n;i++){
-            ll bit = n >> 1ll;
-            for(;j >= bit;bit >>= 1ll) j -= bit;
-            j += bit;
-            if(i < j) swap(v[i], v[j]);
-        }
-
-        for(int k = 1;k < n;k <<= 1ll){
-            double a = PI / k * (inv ? 1 : -1);
-            cpd w(cos(a), sin(a));
-            for(int i = 0;i < n;i += 2 * k){
-                cpd wp(1, 0);
-                for(int j = 0;j < k;j++){
-                    cpd x = v[i + j], y = v[i + j + k] * wp;
-                    v[i + j] = x + y;
-                    v[i + j + k] = x - y;
-                    wp *= w;
-                }
-            }
-        }
-
-        if(inv) for(int i = 0;i < n;i++) v[i] /= n;
-    }  
-        
-    vector <T> mul(const vector <T>& a,const vector <T>& b){
-        vector<cpd> av(all(a)), bv(all(b));
-        ll n = 2;
-        while(n < a.size() + b.size()) n <<= 1;
-        av.resize(n); bv.resize(n);
-        fft(av); fft(bv);
-        for(int i = 0;i < n;i++) av[i] *= bv[i];
-        fft(av, 1);
-
-        vector <T> ret(n);
-        for(int i = 0;i < n;i++) ret[i] = round(av[i].real());
-    
-        return ret;
-    }
-        
-    vector <T> carry(vector <T>& a, vector <T>& b){
-        reverse(all(a)); reverse(all(b));
-        vector <T> ret = mul(a, b);
-
-        for(int i = 0;i < ret.size();i++){
-            if(ret[i] < 10) continue;
-            if(i < ret.size() - 1) ret[i + 1] += ret[i] / 10;
-            else ret.push_back(ret[i] / 10);
-            ret[i] %= 10;
-        }
-        
-        while(!ret.empty() && !ret.back()) ret.pop_back();
-        if(ret.empty()) return vector<T>(1, 0);
-        reverse(all(ret));
-        return ret;
     }
 };
 
@@ -382,28 +359,6 @@ public:
     }
 };
 
-class _lucas{ // mod == prime
-public:
-    int mod; vector <_mint> fac, inv;
-    _lucas(int mod) : mod(mod), fac(mod), inv(mod){ // O(mod)
-        fac[0] = _mint(1, mod);
-        for(int i = 1;i < mod;i++) fac[i] = fac[i - 1] * i;
-        inv[mod - 1] = fac[mod - 1].pow(mod - 2);
-        for(int i = mod - 2;i >= 0;i--) inv[i] = inv[i + 1] * (i + 1);
-    }
-
-    _mint cal(ll n, ll r){ // O(1)
-        if(n < r) return _mint(0, mod);
-        return fac[n] * inv[r] * inv[n - r];
-    }
-
-    int ret(ll n, ll r){ // O(log n)
-        if(n < r || n < 0 || r < 0) return 0;
-        if(!n || !r || n == r) return 1;
-        return (cal(n % mod, r % mod) * ret(n / mod, r / mod)).v;
-    }
-};
-
 class _ls{
 public:
     vector <int> lp, prime, vphi, vmu; int n, flag; 
@@ -508,63 +463,6 @@ public:
     ll mobius(int x) const { return vmu[x]; } // 뫼비우스
 };
 
-// comb mod (p1^e1 + p2^e2...)
-class _comb_crt{ // Require mint, crt
-public:
-    class _comb{ // O(p1^e1 + p2^e2 ...)
-    public:
-        vector <_mint> pre; ll p, e, mod = 1; 
-        _comb(ll prime, ll exp) : p(prime), e(exp){
-            for(int i = 1;i <= e;i++) mod *= p;
-            pre.assign(mod + 1, _mint(1, mod));
-            for(ll i = 1;i <= mod;i++){
-                pre[i] = pre[i - 1];
-                if(i % p) pre[i] *= i;
-            }
-        }   
-        
-        ll vp(ll n) const{
-            ll ret = 0;
-            while(n){ n /= p; ret += n; }
-            return ret;
-        }
-
-        _mint f(ll n) const{ // p^e = p^k * f(n)
-            if(!n) return _mint(1, mod);
-            ll div = n / mod, rem = n % mod; _mint ret(1, mod);
-            if(p % 2) ret = div & 1 ? ret *= _mint(mod - 1, mod) : _mint(1, mod);
-            else ret *= pre[mod].pow(div);
-            ret *= pre[rem]; ret *= f(n / p);
-            return ret;
-        }
-
-        ll ret(ll n, ll r) const{ // O(log n + log p)
-            if(r < 0 || r > n) return 0;
-            ll now = vp(n) - vp(r) - vp(n - r);
-            if(now >= e) return 0;
-
-            _mint div = f(r) * f(n - r), inv = div.inv();
-            return (f(n) * inv * _mint(p, mod).pow(now)).v;
-        }
-    }; 
-
-    vector <_comb> c; vector <_lucas> l; _crt crt;
-    void add(ll p, ll e){ // O(1) 
-        if(e <= 0) return;
-        if(e == 1) l.emplace_back(p);
-        else c.emplace_back(p, e);
-    }
-
-    ll ret(ll n, ll r){ // O(log n + log p)
-        crt.clear();
-        for(auto& i : c) crt.add(i.ret(n, r), i.mod);
-        for(auto& i : l) crt.add(i.ret(n, r), i.mod);
-        return crt.ret().x;
-    }
-
-    void clear(){ l.clear(); c.clear(); }
-};
-
 // Prime Tower
 class _pt{
 public:
@@ -648,69 +546,4 @@ public:
     }
 
     ll ret(){ return crt.ret().x; } 
-};
-
-class _mint{
-public:
-    ll mod, v;
-    _mint(ll v, ll mod) : mod(mod), v(norm(v, mod)) {}
-    static ll norm(ll x, ll m){ x %= m; return x < 0 ? x + m : x; }
-    static tll gcd(ll a, ll b){
-        if (b == 0) return {a, 1, 0};
-        auto [g, x, y] = gcd(b, a % b);
-        return {g, y, x - (a / b) * y};
-    }
-
-    _mint inv() const{
-        assert(v);
-        auto [g, x, y] = gcd(v, mod);
-        assert(g == 1 || g == -1);
-        if(g == -1) x *= -1;
-        return _mint(x, mod);
-    }
-
-    _mint pow(ll e) const{
-        assert(e >= 0);
-        _mint base = *this, ret(1, mod);
-        while(e){
-            if(e & 1) ret *= base;
-            base *= base; e >>= 1ll;
-        }
-        return ret;
-    }
-
-    _mint& operator+=(const _mint& ot){
-        assert(mod == ot.mod);
-        v += ot.v;
-        if (v >= mod) v -= mod;
-        return *this;
-    }
-
-    _mint& operator-=(const _mint& ot){
-        assert(mod == ot.mod);
-        v -= ot.v;
-        if (v < 0) v += mod;
-        return *this;
-    }
-
-    _mint& operator*=(const _mint& ot){
-        assert(mod == ot.mod);
-        v = (ll)((i128)v * ot.v % mod);
-        return *this;
-    }
-    _mint& operator/=(const _mint& ot){ return (*this) *= ot.inv(); }
-
-    friend _mint operator+(_mint a, const _mint& b){ return a += b; }
-    friend _mint operator-(_mint a, const _mint& b){ return a -= b; }
-    friend _mint operator*(_mint a, const _mint& b){ return a *= b; }
-    friend _mint operator/(_mint a, const _mint& b){ return a /= b; }
-    _mint& operator+=(ll b){ return (*this) += _mint(b, mod); }
-    _mint& operator-=(ll b){ return (*this) -= _mint(b, mod); }
-    _mint& operator*=(ll b){ return (*this) *= _mint(b, mod); }
-    _mint& operator/=(ll b){ return (*this) /= _mint(b, mod); }
-    friend _mint operator+(_mint a, ll b){ return a += b; }
-    friend _mint operator-(_mint a, ll b){ return a -= b; }
-    friend _mint operator*(_mint a, ll b){ return a *= b; }
-    friend _mint operator/(_mint a, ll b){ return a /= b; }
-    friend ostream& operator<<(ostream& os, const _mint& a){ return os << a.v; }
 };
