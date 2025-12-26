@@ -43,7 +43,7 @@ PS/CP(Problem Solving / Competitive Programming)용 C++ 템플릿 모음입니�
 - `Hash.cpp`
   - Prefix Sum Hash (`_hash`)
   - Deque Hash (`_deque_hash`)
-- `Number_Thoery.cpp`
+- `Number_Theory.cpp`
   - modint (`_mint`)
   - 에라토스테네스의 체 (`_es`)
   - 분할정복 거듭제곱 (`_pow`)
