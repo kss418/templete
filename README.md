@@ -83,5 +83,5 @@ PS/CP(Problem Solving / Competitive Programming)용 C++ 템플릿 모음입니�
 
 ## snippets/
 
-`snippets/`에는 VS Code용 code snippets가 들어있습니다. 각 알고리즘명에 대응하는
+`snippets/`에는 VS Code용 code snippets이 들어있습니다. 각 알고리즘명에 대응하는
 `.code-snippets` 파일이 존재하며 위 템플릿 파일들과 1:1로 매칭됩니다.
