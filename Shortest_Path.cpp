@@ -55,65 +55,79 @@ public:
     ll ret(node cur) { return v[cur.num()]; }
 };
 
-class _dij {
-public:
-    class node{
-    public:
-        ll d;
-        node() : node(0){}
-        node(ll d) : d(d){}
-        ll num() const{ return d; }
-        bool operator<(const node& ot) const{ return num() < ot.num(); }
-        bool operator>(const node& ot) const{ return num() > ot.num(); }
-        bool operator==(const node& ot) const{ return num() == ot.num(); }
-        bool operator<=(const node& ot) const{ return num() <= ot.num(); }
-        node operator+(const node& ot) const{
-            return {d + ot.d};
-        }
-        operator ll(){ return d; }
-    };
-    node mx(){ return {INF}; }
-    node mn(){ return {0}; }
-
-    using ptl = pair <node, ll>;
-    ll n; vector <node> d;
-    vector <ll> pre;
-    vector <vector<ptl>> adj;
-    priority_queue <ptl, vector<ptl>, greater<ptl>> pq;
-
-    _dij(){}
-    _dij(ll n) { this->n = n; adj.resize(n + 1); }
-
-    void add(ll st, ll en, node c) { // 양방향
-        adj[st].push_back({ c,en });
-        adj[en].push_back({ c,st });
-    }
-    void addsol(ll st, ll en, node c) { // 단방향
-        adj[st].push_back({ c,en });
-    }
-
-    void init(ll st) {
-        d.clear(); pre.clear();
-        d.resize(n + 1, mx()); pre.resize(n + 1, -1); 
-        pq.push({ mn(), st });
-        d[st] = mn();
-
+template<
+    class dist = ll, class cost = ll,
+    dist (*add)(dist, cost),
+    bool (*leq)(dist, dist),
+    dist (*inf)(),
+    dist (*zero)()
+>
+class _dij { // add -> dist + cost / leq -> compare dist
+private:
+    struct edge{ cost w; int nxt; };
+    struct node{ dist d; int v; };
+    struct cmp{ bool operator()(const node& a, const node& b) const{ return _dij::less(b.d, a.d); } };
+    vector<vector<edge>> adj; int n; bool built = 0;
+    vector <dist> d; vector<int> pre;
+    priority_queue<node, vector<node>, cmp> pq;
+    void cal(){
+        built = 1;
         while (!pq.empty()) {
-            auto [cn, cur] = pq.top(); pq.pop();
-            if(cn > d[cur]) continue;
-            
-            for (auto& i : adj[cur]) {
-                auto [nn, nxt] = i;
-                node pl = nn + cn;
-        
-                if (d[nxt] <= pl) continue;
-                d[nxt] = pl; pre[nxt] = cur; 
-                pq.push({ pl, nxt });
+            auto [cd, cur] = pq.top(); pq.pop();
+            if(!eq(cd, d[cur])) continue;
+            for(const auto& i : adj[cur]) {
+                auto [w, nxt] = i;
+                dist nd = add(cd, w);
+                if(leq(d[nxt], nd)) continue;
+                d[nxt] = nd; pre[nxt] = cur; 
+                pq.push({ nd, nxt });
             }
         }
     }
+    void reset(int n){ pre.assign(n + 1, -1); d.assign(n + 1, inf()); }
+    void chk(int x) const{ assert(built); assert(x >= 0 && x <= n); }
+public:
+    _dij(int n = 0){ clear(n); } // O(n)
+    static bool less(const dist& a, const dist& b){ return leq(a, b) && !leq(b, a); }
+    static bool eq(const dist& a, const dist& b){ return leq(a, b) && leq(b, a); }
 
-    node ret(ll n) { return d[n]; }
+    void clear(int n = 0){ // O(n + m)
+        this->n = n; adj.assign(n + 1, {}); reset(n);
+        built = 0; while(!pq.empty()) pq.pop();
+    }
+
+    void addsol(int st, int en, cost c){ adj[st].push_back({ c,en }); } // O(1)
+    void add(int st, int en, cost c){ // O(1)
+        adj[st].push_back({ c,en });
+        adj[en].push_back({ c,st });
+    }
+
+    void init(int source){ // O(m log n)
+        reset(n); d[source] = zero();
+        pq.push({ d[source], source }); cal();
+    }
+
+    void init(const vector <int>& source){ // O(m log n)
+        reset(n);
+        for(const auto& i : source){
+            d[i] = zero();
+            pq.push({ d[i], i });
+        } cal();
+    }
+
+    dist ret(int x) const{ // O(1)
+        chk(x);
+        return d[x]; 
+    }
+
+    vector <int> get_path(int x) const{ // O(n)
+        chk(x);
+        if(eq(d[x], inf())) return {};
+        vector<int> ret;
+        for(int cur = x; cur != -1; cur = pre[cur]) ret.push_back(cur);
+        reverse(all(ret));
+        return ret;
+    }
 };
 
 template <typename T = ll> // 1-based index
