@@ -5,7 +5,7 @@
     "class _mint{",
     "public:",
     "    ll mod, v;",
-    "    _mint(ll v, ll mod) : mod(mod), v(norm(v, mod)) {}",
+    "    _mint(ll v = 0, ll mod = 1) : mod(mod), v(norm(v, mod)) {}",
     "    static ll norm(ll x, ll m){ x %= m; return x < 0 ? x + m : x; }",
     "    static tll gcd(ll a, ll b){",
     "        if (b == 0) return {a, 1, 0};",
