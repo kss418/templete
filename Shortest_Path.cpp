@@ -130,6 +130,11 @@ public:
         return d[x];
     }
 
+    bool reachable(int x) const{ // O(1)
+        chk(x);
+        return !eq(d[x], policy::inf());
+    }
+
     vector <int> get_path(int x) const{ // O(n)
         chk(x);
         if(eq(d[x], policy::inf())) return {};
