@@ -1,6 +1,6 @@
 # PS/CP C++ 템플릿
 
-이 레포는 PS/CP(Problem Solving / Competitive Programming)용 C++ 템플릿 모음입니다.
+PS/CP(Problem Solving / Competitive Programming)용 C++ 템플릿 모음입니다.
 대회에서 바로 사용할 수 있도록 알고리즘별 구현을 파일 단위로 정리해 두었습니다.
 
 ## 알고리즘 위치 안내
