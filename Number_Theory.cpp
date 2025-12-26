@@ -12,7 +12,7 @@ constexpr ll MINF = 0xc0c0c0c0c0c0c0c0;
 class _mint{
 public:
     ll mod, v;
-    _mint(ll v, ll mod) : mod(mod), v(norm(v, mod)) {}
+    _mint(ll v = 0, ll mod = 1) : mod(mod), v(norm(v, mod)) {}
     static ll norm(ll x, ll m){ x %= m; return x < 0 ? x + m : x; }
     static tll gcd(ll a, ll b){
         if (b == 0) return {a, 1, 0};
@@ -428,19 +428,19 @@ public:
     }
 
     ll divisor_sum(int x){  // 약수의 합
-    if(x == 0 || x == 1) return x;   
-    ll ret = 1;
-    while(x != 1){
-        ll p = lp[x], sum = 1, cur = 1;
-        while(x % p == 0){
-            x /= p;
-            cur *= p;
-            sum += cur;
+        if(x == 0 || x == 1) return x;   
+        ll ret = 1;
+        while(x != 1){
+            ll p = lp[x], sum = 1, cur = 1;
+            while(x % p == 0){
+                x /= p;
+                cur *= p;
+                sum += cur;
+            }
+            ret *= sum;
         }
-        ret *= sum;
+        return ret;
     }
-    return ret;
-}
 
     vector <ll> divisor(int x){ // 약수 벡터 반환
         if(!x) return {};
