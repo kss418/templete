@@ -1,0 +1,148 @@
+#include <bits/stdc++.h>
+#define all(x) (x).begin(), (x).end()
+#define x first 
+#define y second
+using namespace std; using ll = long long; using u64 = uint64_t;
+using ld = long double; using pld = pair<ld, ld>;
+using i128 = __int128_t; using f128 = __float128; 
+using pll = pair<ll, ll>; using tll = tuple<ll, ll, ll>;
+constexpr ll INF = 0x3f3f3f3f3f3f3f3f;
+constexpr ll MINF = 0xc0c0c0c0c0c0c0c0;
+
+class _hash{ // 0-based index
+public:
+    class _core {
+    public:
+        vector <_mint> pw, ipw, pre; 
+        _mint key, inv; ll mod; 
+        _core() : mod(1), key(1, 0), inv(1, 0){}
+        _core(ll key, ll mod) : mod(mod), key(mod, key){ // O(n)
+            assert(mod > 1); assert(this->key.v > 0);
+            inv = this->key.inv();
+            pw.push_back(_mint(1, mod)); ipw.push_back(_mint(1, mod));
+        }
+
+        void ensure_pw(int k){ 
+            while((int)pw.size() <= k){
+                pw.push_back(pw.back() * key); 
+                ipw.push_back(ipw.back() * inv);
+            }
+        }
+
+        int size() const{ return (int)pre.size(); }
+        void push_back(ll v){ // O(1)
+            _mint now = _mint(v, mod); ensure_pw(size());
+            if(pre.empty()) pre.push_back(now);
+            else pre.push_back(pre.back() + now * pw[size()]);
+        }
+
+        void pop_back(){ // O(1)
+            assert(!pre.empty());
+            pre.pop_back();
+        }
+
+        ll ret(int l, int r) const{ // O(1)
+            _mint ret = pre[r];
+            if(l > 0) ret -= pre[l - 1];
+            ret *= ipw[l];
+            return ret.v;
+        }
+    };
+
+    vector <_core> arr; int m;
+    _hash() : m(0){} 
+    _hash(const vector <ll>& key, const vector<ll>& mod){ // O(n)
+        assert(key.size() == mod.size()); m = key.size(); arr.reserve(m);
+        for(int i = 0; i < mod.size(); i++) arr.emplace_back(key[i], mod[i]);
+    }
+
+    void push_back(ll v){ for(auto& c : arr) c.push_back(v); } // O(1)
+    void pop_back(){ for(auto& c : arr) c.pop_back(); } // O(1)
+    int size() const{ return arr.empty() ? 0 : arr[0].size(); } // O(1)
+    vector<ll> ret(int l, int r) const{ // O(1)
+        vector<ll> ret; ret.reserve(m);
+        for(const auto& c : arr) ret.push_back(c.ret(l, r));
+        return ret;
+    }
+
+    bool same(int l1, int r1, int l2, int r2) const{ // O(1)
+        for(const auto& c : arr) if(c.ret(l1, r1) != c.ret(l2, r2)) return 0;
+        return 1;
+    }
+};
+
+class _deque_hash{ // 0-based index
+public:
+    class _core{ 
+    public:
+        vector <_mint> bit, arr, pw, ipw;
+        _mint key, inv; ll mod; int n, s, e;
+        _core() : mod(1), key(1, 0), inv(1, 0), n(0), s(0), e(-1){}
+        _core(int n, ll key, ll mod) : n(n), mod(mod), key(mod, key) { // mod == prime
+            assert(mod > 1); assert(this->key.v > 0);
+            inv = this->key.inv();
+            n = 2 * n + 5, s = n / 2; e = s - 1; this->n = n;
+            bit.assign(n, _mint(0, mod)); arr.assign(n, _mint(0, mod));
+            pw.assign(n, _mint(1, mod)); ipw.assign(n, _mint(1, mod));
+            
+            for(int i = 1;i < n;i++){
+                pw[i] = pw[i - 1] * this->key;
+                ipw[i] = ipw[i - 1] * inv;
+            }
+        }       
+
+        void set(int idx, ll v){ // O(log n)
+            _mint now(v, mod), diff = now - arr[idx];
+            arr[idx] = now; add(idx, diff * pw[idx]);
+        }
+
+        void clear(int idx){ // O(log n)
+            _mint diff = _mint(0, mod) - arr[idx]; 
+            arr[idx] = _mint(0, mod); add(idx, diff * pw[idx]);
+        }
+
+        void add(int idx, _mint v){ for(int i = idx;i < n;i = (i | (i + 1))) bit[i] += v; } // O(log n)
+        _mint sum(int idx) const{ // O(log n)
+            _mint ret(0, mod);
+            for(int i = idx;i >= 0;i = (i & (i + 1)) - 1) ret += bit[i];
+            return ret;
+        }
+
+        int size() const{ return e - s + 1; } // O(1)
+        void push_back(ll v){ set(++e, v); } // O(log n)
+        void push_front(ll v){ set(--s, v); } // O(log n)
+        void pop_back(){ clear(e--); } // O(log n)
+        void pop_front(){ clear(s++); } // O(log n)
+
+        ll ret(int l, int r) const{ // O(log n)
+            l += s; r += s;
+            _mint ret = sum(r);
+            if(l) ret -= sum(l - 1);
+            return (ret * ipw[l]).v;
+        }
+    };
+
+    vector <_core> arr; int n, m;
+    _deque_hash() : n(0), m(0){} 
+    _deque_hash(int n, const vector <ll>& key, const vector<ll>& mod) : n(n){ // O(n)
+        assert(key.size() == mod.size()); m = key.size(); arr.reserve(m);
+        for(int i = 0; i < mod.size(); i++) arr.emplace_back(n, key[i], mod[i]);
+    }
+
+    void push_back(ll v){ for(auto& c : arr) c.push_back(v); } // O(log n)
+    void push_front(ll v){ for(auto& c : arr) c.push_front(v); } // O(log n)
+    void pop_back(){ for(auto& c : arr) c.pop_back(); } // O(log n)
+    void pop_front(){ for(auto& c : arr) c.pop_front(); } // O(log n)
+
+    int size() const{ return arr.empty() ? 0 : arr[0].size(); } // O(1)
+    vector<ll> ret(int l, int r) const{ // O(log n)
+        vector<ll> ret; ret.reserve(m);
+        for(const auto& c : arr) ret.push_back(c.ret(l, r));
+        return ret;
+    }
+
+    bool same(int l1, int r1, int l2, int r2) const{ // O(log n)
+        for(const auto& c : arr) if(c.ret(l1, r1) != c.ret(l2, r2)) return 0;
+        return 1;
+    }
+};
