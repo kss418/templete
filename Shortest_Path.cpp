@@ -55,17 +55,27 @@ public:
     ll ret(node cur) { return v[cur.num()]; }
 };
 
-template<
-    class dist = ll, class cost = ll,
-    dist (*add)(dist, cost),
-    bool (*leq)(dist, dist),
-    dist (*inf)(),
-    dist (*zero)()
->
-class _dij { // add -> dist + cost / leq -> compare dist
+struct dij_policy{
+    using dist = ll; using cost = ll;
+    static dist add(const dist& d, const cost& w){ // dist + cost
+
+    }
+    static bool leq(const dist& a, const dist& b){ // dist a <= dist b
+
+    }
+    static dist inf(){ // ll -> INF, pll -> {INF, INF}, tll -> {INF, INF, INF}
+
+    }
+    static dist zero(){ // ll -> 0, pll -> {0, 0}, tll -> {0, 0, 0}
+
+    }
+};
+
+template<class policy>
+class _dij { 
 private:
-    struct edge{ cost w; int nxt; };
-    struct node{ dist d; int v; };
+    using dist = typename policy::dist; using cost = typename policy::cost;
+    struct edge{ cost w; int nxt; }; struct node{ dist d; int v; };
     struct cmp{ bool operator()(const node& a, const node& b) const{ return _dij::less(b.d, a.d); } };
     vector<vector<edge>> adj; int n; bool built = 0;
     vector <dist> d; vector<int> pre;
@@ -77,19 +87,21 @@ private:
             if(!eq(cd, d[cur])) continue;
             for(const auto& i : adj[cur]) {
                 auto [w, nxt] = i;
-                dist nd = add(cd, w);
-                if(leq(d[nxt], nd)) continue;
+                dist nd = policy::add(cd, w);
+        
+                if(policy::leq(d[nxt], nd)) continue;
                 d[nxt] = nd; pre[nxt] = cur; 
                 pq.push({ nd, nxt });
             }
         }
     }
-    void reset(int n){ pre.assign(n + 1, -1); d.assign(n + 1, inf()); }
+
+    void reset(int n){ pre.assign(n + 1, -1); d.assign(n + 1, policy::inf()); }
     void chk(int x) const{ assert(built); assert(x >= 0 && x <= n); }
 public:
     _dij(int n = 0){ clear(n); } // O(n)
-    static bool less(const dist& a, const dist& b){ return leq(a, b) && !leq(b, a); }
-    static bool eq(const dist& a, const dist& b){ return leq(a, b) && leq(b, a); }
+    static bool less(const dist& a, const dist& b){ return policy::leq(a, b) && !policy::leq(b, a); }
+    static bool eq(const dist& a, const dist& b){ return policy::leq(a, b) && policy::leq(b, a); }
 
     void clear(int n = 0){ // O(n + m)
         this->n = n; adj.assign(n + 1, {}); reset(n);
@@ -103,14 +115,14 @@ public:
     }
 
     void init(int source){ // O(m log n)
-        reset(n); d[source] = zero();
+        reset(n); d[source] = policy::zero();
         pq.push({ d[source], source }); cal();
     }
 
     void init(const vector <int>& source){ // O(m log n)
         reset(n);
         for(const auto& i : source){
-            d[i] = zero();
+            d[i] = policy::zero();
             pq.push({ d[i], i });
         } cal();
     }
@@ -122,7 +134,7 @@ public:
 
     vector <int> get_path(int x) const{ // O(n)
         chk(x);
-        if(eq(d[x], inf())) return {};
+        if(eq(d[x], policy::inf())) return {};
         vector<int> ret;
         for(int cur = x; cur != -1; cur = pre[cur]) ret.push_back(cur);
         reverse(all(ret));
