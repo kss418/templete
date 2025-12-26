@@ -58,16 +58,16 @@ public:
 struct dij_policy{
     using dist = ll; using cost = ll;
     static dist add(const dist& d, const cost& w){ // dist + cost
-
+        return d + w;
     }
     static bool leq(const dist& a, const dist& b){ // dist a <= dist b
-
+        return a <= b;
     }
     static dist inf(){ // ll -> INF, pll -> {INF, INF}, tll -> {INF, INF, INF}
-
+        return INF;
     }
     static dist zero(){ // ll -> 0, pll -> {0, 0}, tll -> {0, 0, 0}
-
+        return 0;
     }
 };
 
