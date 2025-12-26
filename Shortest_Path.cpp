@@ -72,7 +72,7 @@ struct dij_policy{
 };
 
 template<class policy>
-class _dij { 
+class _dij {
 private:
     using dist = typename policy::dist; using cost = typename policy::cost;
     struct edge{ cost w; int nxt; }; struct node{ dist d; int v; };
@@ -86,16 +86,14 @@ private:
             auto [cd, cur] = pq.top(); pq.pop();
             if(!eq(cd, d[cur])) continue;
             for(const auto& i : adj[cur]) {
-                auto [w, nxt] = i;
+                auto& [w, nxt] = i;
                 dist nd = policy::add(cd, w);
-        
                 if(policy::leq(d[nxt], nd)) continue;
-                d[nxt] = nd; pre[nxt] = cur; 
+                d[nxt] = nd; pre[nxt] = cur;
                 pq.push({ nd, nxt });
             }
         }
     }
-
     void reset(int n){ pre.assign(n + 1, -1); d.assign(n + 1, policy::inf()); }
     void chk(int x) const{ assert(built); assert(x >= 0 && x <= n); }
 public:
@@ -129,7 +127,7 @@ public:
 
     dist ret(int x) const{ // O(1)
         chk(x);
-        return d[x]; 
+        return d[x];
     }
 
     vector <int> get_path(int x) const{ // O(n)
