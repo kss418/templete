@@ -11,7 +11,7 @@ PS/CP(Problem Solving / Competitive Programming)용 C++ 템플릿 모음입니�
 - `Combinatorics.cpp`
   - Combination Table (`_comb`)
   - Lucas's Theorem (`_lucas`)
-  - CRT 기반 조합 (`_comb_crt`)
+  - CRT-based Combination (`_comb_crt`)
 - `DSU.cpp`
   - Union-Find (`_uf`)
   - Weighted Union-Find (`_wuf`)
@@ -23,13 +23,13 @@ PS/CP(Problem Solving / Competitive Programming)용 C++ 템플릿 모음입니�
   - MCMF (`_mcmf`)
 - `Geometry.cpp`
   - CCW (`_ccw`)
-  - 선분/직선 기하 (`_li`, `_line`, `_inter`)
+  - Segment/Line Geometry (`_li`, `_line`, `_inter`)
   - Convex hull (`_ch`)
   - Rotating Calipers (`_rc`)
-  - 다각형 넓이 (`_area`)
-  - 점/벡터 연산 (`_dot`)
-  - 모듈러 행렬 연산 (`_mod_matrix`)
-  - GF(2) 선형대수 (`_gf2`)
+  - Polygon Area (`_area`)
+  - Point/Vector Operations (`_dot`)
+  - Modular Matrix Operations (`_mod_matrix`)
+  - GF(2) Linear Algebra (`_gf2`)
 - `Graph.cpp`
   - LCA (`_lca`)
   - Sparse Table (`_st`)
@@ -45,11 +45,11 @@ PS/CP(Problem Solving / Competitive Programming)용 C++ 템플릿 모음입니�
   - Deque Hash (`_deque_hash`)
 - `Number_Theory.cpp`
   - modint (`_mint`)
-  - 에라토스테네스의 체 (`_es`)
-  - 분할정복 거듭제곱 (`_pow`)
+  - Sieve of Eratosthenes (`_es`)
+  - Divide and Conquer Exponentiation (`_pow`)
   - Extended Euclidean (`_gcd`)
   - CRT (`_crt`)
-  - 이산 로그 (`_dlog`)
+  - Discrete Logarithm (`_dlog`)
   - Pollard Rho (`_pr`)
   - Linear Sieve/φ, μ (`_ls`)
   - Prime Tower (`_pt`)
@@ -78,7 +78,7 @@ PS/CP(Problem Solving / Competitive Programming)용 C++ 템플릿 모음입니�
   - KMP (`_kmp`)
   - Suffix Array + LCP (`_sa`)
   - Manacher (`_mnc`)
-  - Z-algorithm (`_z`)
+  - Z Algorithm (`_z`)
 
 ## snippets/
 
