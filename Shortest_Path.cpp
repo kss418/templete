@@ -99,19 +99,22 @@ public:
 
 template <class policy = sp_policy> // 1-based index
 class _floyd { // ret(i,j) == INF 처리하기
-public:
+private:
     using dist = typename policy::dist; using cost = typename policy::cost;
     vector <vector<dist>> d; vector <vector<int>> nxt; 
     int n; bool built = 0;
 
-    _floyd(int n) : n(n){
-        d.resize(n + 1, vector<dist>(n + 1, policy::inf()));
-        nxt.resize(n + 1, vector<int>(n + 1, 0));
-    }
-
     static bool less(const dist& a, const dist& b){ return policy::leq(a, b) && !policy::leq(b, a); }
     static bool eq(const dist& a, const dist& b){ return policy::leq(a, b) && policy::leq(b, a); }
     void chk(int st, int en) const{ assert(built); assert(st >= 0 && st <= n); assert(en >= 0 && en <= n); }
+public:
+    _floyd(int n = 0){ clear(n); }
+
+    void clear(int n = 0){ // O(n^2)
+        this->n = n; built = 0;
+        d.assign(n + 1, vector<dist>(n + 1, policy::inf()));
+        nxt.assign(n + 1, vector<int>(n + 1, 0));
+    }
 
     void add(int st, int en, cost c) { // O(1)
         if(less(c, d[st][en])) d[st][en] = c;
@@ -157,20 +160,33 @@ public:
 
 template <class policy = sp_policy>
 class _spfa {
-public:
+private:
     using dist = typename policy::dist; using cost = typename policy::cost;
     struct edge{ cost w; int nxt; };
     vector <int> pre, cnt; deque <int> q;
     vector <dist> d; vector <bool> in;
-    vector <vector <egde>> adj; bool built = 0;
-
-    _spfa(int n) : n(n), in(n + 1), adj(n + 1), cnt(n + 1){
-        pre.resize(n + 1, -1); d.resize(n + 1, policy::inf());
-    }
+    vector <vector <edge>> adj; int n; bool built = 0;
 
     static bool less(const dist& a, const dist& b){ return policy::leq(a, b) && !policy::leq(b, a); }
     static bool eq(const dist& a, const dist& b){ return policy::leq(a, b) && policy::leq(b, a); }
     void chk(int x) const{ assert(built); assert(x >= 0 && x <= n); }
+public:
+    _spfa(int n = 0){ clear(n); }
+
+    void clear(int n = 0){ // O(n + m)
+        this->n = n; built = 0;
+        pre.assign(n + 1, -1);
+        cnt.assign(n + 1, 0);
+        d.assign(n + 1, policy::inf());
+        in.assign(n + 1, false);
+        adj.assign(n + 1, {});
+        q.clear();
+    }
+
+    void add(int st, int en, cost c) { // O(1)
+        adj[st].push_back({ c, en });
+        adj[en].push_back({ c, st });
+    }
 
     void addsol(int st, int en, cost c) { // O(1)
         adj[st].push_back({ c, en });
