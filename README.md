@@ -71,7 +71,6 @@ PS/CP(Problem Solving / Competitive Programming)용 C++ 템플릿 모음입니�
   - 2D Fenwick Tree (`_fw2d`)
   - Persistent Segment Tree (`_pst`)
 - `Shortest_Path.cpp`
-  - BFS (`_bfs`)
   - Dijkstra (`_dij`)
   - Floyd–Warshall (`_floyd`)
   - SPFA (`_spfa`)
