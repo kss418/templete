@@ -62,8 +62,7 @@ public:
 
     void addsol(int st, int en, cost c){ adj[st].push_back({ c,en }); } // O(1)
     void add(int st, int en, cost c){ // O(1)
-        adj[st].push_back({ c,en });
-        adj[en].push_back({ c,st });
+        addsol(st, en, c); addsol(en, st, c);
     }
 
     void init(int source){ // O(m log n)
@@ -109,7 +108,6 @@ private:
     void chk(int st, int en) const{ assert(built); assert(st >= 0 && st <= n); assert(en >= 0 && en <= n); }
 public:
     _floyd(int n = 0){ clear(n); }
-
     void clear(int n = 0){ // O(n^2)
         this->n = n; built = 0;
         d.assign(n + 1, vector<dist>(n + 1, policy::inf()));
@@ -170,50 +168,36 @@ private:
     void chk(int x) const{ assert(built); assert(x >= 0 && x <= n); }
 public:
     _spfa(int n = 0){ clear(n); }
-
     void clear(int n = 0){ // O(n + m)
         this->n = n; built = 0;
-        pre.assign(n + 1, -1);
-        cnt.assign(n + 1, 0);
-        d.assign(n + 1, policy::inf());
-        in.assign(n + 1, false);
-        adj.assign(n + 1, {});
-        q.clear();
+        pre.assign(n + 1, -1); cnt.assign(n + 1, 0);
+        d.assign(n + 1, policy::inf()); q.clear();
+        in.assign(n + 1, false); adj.assign(n + 1, {});
     }
 
+    void addsol(int st, int en, cost c) { adj[st].push_back({ c, en }); } // O(1)
     void add(int st, int en, cost c) { // O(1)
-        adj[st].push_back({ c, en });
-        adj[en].push_back({ c, st });
+        addsol(st, en, c); addsol(en, st, c);
     }
 
-    void addsol(int st, int en, cost c) { // O(1)
-        adj[st].push_back({ c, en });
-    }
-
-    bool init(int st, dist fi = policy::zero()) { // cycle 0 else 1 / fi = d[st]
-        built = 1;
-        d[st] = fi; in[st] = 1;
-        q.push_back(st);
-
+    bool init(int source, dist fi = policy::zero()) { // cycle 0 else 1 / fi = d[st]
+        built = 1; d[source] = fi; in[source] = 1;
+        q.push_back(source);
         while (!q.empty()) {
             int cur = q.front(); q.pop_front();
             in[cur] = 0; cnt[cur]++;
             dist cd = d[cur];
             if (cnt[cur] > n) return 0;
 
-            for (auto& nn : adj[cur]) {
-                auto [nd, nxt] = nn;
-                dist nxtd = policy::add(cd, nd);
-                if (policy::leq(d[nxt], nxtd)) continue;
-                d[nxt] = nxtd;
-                pre[nxt] = cur;
-
+            for (auto& e : adj[cur]) {
+                auto [co, nxt] = e;
+                dist nd = policy::add(cd, co);
+                if (policy::leq(d[nxt], nd)) continue;
+                d[nxt] = nd; pre[nxt] = cur;
                 if (in[nxt]) continue;
-                in[nxt] = 1;
-                q.push_back(nxt);
+                in[nxt] = 1; q.push_back(nxt);
             }
         }
-
         return 1;
     }
 
