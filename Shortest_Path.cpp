@@ -11,16 +11,16 @@ constexpr ll MINF = 0xc0c0c0c0c0c0c0c0;
 
 struct sp_policy{
     using dist = ll; using cost = ll;
-    static dist add(const dist& d, const cost& w){ // dist + cost // O(1)
+    static dist add(const dist& d, const cost& w){ // dist + cost 
         return d + w;
     }
-    static bool leq(const dist& a, const dist& b){ // dist a <= dist b // O(1)
+    static bool leq(const dist& a, const dist& b){ // dist a <= dist b 
         return a <= b;
     }
-    static dist inf(){ // ll -> INF, pll -> {INF, INF}, tll -> {INF, INF, INF} // O(1)
+    static dist inf(){ // ll -> INF, pll -> {INF, INF}, tll -> {INF, INF, INF} 
         return INF;
     }
-    static dist zero(){ // ll -> 0, pll -> {0, 0}, tll -> {0, 0, 0} // O(1)
+    static dist zero(){ // ll -> 0, pll -> {0, 0}, tll -> {0, 0, 0} 
         return 0;
     }
 };
@@ -55,12 +55,15 @@ public:
     static bool eq(const dist& a, const dist& b){ return policy::leq(a, b) && policy::leq(b, a); }   // O(1)
 
     _dij(int n = 0){ clear(n); } // O(n)
-    void clear(int n = 0){ // O(n + m)  (m: 기존 간선 수 포함)
+    void clear(int n = 0){ // O(n + m) 
         this->n = n; adj.assign(n + 1, {}); reset(n);
         built = 0; while(!pq.empty()) pq.pop();
     }
 
-    void addsol(int st, int en, cost c){ adj[st].push_back({ c,en }); } // O(1)
+    void addsol(int st, int en, cost c){ // O(1)
+        built = 0;
+        adj[st].push_back({ c,en });
+    }
     void add(int st, int en, cost c){ // O(1)
         addsol(st, en, c); addsol(en, st, c);
     }
@@ -88,8 +91,9 @@ public:
         return !eq(d[x], policy::inf());
     }
 
-    vector <int> get_path(int x) const{ // O(L) (L: 경로 길이, 최악 O(n))
-        chk(x); vector<int> ret;
+    vector <int> get_path(int x) const{ // O(n)
+        chk(x); assert(reachable(x));
+        vector<int> ret;
         for(int cur = x; cur != -1; cur = pre[cur]) ret.push_back(cur);
         reverse(all(ret));
         return ret;
@@ -112,6 +116,10 @@ public:
         this->n = n; built = 0;
         d.assign(n + 1, vector<dist>(n + 1, policy::inf()));
         nxt.assign(n + 1, vector<int>(n + 1, 0));
+        for(int i = 1; i <= n; i++){
+            d[i][i] = policy::zero();
+            nxt[i][i] = i;
+        }
     }
 
     void add(int st, int en, cost c) { // O(1)
@@ -119,6 +127,7 @@ public:
     }
 
     void addsol(int st, int en, cost c) { // O(1)
+        built = 0;
         if(!less(c, d[st][en])) return;
         d[st][en] = c; nxt[st][en] = en;
     }
@@ -136,18 +145,19 @@ public:
         }
     }
 
-    dist ret(int st, int en) { // O(1)
+    dist ret(int st, int en) const{ // O(1)
         chk(st, en);
         return d[st][en];
     }
 
-    bool reachable(int st, int en) { // O(1)
+    bool reachable(int st, int en) const{ // O(1)
         chk(st, en);
         return !eq(d[st][en], policy::inf());
     }
 
-    vector <int> get_path(int st, int en) { // O(n)
-        chk(st, en); vector <int> ret;
+    vector <int> get_path(int st, int en) const{ // O(n)
+        chk(st, en); assert(reachable(st, en));
+        vector <int> ret;
         for(int cur = st;cur != en; cur = nxt[cur][en]) ret.push_back(cur);
         ret.push_back(en);
         return ret;
@@ -166,12 +176,12 @@ private:
     static bool less(const dist& a, const dist& b){ return policy::leq(a, b) && !policy::leq(b, a); }
     static bool eq(const dist& a, const dist& b){ return policy::leq(a, b) && policy::leq(b, a); }
     bool cal(){
+        built = 1;
         while (!q.empty()) {
             int cur = q.front(); q.pop_front();
             in[cur] = 0; cnt[cur]++;
             dist cd = d[cur];
             if (cnt[cur] > n) return 0;
-
             for (auto& e : adj[cur]) {
                 auto [co, nxt] = e;
                 dist nd = policy::add(cd, co);
@@ -196,21 +206,24 @@ public:
         reset(n); adj.assign(n + 1, {});
     }
 
-    void addsol(int st, int en, cost c) { adj[st].push_back({ c, en }); } // O(1)
+    void addsol(int st, int en, cost c) { // O(1)
+        built = 0;
+        adj[st].push_back({ c, en });
+    }
     void add(int st, int en, cost c) { // O(1)
         addsol(st, en, c); addsol(en, st, c);
     }
 
     // cycle existed -> return 0 
     bool init(int source, dist fi = policy::zero()) { // O(nm)
-        reset(n); built = 1; d[source] = fi; in[source] = 1;
+        reset(n); d[source] = fi; in[source] = 1;
         q.push_back(source);
         return cal();
     }
 
     // cycle existed -> return 0 
     bool init(const vector <int>& source, dist fi = policy::zero()) { // O(nm)
-        reset(n); built = 1;
+        reset(n); 
         for (const auto& st : source) {
             d[st] = fi; in[st] = 1;
             q.push_back(st);
@@ -218,18 +231,19 @@ public:
         return cal();
     }
 
-    dist ret(int x) { // O(1)
+    dist ret(int x) const{ // O(1)
         chk(x);
         return d[x];
     }
 
-    bool reachable(int x) const { // O(1)
+    bool reachable(int x) const{ // O(1)
         chk(x);
         return !eq(d[x], policy::inf());
     }
 
-    vector <int> get_path(int x) { // O(n) 
-        chk(x); vector <int> ret;
+    vector <int> get_path(int x) const{ // O(n) 
+        chk(x); assert(reachable(x));
+        vector <int> ret;
         for(int cur = x; cur != -1; cur = pre[cur]) ret.push_back(cur);
         reverse(ret.begin(), ret.end());
         return ret;
