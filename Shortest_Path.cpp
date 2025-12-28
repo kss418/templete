@@ -103,11 +103,10 @@ template <class policy = sp_policy> // 1-based index
 class _floyd { // ret(i,j) == INF 처리하기
 public:
     using dist = typename policy::dist; using cost = typename policy::cost;
-    ll n; vector <vector<dist>> d; vector <vector<int>> nxt; bool built = 0;
-    vector <int> tr;
+    vector <vector<dist>> d; vector <vector<int>> nxt; 
+    int n; bool built = 0;
 
-    _floyd(ll n) {
-        this->n = n;
+    _floyd(int n) : n(n){
         d.resize(n + 1, vector<dist>(n + 1, policy::inf()));
         nxt.resize(n + 1, vector<int>(n + 1, 0));
     }
@@ -116,13 +115,13 @@ public:
     static bool eq(const dist& a, const dist& b){ return policy::leq(a, b) && policy::leq(b, a); }
     void chk(int st, int en) const{ assert(built); assert(st >= 0 && st <= n); assert(en >= 0 && en <= n); }
 
-    void add(ll st, ll en, cost c) { //양방향
+    void add(int st, int en, cost c) { // O(1)
         if(less(c, d[st][en])) d[st][en] = c;
         if(less(c, d[en][st])) d[en][st] = c;
         nxt[st][en] = en; nxt[en][st] = st;
     }
 
-    void addsol(ll st, ll en, cost c) { //단방향
+    void addsol(int st, int en, cost c) { // O(1)
         if(less(c, d[st][en])) d[st][en] = c;
         nxt[st][en] = en;
     }
@@ -134,8 +133,7 @@ public:
                 for (int j = 1; j <= n; j++) {
                     dist nd = policy::add(d[i][k], d[k][j]);
                     if (policy::leq(d[i][j], nd)) continue;
-                    d[i][j] = nd;
-                    nxt[i][j] = nxt[i][k];
+                    d[i][j] = nd; nxt[i][j] = nxt[i][k];
                 }
             }
         }
@@ -152,16 +150,9 @@ public:
     }
 
     vector <int> get_path(int st, int en) {
-        chk(st, en);
-        int cur = st; tr.clear();
-
-        while (cur != en) {
-            tr.push_back(cur);
-            cur = nxt[cur][en];
-        }
-        tr.push_back(en);
-
-        return tr;
+        chk(st, en); vector <int> ret;
+        for(int cur = en; cur != -1; cur = pre[cur]) ret.push_back(cur);
+        return ret;
     }
 };
 
@@ -169,28 +160,24 @@ template <class policy = sp_policy>
 class _spfa {
 public:
     using dist = typename policy::dist; using cost = typename policy::cost;
-    using ptl = pair <cost, ll>;
-    ll n; vector <int> pre, cnt;
+    struct edge{ cost w; int nxt; };
+    vector <int> pre, cnt; deque <int> q;
     vector <dist> d; vector <bool> in;
-    deque <ll> q;
-    vector <vector <ptl>> adj; bool built = 0;
+    vector <vector <egde>> adj; bool built = 0;
 
-    _spfa(ll n) {
-        this->n = n;
+    _spfa(int n) : n(n), in(n + 1), adj(n + 1), cnt(n + 1){
         pre.resize(n + 1, -1); d.resize(n + 1, policy::inf());
-        in.resize(n + 1); adj.resize(n + 1);
-        cnt.resize(n + 1);
     }
 
     static bool less(const dist& a, const dist& b){ return policy::leq(a, b) && !policy::leq(b, a); }
     static bool eq(const dist& a, const dist& b){ return policy::leq(a, b) && policy::leq(b, a); }
     void chk(int x) const{ assert(built); assert(x >= 0 && x <= n); }
 
-    void addsol(ll st, ll en, cost c) { // 단방향
+    void addsol(int st, int en, cost c) { // O(1)
         adj[st].push_back({ c, en });
     }
 
-    ll init(int st, dist fi = policy::zero()) { // cycle 0 else 1 / fi = d[st]
+    bool init(int st, dist fi = policy::zero()) { // cycle 0 else 1 / fi = d[st]
         built = 1;
         d[st] = fi; in[st] = 1;
         q.push_back(st);
