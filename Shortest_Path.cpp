@@ -97,8 +97,8 @@ public:
     }
 };
 
-template <class policy = sp_policy> // 1-based index
-class _floyd { // ret(i,j) == INF 처리하기
+template <class policy = sp_policy>
+class _floyd { 
 private:
     using dist = typename policy::dist; using cost = typename policy::cost;
     vector <vector<dist>> d; vector <vector<int>> nxt; 
@@ -117,14 +117,12 @@ public:
     }
 
     void add(int st, int en, cost c) { // O(1)
-        if(less(c, d[st][en])) d[st][en] = c;
-        if(less(c, d[en][st])) d[en][st] = c;
-        nxt[st][en] = en; nxt[en][st] = st;
+        addsol(st, en, c); addsol(en, st, c);
     }
 
     void addsol(int st, int en, cost c) { // O(1)
-        if(less(c, d[st][en])) d[st][en] = c;
-        nxt[st][en] = en;
+        if(!less(c, d[st][en])) return;
+        d[st][en] = c; nxt[st][en] = en;
     }
 
     void init() {
@@ -152,8 +150,8 @@ public:
 
     vector <int> get_path(int st, int en) {
         chk(st, en); vector <int> ret;
-        for(int cur = en; cur != -1; cur = pre[cur]) ret.push_back(cur);
-        reverse(all(ret));
+        for(int cur = st;cur != en; cur = nxt[cur][en]) ret.push_back(cur);
+        ret.push_back(en);
         return ret;
     }
 };
