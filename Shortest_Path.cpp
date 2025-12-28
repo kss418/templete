@@ -103,7 +103,7 @@ template <class policy = sp_policy> // 1-based index
 class _floyd { // ret(i,j) == INF 처리하기
 public:
     using dist = typename policy::dist; using cost = typename policy::cost;
-    ll n; vector <vector<dist>> d; vector <vector<int>> nxt;
+    ll n; vector <vector<dist>> d; vector <vector<int>> nxt; bool built = 0;
     vector <int> tr;
 
     _floyd(ll n) {
@@ -114,6 +114,7 @@ public:
 
     static bool less(const dist& a, const dist& b){ return policy::leq(a, b) && !policy::leq(b, a); }
     static bool eq(const dist& a, const dist& b){ return policy::leq(a, b) && policy::leq(b, a); }
+    void chk(int st, int en) const{ assert(built); assert(st >= 0 && st <= n); assert(en >= 0 && en <= n); }
 
     void add(ll st, ll en, cost c) { //양방향
         if(less(c, d[st][en])) d[st][en] = c;
@@ -127,6 +128,7 @@ public:
     }
 
     void init() {
+        built = 1;
         for (int k = 1; k <= n; k++) {
             for (int i = 1; i <= n; i++) {
                 for (int j = 1; j <= n; j++) {
@@ -140,14 +142,17 @@ public:
     }
 
     dist ret(int st, int en) {
+        chk(st, en);
         return d[st][en];
     }
 
     bool reachable(int st, int en) {
+        chk(st, en);
         return !eq(d[st][en], policy::inf());
     }
 
     vector <int> get_path(int st, int en) {
+        chk(st, en);
         int cur = st; tr.clear();
 
         while (cur != en) {
@@ -168,7 +173,7 @@ public:
     ll n; vector <int> pre, cnt;
     vector <dist> d; vector <bool> in;
     deque <ll> q;
-    vector <vector <ptl>> adj;
+    vector <vector <ptl>> adj; bool built = 0;
 
     _spfa(ll n) {
         this->n = n;
@@ -179,12 +184,14 @@ public:
 
     static bool less(const dist& a, const dist& b){ return policy::leq(a, b) && !policy::leq(b, a); }
     static bool eq(const dist& a, const dist& b){ return policy::leq(a, b) && policy::leq(b, a); }
+    void chk(int x) const{ assert(built); assert(x >= 0 && x <= n); }
 
     void addsol(ll st, ll en, cost c) { // 단방향
         adj[st].push_back({ c, en });
     }
 
     ll init(int st, dist fi = policy::zero()) { // cycle 0 else 1 / fi = d[st]
+        built = 1;
         d[st] = fi; in[st] = 1;
         q.push_back(st);
 
@@ -210,23 +217,22 @@ public:
         return 1;
     }
 
-    dist ret(int num) { // 거리 반환
-        return d[num];
+    dist ret(int x) { // 거리 반환
+        chk(x);
+        return d[x];
     }
 
-    bool reachable(int num) const { // 거리 도달 여부
-        return !eq(d[num], policy::inf());
+    bool reachable(int x) const { // 거리 도달 여부
+        chk(x);
+        return !eq(d[x], policy::inf());
     }
 
-    vector <int> get_path(int st, int en) { // st -> en 경로 반환
+    vector <int> get_path(int x) { // 시작점 -> x 경로 반환
+        chk(x);
+        if(eq(d[x], policy::inf())) return {};
         vector <int> ret;
-        int cur = en;
-        while (cur != -1) {
-            ret.push_back(cur);
-            cur = pre[cur];
-        }
+        for(int cur = x; cur != -1; cur = pre[cur]) ret.push_back(cur);
         reverse(ret.begin(), ret.end());
-
         return ret;
     }
 };
