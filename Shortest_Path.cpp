@@ -9,53 +9,7 @@ using pll = pair<ll, ll>; using tll = tuple<ll, ll, ll>;
 constexpr ll INF = 0x3f3f3f3f3f3f3f3f;
 constexpr ll MINF = 0xc0c0c0c0c0c0c0c0;
 
-class _bfs { // 0-based index
-public:
-    ll n, m;
-    ll dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
-    // ll dx[8] = { 1, 1, 1, 0, 0, -1, -1, -1 };
-    // ll dy[8] = { -1, 0, 1, -1, 1, -1, 0, 1 };
-
-    class node {
-    public:
-        ll y, x;
-        ll num() const{
-            return y * 200 + x;
-        }
-    };
-    deque <pair <node, ll>> q; vector <ll> v;
-    _bfs(){}
-    _bfs(ll n, ll m) { 
-        this->n = n; this->m = m; 
-        v.resize(n * m + 1, INF);
-    }
-
-    bool outrange(node cur){
-        auto[cy, cx] = cur;
-        if(cy < 0 || cx < 0 || cy >= n || cx >= m) return 1;
-        return 0;
-    }
-
-    void init(node st) {
-        q.push_back({st, 0});
-        while (!q.empty()) {
-            auto [cur, cc] = q.front(); q.pop_front();
-            auto [cy, cx] = cur;
-            if (v[cur.num()] <= cc) continue; v[cur.num()] = cc;
-
-            for(int i = 0;i < 4;i++){
-                ll nx = cx + dx[i], ny = cy + dy[i];
-                node nxt = {ny, nx};
-                if (outrange(nxt)) continue;
-                q.push_back({nxt, cc + 1});
-            }
-        }
-    }
-
-    ll ret(node cur) { return v[cur.num()]; }
-};
-
-struct dij_policy{
+struct sp_policy{
     using dist = ll; using cost = ll;
     static dist add(const dist& d, const cost& w){ // dist + cost
         return d + w;
@@ -71,7 +25,7 @@ struct dij_policy{
     }
 };
 
-template<class policy>
+template<class policy = sp_policy>
 class _dij {
 private:
     using dist = typename policy::dist; using cost = typename policy::cost;
@@ -145,26 +99,30 @@ public:
     }
 };
 
-template <typename T = ll> // 1-based index
+template <class policy = sp_policy> // 1-based index
 class _floyd { // ret(i,j) == INF 처리하기
 public:
-    ll n; vector <vector<T>> d, nxt;
-    vector <ll> tr;
+    using dist = typename policy::dist; using cost = typename policy::cost;
+    ll n; vector <vector<dist>> d; vector <vector<int>> nxt;
+    vector <int> tr;
 
     _floyd(ll n) {
         this->n = n;
-        d.resize(n + 1, vector<T>(n + 1, INF));
-        nxt.resize(n + 1, vector<T>(n + 1, 0));
+        d.resize(n + 1, vector<dist>(n + 1, policy::inf()));
+        nxt.resize(n + 1, vector<int>(n + 1, 0));
     }
 
-    void add(ll st, ll en, T c = 1) { //양방향
-        d[st][en] = min(d[st][en], c);
-        d[en][st] = min(d[en][st], c);
+    static bool less(const dist& a, const dist& b){ return policy::leq(a, b) && !policy::leq(b, a); }
+    static bool eq(const dist& a, const dist& b){ return policy::leq(a, b) && policy::leq(b, a); }
+
+    void add(ll st, ll en, cost c) { //양방향
+        if(less(c, d[st][en])) d[st][en] = c;
+        if(less(c, d[en][st])) d[en][st] = c;
         nxt[st][en] = en; nxt[en][st] = st;
     }
 
-    void addsol(ll st, ll en, T c = 1) { //단방향
-        d[st][en] = min(d[st][en], c);
+    void addsol(ll st, ll en, cost c) { //단방향
+        if(less(c, d[st][en])) d[st][en] = c;
         nxt[st][en] = en;
     }
 
@@ -172,20 +130,25 @@ public:
         for (int k = 1; k <= n; k++) {
             for (int i = 1; i <= n; i++) {
                 for (int j = 1; j <= n; j++) {
-                    if (d[i][j] <= d[i][k] + d[k][j]) continue;
-                    d[i][j] = d[i][k] + d[k][j];
+                    dist nd = policy::add(d[i][k], d[k][j]);
+                    if (policy::leq(d[i][j], nd)) continue;
+                    d[i][j] = nd;
                     nxt[i][j] = nxt[i][k];
                 }
             }
         }
     }
 
-    T ret(ll st, ll en) {
+    dist ret(int st, int en) {
         return d[st][en];
     }
 
-    vector <ll> track(ll st, ll en) {
-        ll cur = st; tr.clear();
+    bool reachable(int st, int en) {
+        return !eq(d[st][en], policy::inf());
+    }
+
+    vector <int> get_path(int st, int en) {
+        int cur = st; tr.clear();
 
         while (cur != en) {
             tr.push_back(cur);
@@ -197,40 +160,45 @@ public:
     }
 };
 
-template <typename T = ll>
+template <class policy = sp_policy>
 class _spfa {
 public:
-    using ptl = pair <T, ll>;
-    ll n; vector <ll> pre, cnt;
-    vector <T> d; vector <bool> in;
+    using dist = typename policy::dist; using cost = typename policy::cost;
+    using ptl = pair <cost, ll>;
+    ll n; vector <int> pre, cnt;
+    vector <dist> d; vector <bool> in;
     deque <ll> q;
     vector <vector <ptl>> adj;
 
     _spfa(ll n) {
         this->n = n;
-        pre.resize(n + 1, -1); d.resize(n + 1, INF);
+        pre.resize(n + 1, -1); d.resize(n + 1, policy::inf());
         in.resize(n + 1); adj.resize(n + 1);
         cnt.resize(n + 1);
     }
 
-    void addsol(ll st, ll en, T c = 1) { // 단방향
+    static bool less(const dist& a, const dist& b){ return policy::leq(a, b) && !policy::leq(b, a); }
+    static bool eq(const dist& a, const dist& b){ return policy::leq(a, b) && policy::leq(b, a); }
+
+    void addsol(ll st, ll en, cost c) { // 단방향
         adj[st].push_back({ c, en });
     }
 
-    ll init(ll st, ll fi = 0) { // cycle 0 else 1 / fi = d[st]
+    ll init(int st, dist fi = policy::zero()) { // cycle 0 else 1 / fi = d[st]
         d[st] = fi; in[st] = 1;
         q.push_back(st);
 
         while (!q.empty()) {
-            ll cur = q.front(); q.pop_front();
+            int cur = q.front(); q.pop_front();
             in[cur] = 0; cnt[cur]++;
-            ll cd = d[cur];
+            dist cd = d[cur];
             if (cnt[cur] > n) return 0;
 
             for (auto& nn : adj[cur]) {
                 auto [nd, nxt] = nn;
-                if (d[nxt] <= nd + cd) continue;
-                d[nxt] = nd + cd;
+                dist nxtd = policy::add(cd, nd);
+                if (policy::leq(d[nxt], nxtd)) continue;
+                d[nxt] = nxtd;
                 pre[nxt] = cur;
 
                 if (in[nxt]) continue;
@@ -242,13 +210,17 @@ public:
         return 1;
     }
 
-    T ret(ll num) { // 거리 반환
+    dist ret(int num) { // 거리 반환
         return d[num];
     }
 
-    vector <ll> track(ll st, ll en) { // st -> en 경로 반환
-        vector <ll> ret;
-        ll cur = en;
+    bool reachable(int num) const { // 거리 도달 여부
+        return !eq(d[num], policy::inf());
+    }
+
+    vector <int> get_path(int st, int en) { // st -> en 경로 반환
+        vector <int> ret;
+        int cur = en;
         while (cur != -1) {
             ret.push_back(cur);
             cur = pre[cur];
