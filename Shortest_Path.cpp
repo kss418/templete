@@ -165,24 +165,7 @@ private:
 
     static bool less(const dist& a, const dist& b){ return policy::leq(a, b) && !policy::leq(b, a); }
     static bool eq(const dist& a, const dist& b){ return policy::leq(a, b) && policy::leq(b, a); }
-    void chk(int x) const{ assert(built); assert(x >= 0 && x <= n); }
-public:
-    _spfa(int n = 0){ clear(n); }
-    void clear(int n = 0){ // O(n + m)
-        this->n = n; built = 0;
-        pre.assign(n + 1, -1); cnt.assign(n + 1, 0);
-        d.assign(n + 1, policy::inf()); q.clear();
-        in.assign(n + 1, false); adj.assign(n + 1, {});
-    }
-
-    void addsol(int st, int en, cost c) { adj[st].push_back({ c, en }); } // O(1)
-    void add(int st, int en, cost c) { // O(1)
-        addsol(st, en, c); addsol(en, st, c);
-    }
-
-    bool init(int source, dist fi = policy::zero()) { // cycle 0 else 1 / fi = d[st]
-        built = 1; d[source] = fi; in[source] = 1;
-        q.push_back(source);
+    bool cal(){
         while (!q.empty()) {
             int cur = q.front(); q.pop_front();
             in[cur] = 0; cnt[cur]++;
@@ -199,6 +182,38 @@ public:
             }
         }
         return 1;
+    }
+    void reset(int n){
+        pre.assign(n + 1, -1); cnt.assign(n + 1, 0);
+        d.assign(n + 1, policy::inf()); q.clear();
+        in.assign(n + 1, false);
+    }
+    void chk(int x) const{ assert(built); assert(x >= 0 && x <= n); }
+public:
+    _spfa(int n = 0){ clear(n); }
+    void clear(int n = 0){ // O(n + m)
+        this->n = n; built = 0;
+        reset(n); adj.assign(n + 1, {});
+    }
+
+    void addsol(int st, int en, cost c) { adj[st].push_back({ c, en }); } // O(1)
+    void add(int st, int en, cost c) { // O(1)
+        addsol(st, en, c); addsol(en, st, c);
+    }
+
+    bool init(int source, dist fi = policy::zero()) { // cycle 0 else 1 / fi = d[st]
+        reset(n); built = 1; d[source] = fi; in[source] = 1;
+        q.push_back(source);
+        return cal();
+    }
+
+    bool init(const vector <int>& source, dist fi = policy::zero()) { // cycle 0 else 1 / fi = d[st]
+        reset(n); built = 1;
+        for (const auto& st : source) {
+            d[st] = fi; in[st] = 1;
+            q.push_back(st);
+        }
+        return cal();
     }
 
     dist ret(int x) { // 거리 반환
