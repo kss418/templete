@@ -2,7 +2,7 @@
   "dijkstra": {
     "prefix": ">>dij",
     "body": [
-      "struct dij_policy{",
+      "struct sp_policy{",
       "    using dist = ll; using cost = ll;",
       "    static dist add(const dist& d, const cost& w){ // dist + cost",
       "        return d + w;",
@@ -18,7 +18,7 @@
       "    }",
       "};",
       "",
-      "template<class policy>",
+      "template<class policy = sp_policy>",
       "class _dij {",
       "private:",
       "    using dist = typename policy::dist; using cost = typename policy::cost;",
@@ -84,9 +84,7 @@
       "    }",
       "",
       "    vector <int> get_path(int x) const{ // O(n)",
-      "        chk(x);",
-      "        if(eq(d[x], policy::inf())) return {};",
-      "        vector<int> ret;",
+      "        chk(x); vector<int> ret;",
       "        for(int cur = x; cur != -1; cur = pre[cur]) ret.push_back(cur);",
       "        reverse(all(ret));",
       "        return ret;",
