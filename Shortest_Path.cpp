@@ -90,9 +90,7 @@ public:
     }
 
     vector <int> get_path(int x) const{ // O(n)
-        chk(x);
-        if(eq(d[x], policy::inf())) return {};
-        vector<int> ret;
+        chk(x); vector<int> ret;
         for(int cur = x; cur != -1; cur = pre[cur]) ret.push_back(cur);
         reverse(all(ret));
         return ret;
@@ -152,6 +150,7 @@ public:
     vector <int> get_path(int st, int en) {
         chk(st, en); vector <int> ret;
         for(int cur = en; cur != -1; cur = pre[cur]) ret.push_back(cur);
+        reverse(all(ret));
         return ret;
     }
 };
@@ -215,9 +214,7 @@ public:
     }
 
     vector <int> get_path(int x) { // 시작점 -> x 경로 반환
-        chk(x);
-        if(eq(d[x], policy::inf())) return {};
-        vector <int> ret;
+        chk(x); vector <int> ret;
         for(int cur = x; cur != -1; cur = pre[cur]) ret.push_back(cur);
         reverse(ret.begin(), ret.end());
         return ret;
