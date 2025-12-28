@@ -46,7 +46,7 @@ PS/CP(Problem Solving / Competitive Programming)용 C++ 템플릿 모음입니�
   - Rolling Hash (Prefix) (`_hash`)
   - Deque Rolling Hash (`_deque_hash`)
 - `Number_Theory.cpp`
-  - modint (`_mint`)
+  - Modint (`_mint`)
   - Sieve of Eratosthenes (`_es`)
   - Binary Exponentiation (`_pow`)
   - Extended Euclidean (`_gcd`)
