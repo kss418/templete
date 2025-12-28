@@ -23,7 +23,9 @@ PS/CP(Problem Solving / Competitive Programming)용 C++ 템플릿 모음입니�
   - MCMF (`_mcmf`)
 - `Geometry.cpp`
   - CCW (`_ccw`)
-  - Segment/Line Geometry (`_li`, `_line`, `_inter`)
+  - Segment Intersection (`_li`)
+  - Line Equation/Intersection (`_line`)
+  - Point-in-Polygon (`_inter`)
   - Convex hull (`_ch`)
   - Rotating Calipers (`_rc`)
   - Polygon Area (`_area`)
@@ -32,7 +34,7 @@ PS/CP(Problem Solving / Competitive Programming)용 C++ 템플릿 모음입니�
   - GF(2) Linear Algebra (`_gf2`)
 - `Graph.cpp`
   - LCA (`_lca`)
-  - Sparse Table (`_st`)
+  - Binary Lifting Table (`_st`)
   - MST (`_mst`)
   - SCC (`_scc`)
   - 2-SAT (`_2sat`)
@@ -41,12 +43,12 @@ PS/CP(Problem Solving / Competitive Programming)용 C++ 템플릿 모음입니�
   - BCC (`_bcc`)
   - 3/4-cycle Search (`_3cycle`, `_4cycle`)
 - `Hash.cpp`
-  - Prefix Sum Hash (`_hash`)
-  - Deque Hash (`_deque_hash`)
+  - Rolling Hash (Prefix) (`_hash`)
+  - Deque Rolling Hash (`_deque_hash`)
 - `Number_Theory.cpp`
-  - modint (`_mint`)
+  - Modint (`_mint`)
   - Sieve of Eratosthenes (`_es`)
-  - Divide and Conquer Exponentiation (`_pow`)
+  - Binary Exponentiation (`_pow`)
   - Extended Euclidean (`_gcd`)
   - CRT (`_crt`)
   - Discrete Logarithm (`_dlog`)
