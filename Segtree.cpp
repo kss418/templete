@@ -82,7 +82,7 @@ public:
     void build(const vector<node>& arr){
         if(arr.empty()){ clear(0); return; }
         clear((int)arr.size() - 1);
-        for(int i = 0;i < (int)arr.size();i++) seg[i + sz] = a[i];
+        for(int i = 0;i < (int)arr.size();i++) seg[i + sz] = arr[i];
         for(int i = sz - 1;i >= 1;i--) seg[i] = op(seg[i << 1], seg[i << 1 | 1]);
     }
 
