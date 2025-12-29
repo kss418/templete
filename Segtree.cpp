@@ -56,57 +56,47 @@ public:
 };
 
 //SEG
-class _seg { // 구간 예외 처리하기
+struct seg_policy{
+    using node = ll;
+    static node id(){ return 0; }
+    static node op(const node& l, const node& r){
+        return l + r;
+    }
+};
+
+template <class policy = seg_policy>
+class _seg {
+private:
+    using node = typename policy::node;
+    int n, sz; vector <node> seg;
+    node op(const node& l, const node& r) const{ return policy::op(l, r); }
+    node id() const{ return policy::id(); }
 public:
-    ll n, sz;
-    class node{
-    public:
-        ll v;
-        node() : node(0){} // identity
-        node(ll v) : v(v) {}
-
-        operator ll(){ // query
-            return v;
-        }
-    }; vector <node> seg;
-
-    _seg(){}
-    _seg(ll n) : n(n){ 
-        sz = 1; while(sz < n + 1) sz <<= 1ll;
-        seg.assign(2 * sz, node());
+    _seg(int n = 0){ clear(n); }
+    void clear(int n){
+        this->n = n;
+        sz = 1; while(sz < n + 1) sz <<= 1;
+        seg.assign(2 * sz, id());
     }
 
-    node merge(node l, node r){
-        return{
-            l.v + r.v
-        };
-    }
-
-    node query(ll st, ll en) {
-        st = max(0ll, st); en = min(n, en);
-        if(st > en) return node();
-
-        node l = node(), r = node();
+    node query(int st, int en) {
+        st = max(0, st); en = min(n, en);
+        if(st > en) return id();
+        node l = id(), r = id();
         st += sz; en += sz;
         while(st <= en){
-            if(st & 1) l = merge(l, seg[st++]);
-            if(!(en & 1)) r = merge(seg[en--], r);
+            if(st & 1) l = op(l, seg[st++]);
+            if(!(en & 1)) r = op(seg[en--], r);
             st >>= 1; en >>= 1; 
         }
-
-        return merge(l, r);
+        return op(l, r);
     }
 
-    void set(ll idx, node val){
+    void set(int idx, node v){
         if(idx < 0 || idx > n) return;
-        ll p = idx + sz;
-        seg[p] = val;
-        for(p >>= 1ll; p; p >>= 1){
-            seg[p] = merge(seg[p << 1], seg[p << 1 | 1]);
-        }
+        int p = idx + sz; seg[p] = v;
+        for(p >>= 1; p; p >>= 1) seg[p] = op(seg[p << 1], seg[p << 1 | 1]);
     }
-
-    void clear(){ fill(all(seg), node()); }
 };
 
 //LAZY PROP
