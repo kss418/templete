@@ -170,33 +170,49 @@ private:
     using dist = typename policy::dist; using cost = typename policy::cost;
     struct edge{ cost w; int nxt; };
     vector <int> pre, cnt; deque <int> q;
-    vector <dist> d; vector <bool> in;
+    vector <dist> d; vector <bool> in, cy;
     vector <vector <edge>> adj; int n; bool built = 0;
 
     static bool less(const dist& a, const dist& b){ return policy::leq(a, b) && !policy::leq(b, a); }
     static bool eq(const dist& a, const dist& b){ return policy::leq(a, b) && policy::leq(b, a); }
+    void cal_cy(int x){
+        if(cy[x]) return; cy[x] = 1;
+        deque <int> q; q.push_back(x);
+        while(!q.empty()){
+            int cur = q.front(); q.pop_front();
+            for(auto& e : adj[cur]){
+                if(cy[e.nxt]) continue;
+                cy[e.nxt] = 1; q.push_back(e.nxt);
+            }
+        }
+    }
+    
     bool cal(){
-        built = 1;
+        built = 1; bool ret = 1;
         while (!q.empty()) {
             int cur = q.front(); q.pop_front();
-            in[cur] = 0; cnt[cur]++;
-            dist cd = d[cur];
-            if (cnt[cur] > n) return 0;
+            in[cur] = 0; dist cd = d[cur];
+            if(cy[cur]) continue;
             for (auto& e : adj[cur]) {
                 auto [co, nxt] = e;
+                if(cy[nxt]) continue;
                 dist nd = policy::add(cd, co);
                 if (policy::leq(d[nxt], nd)) continue;
                 d[nxt] = nd; pre[nxt] = cur;
-                if (in[nxt]) continue;
-                in[nxt] = 1; q.push_back(nxt);
+
+                if(++cnt[nxt] > n){
+                    ret = 0; cal_cy(nxt);
+                    continue;
+                }
+                if(!in[nxt]){ in[nxt] = 1; q.push_back(nxt); }
             }
         }
-        return 1;
+        return ret;
     }
     void reset(int n){
         pre.assign(n + 1, -1); cnt.assign(n + 1, 0);
         d.assign(n + 1, policy::inf()); q.clear();
-        in.assign(n + 1, false);
+        in.assign(n + 1, false); cy.assign(n + 1, false);
     }
     void chk(int x) const{ assert(built); assert(x >= 0 && x <= n); }
 public:
@@ -238,11 +254,16 @@ public:
 
     bool reachable(int x) const{ // O(1)
         chk(x);
-        return !eq(d[x], policy::inf());
+        return !is_cycle(x) && !eq(d[x], policy::inf());
+    }
+
+    bool is_cycle(int x) const{ // O(1)
+        chk(x);
+        return cy[x];
     }
 
     vector <int> get_path(int x) const{ // O(n) 
-        chk(x); assert(reachable(x));
+        chk(x); assert(reachable(x)); assert(!is_cycle(x));
         vector <int> ret;
         for(int cur = x; cur != -1; cur = pre[cur]) ret.push_back(cur);
         reverse(ret.begin(), ret.end());
