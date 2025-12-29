@@ -55,7 +55,7 @@ public:
     static bool eq(const dist& a, const dist& b){ return policy::leq(a, b) && policy::leq(b, a); }   // O(1)
 
     _dij(int n = 0){ clear(n); } // O(n)
-    void clear(int n = 0){ // O(n + m) 
+    void clear(int n){ // O(n + m) 
         this->n = n; adj.assign(n + 1, {}); reset(n);
         built = 0; while(!pq.empty()) pq.pop();
     }
@@ -112,7 +112,7 @@ private:
     void chk(int st, int en) const{ assert(built); assert(st >= 0 && st <= n); assert(en >= 0 && en <= n); }
 public:
     _floyd(int n = 0){ clear(n); } // O(n^2)
-    void clear(int n = 0){ // O(n^2)
+    void clear(int n){ // O(n^2)
         this->n = n; built = 0;
         d.assign(n + 1, vector<dist>(n + 1, policy::inf()));
         nxt.assign(n + 1, vector<int>(n + 1, 0));
@@ -217,7 +217,7 @@ private:
     void chk(int x) const{ assert(built); assert(x >= 0 && x <= n); }
 public:
     _spfa(int n = 0){ clear(n); } // O(n)
-    void clear(int n = 0){ // O(n + m)
+    void clear(int n){ // O(n + m)
         this->n = n; built = 0;
         reset(n); adj.assign(n + 1, {});
     }
