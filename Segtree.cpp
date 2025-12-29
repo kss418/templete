@@ -78,10 +78,11 @@ public:
         sz = 1; while(sz < n + 1) sz <<= 1;
         seg.assign(2 * sz, id());
     }
-    void build(const vector<node>& a){
-        if(a.empty()){ clear(0); return; }
-        clear((int)a.size() - 1);
-        for(int i = 0;i < (int)a.size();i++) seg[i + sz] = a[i];
+
+    void build(const vector<node>& arr){
+        if(arr.empty()){ clear(0); return; }
+        clear((int)arr.size() - 1);
+        for(int i = 0;i < (int)arr.size();i++) seg[i + sz] = a[i];
         for(int i = sz - 1;i >= 1;i--) seg[i] = op(seg[i << 1], seg[i << 1 | 1]);
     }
 
