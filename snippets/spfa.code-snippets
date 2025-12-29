@@ -71,7 +71,7 @@
       "    void chk(int x) const{ assert(built); assert(x >= 0 && x <= n); }",
       "public:",
       "    _spfa(int n = 0){ clear(n); } // O(n)",
-      "    void clear(int n = 0){ // O(n + m)",
+      "    void clear(int n){ // O(n + m)",
       "        this->n = n; built = 0;",
       "        reset(n); adj.assign(n + 1, {});",
       "    }",

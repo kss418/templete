@@ -49,7 +49,7 @@
       "    static bool eq(const dist& a, const dist& b){ return policy::leq(a, b) && policy::leq(b, a); }",
       "",
       "    _dij(int n = 0){ clear(n); } // O(n)",
-      "    void clear(int n = 0){ // O(n + m)",
+      "    void clear(int n){ // O(n + m)",
       "        this->n = n; adj.assign(n + 1, {}); reset(n);",
       "        built = 0; while(!pq.empty()) pq.pop();",
       "    }",

@@ -30,7 +30,7 @@
       "    void chk(int st, int en) const{ assert(built); assert(st >= 0 && st <= n); assert(en >= 0 && en <= n); }",
       "public:",
       "    _floyd(int n = 0){ clear(n); } // O(n^2)",
-      "    void clear(int n = 0){ // O(n^2)",
+      "    void clear(int n){ // O(n^2)",
       "        this->n = n; built = 0;",
       "        d.assign(n + 1, vector<dist>(n + 1, policy::inf()));",
       "        nxt.assign(n + 1, vector<int>(n + 1, 0));",
