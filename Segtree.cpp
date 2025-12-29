@@ -78,6 +78,12 @@ public:
         sz = 1; while(sz < n + 1) sz <<= 1;
         seg.assign(2 * sz, id());
     }
+    void build(const vector<node>& a){
+        if(a.empty()){ clear(0); return; }
+        clear((int)a.size() - 1);
+        for(int i = 0;i < (int)a.size();i++) seg[i + sz] = a[i];
+        for(int i = sz - 1;i >= 1;i--) seg[i] = op(seg[i << 1], seg[i << 1 | 1]);
+    }
 
     node query(int st, int en) {
         st = max(0, st); en = min(n, en);
@@ -92,9 +98,15 @@ public:
         return op(l, r);
     }
 
-    void set(int idx, node v){
+    void set(int idx, const node& v){
         if(idx < 0 || idx > n) return;
         int p = idx + sz; seg[p] = v;
+        for(p >>= 1; p; p >>= 1) seg[p] = op(seg[p << 1], seg[p << 1 | 1]);
+    }
+
+    void add(int idx, const node& v){
+        if(idx < 0 || idx > n) return;
+        int p = idx + sz; seg[p] = op(seg[p], v);
         for(p >>= 1; p; p >>= 1) seg[p] = op(seg[p << 1], seg[p << 1 | 1]);
     }
 };
