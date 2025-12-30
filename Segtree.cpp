@@ -57,10 +57,12 @@ public:
 
 //SEG
 struct seg_policy{
-    using node = ll;
-    static node id(){ return 0; }
+    struct node { ll v; };
+    static node id(){ return node{0}; }
     static node op(const node& l, const node& r){
-        return l + r;
+        return node{
+            l.v + r.v
+        };
     }
 };
 
