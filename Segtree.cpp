@@ -31,21 +31,21 @@ private:
     node op(const node& l, const node& r) const{ return policy::op(l, r); }
     node id() const{ return node(); }
 public:
-    _seg(int n = 0){ clear(n); }
-    void clear(int n){
+    _seg(int n = 0){ clear(n); } // O(n)
+    void clear(int n){ // O(n)
         this->n = n;
         sz = 1; while(sz < n + 1) sz <<= 1;
         seg.assign(2 * sz, id());
     }
 
-    void build(const vector<node>& arr){
+    void build(const vector<node>& arr){ // O(n)
         if(arr.empty()){ clear(0); return; }
         clear((int)arr.size() - 1);
         for(int i = 0;i < (int)arr.size();i++) seg[i + sz] = arr[i];
         for(int i = sz - 1;i >= 1;i--) seg[i] = op(seg[i << 1], seg[i << 1 | 1]);
     }
 
-    node query(int st, int en) {
+    node query(int st, int en){ // O(log n)
         st = max(0, st); en = min(n, en);
         if(st > en) return id();
         node l = id(), r = id();
@@ -58,13 +58,13 @@ public:
         return op(l, r);
     }
 
-    void set(int idx, const node& v){
+    void set(int idx, const node& v){ // O(log n)
         if(idx < 0 || idx > n) return;
         int p = idx + sz; seg[p] = v;
         for(p >>= 1; p; p >>= 1) seg[p] = op(seg[p << 1], seg[p << 1 | 1]);
     }
 
-    void update(int idx, const node& v){
+    void update(int idx, const node& v){ // O(log n)
         if(idx < 0 || idx > n) return;
         int p = idx + sz; seg[p] = op(seg[p], v);
         for(p >>= 1; p; p >>= 1) seg[p] = op(seg[p << 1], seg[p << 1 | 1]);
@@ -131,8 +131,8 @@ private:
         }
     }
 public:
-    _prop(int n = 0){ clear(n); }
-    void clear(int n){
+    _prop(int n = 0){ clear(n); } // O(n)
+    void clear(int n){ // O(n)
         this->n = n;
         sz = 1; while(sz < n + 1) sz <<= 1;
         h = __lg(sz);
@@ -140,15 +140,15 @@ public:
         lz.assign(2 * sz, lz_id());
     }
 
-    void build(const vector<node>& arr){
+    void build(const vector<node>& arr){ // O(n)
         if(arr.empty()){ clear(0); return; }
         clear((int)arr.size() - 1);
         for(int i = 0;i < (int)arr.size();i++) seg[i + sz] = arr[i];
         for(int i = sz - 1;i >= 1;i--) seg[i] = op(seg[i << 1], seg[i << 1 | 1]);
     }
 
-    node query(int idx){ return query(idx, idx); }
-    node query(int st, int en) {
+    node query(int idx){ return query(idx, idx); } // O(log n)
+    node query(int st, int en) { // O(log n)
         st = max(0, st); en = min(n, en);
         if(st > en) return id();
 
@@ -165,8 +165,8 @@ public:
         return op(nl, nr);
     }
 
-    void update(int idx, const lazy& lz){ update(idx, idx, lz); }
-    void update(int st, int en, const lazy& lz){
+    void update(int idx, const lazy& lz){ update(idx, idx, lz); } // O(log n)
+    void update(int st, int en, const lazy& lz){ // O(log n)
         st = max(0, st); en = min(n, en);
         if(st > en) return;
 
@@ -325,13 +325,9 @@ public:
 struct fw_policy{
     struct node{
         ll v;
-        node() : node(0){} // identity
         node(ll v) : v(v){}
-        operator ll() const{ // query type
-            return v;
-        }
+        node() : node(0){} // identity
     };
-    static node id(){ return node(0); }
     static node op(const node& l, const node& r){
         return node(l.v + r.v);
     }
@@ -341,37 +337,54 @@ struct fw_policy{
 };
 
 template <class policy = fw_policy>
-class _fw{
+class _fw{ // 1-based index
 private:
     using node = typename policy::node;
-    ll n; vector <node> bit;
+    vector <node> bit; int n;
     node op(const node& l, const node& r) const{ return policy::op(l, r); }
-    node id() const{ return policy::id(); }
+    node id() const{ return node(); }
     node inv(const node& a) const{ return policy::inv(a); }
 public:
-    _fw() : n(0) {}
-    _fw(ll n){ clear(n); }
-    void clear(ll n){
+    _fw(int n = 0){ clear(n); } // O(n)
+    void clear(int n){ // O(n)
         this->n = n;
         bit.assign(n + 1, id());
     }
 
+    void build(const vector<node>& arr){ // O(n)
+        if(arr.empty()){ clear(0); return; }
+        clear((int)arr.size() - 1);
+        for(int i = 1;i <= n;i++) bit[i] = arr[i];
+        for(int i = 1;i <= n;i++){
+            int j = i + (i & -i);
+            if(j <= n) bit[j] = op(bit[j], bit[i]);
+        }
+    }
+
     // range query -> need inv
-    node query(ll idx){ return query(idx, idx); }
-    node query(ll l, ll r){ 
+    node query(int idx){ return query(idx, idx); } // O(log n)
+    node query(int l, int r){ // O(log n)
+        l = max(l, 1); r = min(r, n);
         if(l > r) return id();
-        return op(inv(cal(l - 1)), cal(r)); 
+        return op(pre(r), inv(pre(l - 1))); 
     }
 
     // return 1 ~ idx
-    node cal(ll idx){
-        node ret = id();
-        for(ll i = idx;i > 0;i -= i & -i) ret = op(ret, bit[i]);
+    node pre(int idx){ // O(log n)
+        node ret = id(); idx = min(idx, n);
+        for(int i = idx;i > 0;i -= i & -i) ret = op(ret, bit[i]);
         return ret;
     }
 
-    void add(ll idx, const node& v){
-        for(ll i = idx;i <= n;i += i & -i) bit[i] = op(bit[i], v);
+    void set(int idx, const node& v){ // O(log n)
+        if(idx <= 0 || idx > n) return;
+        node cur = query(idx, idx), d = op(v, inv(cur));         
+        update(idx, d);                
+    }
+
+    void update(int idx, const node& v){ // O(log n)
+        if(idx <= 0 || idx > n) return;
+        for(int i = idx;i <= n;i += i & -i) bit[i] = op(bit[i], v);
     }
 };
 
