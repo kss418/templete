@@ -61,7 +61,7 @@ public:
         for(p >>= 1; p; p >>= 1) seg[p] = op(seg[p << 1], seg[p << 1 | 1]);
     }
 
-    void add(int idx, const node& v){
+    void update(int idx, const node& v){
         if(idx < 0 || idx > n) return;
         int p = idx + sz; seg[p] = op(seg[p], v);
         for(p >>= 1; p; p >>= 1) seg[p] = op(seg[p << 1], seg[p << 1 | 1]);
@@ -140,8 +140,8 @@ public:
         return op(nl, nr);
     }
 
-    void set(int idx, const lazy& lz){ set(idx, idx, lz); }
-    void set(int st, int en, const lazy& lz){
+    void update(int idx, const lazy& lz){ update(idx, idx, lz); }
+    void update(int st, int en, const lazy& lz){
         st = max(0, st); en = min(n, en);
         if(st > en) return;
 
