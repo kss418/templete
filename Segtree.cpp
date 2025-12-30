@@ -24,6 +24,29 @@ struct seg_policy{
     }
 };
 
+struct prop_policy{
+    struct node {
+        ll v; int sz;
+        node(ll v, int sz) : v(v), sz(sz){}
+        node() : node(0, 0){} // identity
+    };
+    struct lazy{
+        ll v;
+        lazy(ll v) : v(v){}
+        lazy() : lazy(0){} // identity
+    };
+
+    static node op(const node& l, const node& r){
+        return node{
+            l.v + r.v,
+            l.sz + r.sz
+        };
+    }
+    static bool is_lz_id(const lazy& now){ return now.v == 0; }
+    static void apply(node& seg, const lazy& lz){ seg.v += lz.v * seg.sz; }
+    static void compose(lazy& s, const lazy& p){ s.v += p.v; }
+};
+
 template <class policy = seg_policy>
 class _seg {
 private:
@@ -80,8 +103,8 @@ private:
     using lazy = typename policy::lazy;
     vector <node> seg; vector <lazy> lz; int sz, h, n;
     node op(const node& l, const node& r) const{ return policy::op(l, r); }
-    node id() const{ return policy::id(); }
-    lazy lz_id() const{ return policy::lz_id(); }
+    node id() const{ return node(); }
+    lazy lz_id() const{ return lazy(); }
     bool is_lz_id(const lazy& now) const{ return policy::is_lz_id(now); }
     void prop(node& seg, const lazy& lz) const{ policy::apply(seg, lz); }
     void comp(lazy& s, const lazy& p) const{ policy::compose(s, p); }
