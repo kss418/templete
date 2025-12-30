@@ -57,10 +57,12 @@ public:
 
 //SEG
 struct seg_policy{
-    using node = ll;
-    static node id(){ return 0; }
+    struct node { ll v; };
+    static node id(){ return node{0}; }
     static node op(const node& l, const node& r){
-        return l + r;
+        return node{
+            l.v + r.v
+        };
     }
 };
 
@@ -79,13 +81,6 @@ public:
         seg.assign(2 * sz, id());
     }
 
-    void build(const vector<node>& arr){
-        if(arr.empty()){ clear(0); return; }
-        clear((int)arr.size() - 1);
-        for(int i = 0;i < (int)arr.size();i++) seg[i + sz] = arr[i];
-        for(int i = sz - 1;i >= 1;i--) seg[i] = op(seg[i << 1], seg[i << 1 | 1]);
-    }
-
     node query(int st, int en) {
         st = max(0, st); en = min(n, en);
         if(st > en) return id();
@@ -99,15 +94,9 @@ public:
         return op(l, r);
     }
 
-    void set(int idx, const node& v){
+    void set(int idx, node v){
         if(idx < 0 || idx > n) return;
         int p = idx + sz; seg[p] = v;
-        for(p >>= 1; p; p >>= 1) seg[p] = op(seg[p << 1], seg[p << 1 | 1]);
-    }
-
-    void add(int idx, const node& v){
-        if(idx < 0 || idx > n) return;
-        int p = idx + sz; seg[p] = op(seg[p], v);
         for(p >>= 1; p; p >>= 1) seg[p] = op(seg[p << 1], seg[p << 1 | 1]);
     }
 };
