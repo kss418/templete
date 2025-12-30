@@ -9,52 +9,6 @@ using pll = pair<ll, ll>; using tll = tuple<ll, ll, ll>;
 constexpr ll INF = 0x3f3f3f3f3f3f3f3f;
 constexpr ll MINF = 0xc0c0c0c0c0c0c0c0;
 
-//SUM SEG
-class _sseg {
-public:
-    ll n; vector <ll> seg;
-    _sseg(){}
-    _sseg(ll n) { this->n = n; seg.resize(4 * n + 1); }
-
-    ll query(ll st, ll en) { return query(st, en, 0, n); }
-    ll query(ll st, ll en, ll l, ll r, ll node = 1) {
-        if (en < l || st > r) return 0;
-        if (st <= l && en >= r) return seg[node];
-        ll mid = (l + r) >> 1;
-        return query(st, en, l, mid, node * 2) + query(st, en, mid + 1, r, node * 2 + 1);
-    }
-
-    void add(ll idx, ll val) { add(idx, val, 0, n); }
-    void add(ll idx, ll val, ll l, ll r, ll node = 1) {
-        if (idx < l || idx > r) return;
-        seg[node] += val;
-        if (l == r) return;
-        ll mid = (l + r) >> 1;
-        add(idx, val, l, mid, node * 2);
-        add(idx, val, mid + 1, r, node * 2 + 1);
-    }
-
-    ll update(ll idx, ll val) { return update(idx, val, 0, n); }
-    ll update(ll idx, ll val, ll l, ll r, ll node = 1) {
-        if (idx < l || idx > r) return seg[node];
-        if (l == r) return seg[node] = val;
-        ll mid = (l + r) >> 1;
-
-        seg[node] = update(idx, val, l, mid, node * 2);
-        seg[node] += update(idx, val, mid + 1, r, node * 2 + 1);
-        return seg[node];
-    }
-
-    ll cnt(ll val) { return cnt(val, 0, n); }
-    ll cnt(ll val, ll l, ll r, ll node = 1){
-        if(l == r) return r;
-        ll mid = (l + r) >> 1;
-
-        if(seg[node * 2] < val) return cnt(val - seg[node * 2], mid + 1, r, node * 2 + 1);
-        else return cnt(val, l, mid, node * 2);
-    }
-};
-
 //SEG
 struct seg_policy{
     struct node { ll v; };
@@ -115,70 +69,23 @@ public:
 };
 
 //LAZY PROP
-struct prop_policy{
-    struct node{
-        ll v, c;
-    };
-
-    struct lazy{
-        ll v;
-    };
-
-    static node id(){ return node{0, 0}; }
-    static lazy lz_id(){ return lazy{0}; }
-    static bool is_lazy_id(const lazy& lz){ return !lz.v; }
-    static node merge(const node& l, const node& r){ // node + node
-        return{
-            l.v + r.v,
-            l.c + r.c
-        };
-    }
-    static void apply(node& seg, const lazy& lz){ // lazy -> node
-        seg.v += lz.v * seg.c;
-    }
-    static void compose(lazy& s, const lazy& p){ // lazy -> lazy
-        s.v += p.v;
-    }
-};
-
 template <class policy = prop_policy>
-class _prop { // 구간 예외 처리하기
-public:
+class _prop { 
+private:
     using node = typename policy::node;
     using lazy = typename policy::lazy;
-    ll n;
-    int sz, h;
-    vector <node> seg;
-    vector <lazy> lz;
-
-    _prop(){}
-    _prop(ll n) : n(n){
-        sz = 1; while(sz < n + 1) sz <<= 1;
-        h = __lg(sz);
-        seg.assign(2 * sz, id());
-        lz.assign(2 * sz, lz_id());
-    }
-
-    node merge(const node& l, const node& r) const{ return policy::merge(l, r); }
+    vector <node> seg; vector <lazy> lz; int sz, h, n;
+    node op(const node& l, const node& r) const{ return policy::op(l, r); }
     node id() const{ return policy::id(); }
     lazy lz_id() const{ return policy::lz_id(); }
-    bool is_lazy_id(const lazy& now) const{ return policy::is_lazy_id(now); }
+    bool is_lz_id(const lazy& now) const{ return policy::is_lz_id(now); }
     void prop(node& seg, const lazy& lz) const{ policy::apply(seg, lz); }
     void comp(lazy& s, const lazy& p) const{ policy::compose(s, p); }
-
-    void build(int idx){
-        while(idx > 1){
-            idx >>= 1;
-            seg[idx] = merge(seg[idx << 1], seg[idx << 1 | 1]);
-            if(is_lazy_id(lz[idx])) continue;
-            prop(seg[idx], lz[idx]);
-        }
-    }
 
     void push(int idx){
         for(int i = h;i > 0;i--){
             int cur = idx >> i;
-            if(is_lazy_id(lz[cur])) continue;
+            if(is_lz_id(lz[cur])) continue;
             apply(cur << 1, lz[cur]);
             apply(cur << 1 | 1, lz[cur]);
             lz[cur] = lz_id();
@@ -190,9 +97,34 @@ public:
         if(idx < sz) comp(lz[idx], now); 
     }
 
-    node query(ll idx){ return query(idx, idx); }
-    node query(ll st, ll en) {
-        st = max(0ll, st); en = min(n, en);
+    void init(int idx){
+        while(idx > 1){
+            idx >>= 1;
+            seg[idx] = op(seg[idx << 1], seg[idx << 1 | 1]);
+            if(is_lz_id(lz[idx])) continue;
+            prop(seg[idx], lz[idx]);
+        }
+    }
+public:
+    _prop(int n = 0){ clear(n); }
+    void clear(int n){
+        this->n = n;
+        sz = 1; while(sz < n + 1) sz <<= 1;
+        h = __lg(sz);
+        seg.assign(2 * sz, id());
+        lz.assign(2 * sz, lz_id());
+    }
+
+    void build(const vector<node>& arr){
+        if(arr.empty()){ clear(0); return; }
+        clear((int)arr.size() - 1);
+        for(int i = 0;i < (int)arr.size();i++) seg[i + sz] = arr[i];
+        for(int i = sz - 1;i >= 1;i--) seg[i] = op(seg[i << 1], seg[i << 1 | 1]);
+    }
+
+    node query(int idx){ return query(idx, idx); }
+    node query(int st, int en) {
+        st = max(0, st); en = min(n, en);
         if(st > en) return id();
 
         int l = (int)st + sz, r = (int)en + sz;
@@ -200,17 +132,17 @@ public:
 
         node nl = id(), nr = id();
         while(l <= r){
-            if(l & 1) nl = merge(nl, seg[l++]);
-            if(!(r & 1)) nr = merge(seg[r--], nr);
+            if(l & 1) nl = op(nl, seg[l++]);
+            if(!(r & 1)) nr = op(seg[r--], nr);
             l >>= 1; r >>= 1;
         }
 
-        return merge(nl, nr);
+        return op(nl, nr);
     }
 
-    void update(ll idx, lazy lz){ update(idx, idx, lz); }
-    void update(ll st, ll en, lazy lz){
-        st = max(0ll, st); en = min(n, en);
+    void set(int idx, const lazy& lz){ set(idx, idx, lz); }
+    void set(int st, int en, const lazy& lz){
+        st = max(0, st); en = min(n, en);
         if(st > en) return;
 
         int l = (int)st + sz, r = (int)en + sz;
@@ -223,24 +155,7 @@ public:
             l >>= 1; r >>= 1;
         }
         
-        build(tl); build(tr);
-    }
-
-    void set(ll idx, const node& now){
-        if(idx < 0 || idx > n) return;
-        int p = (int)idx + sz;
-        seg[p] = now;
-    }
-
-    void init(){
-        for(int i = sz - 1;i >= 1;i--){
-            seg[i] = merge(seg[i << 1], seg[i << 1 | 1]);
-        }
-    }
-
-    void clear(){ 
-        fill(all(seg), id()); 
-        fill(all(lz), lz_id());
+        init(tl); init(tr);
     }
 };
 
