@@ -11,8 +11,12 @@ constexpr ll MINF = 0xc0c0c0c0c0c0c0c0;
 
 //SEG
 struct seg_policy{
-    struct node { ll v; };
-    static node id(){ return node{0}; }
+    struct node {
+        ll v;
+        node(ll v) : v(v){}
+        node() : node(0){} // identity
+    };
+
     static node op(const node& l, const node& r){
         return node{
             l.v + r.v
@@ -26,7 +30,7 @@ private:
     using node = typename policy::node;
     int n, sz; vector <node> seg;
     node op(const node& l, const node& r) const{ return policy::op(l, r); }
-    node id() const{ return policy::id(); }
+    node id() const{ return node(); }
 public:
     _seg(int n = 0){ clear(n); }
     void clear(int n){
