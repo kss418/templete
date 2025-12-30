@@ -118,9 +118,6 @@ public:
 struct prop_policy{
     struct node{
         ll v, c;
-        operator ll() const{ // query
-            return v;
-        }
     };
 
     struct lazy{
