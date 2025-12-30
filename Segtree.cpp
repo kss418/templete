@@ -9,7 +9,6 @@ using pll = pair<ll, ll>; using tll = tuple<ll, ll, ll>;
 constexpr ll INF = 0x3f3f3f3f3f3f3f3f;
 constexpr ll MINF = 0xc0c0c0c0c0c0c0c0;
 
-//SEG
 struct seg_policy{
     struct node {
         ll v;
@@ -22,29 +21,6 @@ struct seg_policy{
             l.v + r.v
         };
     }
-};
-
-struct prop_policy{
-    struct node {
-        ll v; int sz;
-        node(ll v, int sz) : v(v), sz(sz){}
-        node() : node(0, 0){} // identity
-    };
-    struct lazy{
-        ll v;
-        lazy(ll v) : v(v){}
-        lazy() : lazy(0){} // identity
-    };
-
-    static node op(const node& l, const node& r){
-        return node{
-            l.v + r.v,
-            l.sz + r.sz
-        };
-    }
-    static bool is_lz_id(const lazy& now){ return now.v == 0; }
-    static void apply(node& seg, const lazy& lz){ seg.v += lz.v * seg.sz; }
-    static void compose(lazy& s, const lazy& p){ s.v += p.v; }
 };
 
 template <class policy = seg_policy>
@@ -95,7 +71,29 @@ public:
     }
 };
 
-//LAZY PROP
+struct prop_policy{
+    struct node {
+        ll v; int sz;
+        node(ll v, int sz) : v(v), sz(sz){}
+        node() : node(0, 0){} // identity
+    };
+    struct lazy{
+        ll v;
+        lazy(ll v) : v(v){}
+        lazy() : lazy(0){} // identity
+    };
+
+    static node op(const node& l, const node& r){
+        return node{
+            l.v + r.v,
+            l.sz + r.sz
+        };
+    }
+    static bool is_lz_id(const lazy& now){ return now.v == 0; }
+    static void apply(node& seg, const lazy& lz){ seg.v += lz.v * seg.sz; }
+    static void compose(lazy& s, const lazy& p){ s.v += p.v; }
+};
+
 template <class policy = prop_policy>
 class _prop { 
 private:
