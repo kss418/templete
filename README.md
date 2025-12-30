@@ -64,7 +64,6 @@ PS/CP(Problem Solving / Competitive Programming)용 C++ 템플릿 모음입니�
   - Convex Hull Trick (`_cht`)
   - Parallel Binary Search (`_pbs`)
 - `Segtree.cpp`
-  - Sum Segment Tree (`_sseg`)
   - Segment Tree (`_seg`)
   - Lazy Propagation (`_prop`)
   - HLD (`_hld`)
