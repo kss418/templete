@@ -118,21 +118,17 @@ public:
 struct prop_policy{
     struct node{
         ll v, c;
-        node() : node(0, 0){} // identity
-        node(ll v, ll c) : v(v), c(c) {}
-        operator ll(){ // query
+        operator ll() const{ // query
             return v;
         }
     };
 
     struct lazy{
         ll v;
-        lazy() : lazy(0){} // identity
-        lazy(ll v) : v(v){}
     };
 
-    static node id(){ return node(); }
-    static lazy lz_id(){ return lazy(); }
+    static node id(){ return node{0, 0}; }
+    static lazy lz_id(){ return lazy{0}; }
     static bool is_lazy_id(const lazy& lz){ return !lz.v; }
     static node merge(const node& l, const node& r){ // node + node
         return{
