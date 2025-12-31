@@ -322,6 +322,11 @@ public:
     }
 };
 
+template <class policy>
+concept has_inv = requires(const typename policy::node& a){
+    { policy::inv(a) } -> std::same_as<typename policy::node>;
+};
+
 struct fw_policy{
     struct node{
         ll v;
@@ -362,8 +367,8 @@ public:
     }
 
     // range query -> need inv
-    node query(int idx){ return query(idx, idx); } // O(log n)
-    node query(int l, int r){ // O(log n)
+    node query(int idx) requires has_inv<policy> { return query(idx, idx); } // O(log n)
+    node query(int l, int r) requires has_inv<policy> { // O(log n)
         l = max(l, 0); r = min(r, n);
         if(l > r) return id();
         return op(pre(r), inv(pre(l - 1))); 
@@ -376,7 +381,7 @@ public:
         return ret;
     }
 
-    void set(int idx, const node& v){ // O(log n)
+    void set(int idx, const node& v) requires has_inv<policy> { // O(log n)
         if(idx < 0 || idx > n) return;
         node cur = query(idx, idx), d = op(v, inv(cur));         
         update(idx, d);                
@@ -416,8 +421,8 @@ public:
     }
 
     // range query -> need inv
-    node query(int y, int x){ return query(y, x, y, x); } // O(log n log m)
-    node query(int y1, int x1, int y2, int x2){ // O(log n log m)
+    node query(int y, int x) requires has_inv<policy> { return query(y, x, y, x); } // O(log n log m)
+    node query(int y1, int x1, int y2, int x2) requires has_inv<policy> { // O(log n log m)
         x1 = max(x1, 1); y1 = max(y1, 1);
         x2 = min(x2, m); y2 = min(y2, n);
         if(x1 > x2 || y1 > y2) return id();
@@ -436,7 +441,7 @@ public:
         }
     }
 
-    void set(int y, int x, const node& v){ // O(log n log m)
+    void set(int y, int x, const node& v) requires has_inv<policy> { // O(log n log m)
         if(x <= 0 || y <= 0 || x > m || y > n) return;
         node cur = query(y, x), d = op(v, inv(cur));
         update(y, x, d);
