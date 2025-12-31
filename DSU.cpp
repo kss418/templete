@@ -49,6 +49,7 @@ public:
     node& get(int x){ return arr[find(x)]; } // O(1)
     void set(int x, const node& v){ arr[find(x)] = v; } // O(1)
     int size(int x){ return sz[find(x)]; } // O(1)
+    bool root(int x){ return find(x) == x; } // O(1)
     bool same(int a, int b){ return find(a) == find(b); } // O(1)
 };
 
