@@ -17,7 +17,7 @@ struct uf_policy{
 };
 
 template <class policy = uf_policy>
-class _uf{
+class _uf{ // 1-based index
 private:
     using node = typename policy::node;
     vector<node> arr;
@@ -89,33 +89,37 @@ public:
     bool same(ll a, ll b) { return find(a).x == find(b).x; }
 };
 
-class _ufset{ 
+class _ufset{ // 1-based index 
+private:
+    vector <int> p, sz, l, r; int n, cc;
 public:
-    ll n; vector <ll> p, si, l, r;
-    _ufset(){}
-    _ufset(ll n) { 
-        this->n = n;
-        p.resize(n + 1, -1); si.resize(n + 1, 1);
-        l.resize(n + 1); r.resize(n + 1);
+    _ufset(int n = 0){ clear(n); } // O(n)
+    void clear(int n){ // O(n)
+        this->n = n; cc = n;
+        p.assign(n + 2, -1); sz.assign(n + 2, 1);
+        l.resize(n + 2); r.resize(n + 2);
         iota(all(l), 0); iota(all(r), 0);
     }
 
-    ll find(ll num) { 
-        if (p[num] == -1) return num;
+    int find(int num){ // O(1) 
+        if(p[num] == -1) return num;
         return p[num] = find(p[num]);
     }
 
-    void merge(ll a, ll b) {
+    bool merge(int a, int b){ // O(1)
         a = find(a); b = find(b);
-        if (a == b) return;
-        if (size(a) < size(b)) swap(a, b);
-        p[b] = a, si[a] += si[b];
+        if (a == b) return false; 
+        if (sz[a] < sz[b]) swap(a, b);
+        p[b] = a; sz[a] += sz[b]; cc--;
         l[a] = min(l[a], l[b]);
         r[a] = max(r[a], r[b]);
+        return true;
     }
 
-    ll size(ll num){ return si[find(num)]; }
-    bool same(ll a, ll b) { return find(a) == find(b); }
-    ll prv(ll num){ return find(l[find(num)] - 1); }
-    ll nxt(ll num){ return find(r[find(num)] + 1); }
+    int count() const{ return cc; } // O(1)
+    int size(int x){ return sz[find(x)]; } // O(1)
+    bool root(int x){ return find(x) == x; } // O(1)
+    bool same(int a, int b) { return find(a) == find(b); } // O(1)
+    int prv(int x){ return find(l[find(x)] - 1); } // O(1)
+    int nxt(int x){ return find(r[find(x)] + 1); } // O(1)
 };

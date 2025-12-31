@@ -10,7 +10,7 @@
     "};",
     "",
     "template <class policy = uf_policy>",
-    "class _uf{",
+    "class _uf{ // 1-based index",
     "private:",
     "    using node = typename policy::node;",
     "    vector<node> arr;",
