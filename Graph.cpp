@@ -181,65 +181,71 @@ public:
 };
 
 // MST
-template <typename T = ll>
-class _mst {
-public:
-    vector<ll> p, size; T result = 0;
-    ll n, cnt = 0;
-    class edge {
+struct mst_policy{
+    using cost = ll;
+    static cost zero(){ return 0; }
+    static cost add(const cost& a, const cost& b){ return a + b; }
+};
+
+template <class policy = mst_policy>
+class _mst{
+private:
+    using cost = typename policy::cost;
+    cost zero() const{ return policy::zero(); }
+    cost add(const cost& a, const cost& b) const{ return policy::add(a, b); }
+    cost result = zero(); int n; bool built = 0;
+    class edge{
     public:
-        ll s, e; T c;
-        bool operator>(const edge& ot) const {
-            return c > ot.c;
-        }
-
-        bool operator<(const edge& ot) const {
-            return c < ot.c;
-        }
+        int s, e; cost c;
+        bool operator<(const edge& ot) const{ return c < ot.c; }
     };
-    vector <edge> adj;
-
-    _mst(ll n) {
-        this->n = n;
-        p.resize(n + 1, -1); size.resize(n + 1, 1);
-    }
-
-    ll find(ll num) {
-        if (p[num] == -1) return num;
-        return p[num] = find(p[num]);
-    }
-
-    void merge(ll a, ll b) {
-        a = find(a); b = find(b);
-        if (a == b) return;
-        if (a > b) swap(a, b);
-        p[b] = a, size[a] += size[b];
-    }
-
-    ll same(ll a, ll b) {
-        if (find(a) == find(b)) return 1;
-        return 0;
-    }
-
-    void add(ll st, ll en, T c = 1) { // 양방향
-        adj.push_back({ st, en, c });
-    }
-
-    void init(ll num = 0) { // num 만큼 적게 간선 연결
-        cnt = 0; result = 0;
-        sort(all(adj));
-        for(auto& i : adj) {
-            auto [st, en, c] = i;
-            if (cnt >= n - 1 - num) break;
-            if (same(st, en)) continue; merge(st, en);
-            result += c; cnt++;
+    class _uf{
+    private:
+        vector <int> p, sz; int n;
+    public:
+        _uf(int n = 0){ clear(n); } // O(n)
+        void clear(int n){ this->n = n; p.assign(n + 1, -1); sz.assign(n + 1, 1); }  // O(n)
+        int find(int x){ // O(1)
+            if(p[x] == -1) return x;
+            return p[x] = find(p[x]);
         }
 
-        if(cnt < n - 1 - num) result = MINF;
+        bool merge(int a, int b){ // O(1) 
+            a = find(a); b = find(b);
+            if(a == b) return false;
+            if(sz[a] < sz[b]) swap(a, b);
+            p[b] = a; sz[a] += sz[b];
+            return true;
+        }
+    }; _uf uf; vector<edge> adj;
+
+    bool cal(int num = 0){ 
+        assert(!built); built = 1;
+        sort(all(adj)); int cnt = 0;
+        for(auto& i : adj){
+            auto& [st, en, c] = i;
+            if(cnt >= n - num - 1) return 1;
+            if(!uf.merge(st, en)) continue;
+            result = add(result, c); cnt++;
+        }
+        return cnt >= n - num - 1;
+    }
+public:
+    _mst(int n = 0){ clear(n); } // O(n)
+    void clear(int n){ // O(n)
+        this->n = n; result = zero(); 
+        uf.clear(n); built = 0; adj.clear();
     }
 
-    T ret() {
-        return result;
+    void add(int st, int en, cost c){ // O(1)
+        assert(!built);
+        adj.push_back({st, en, c}); 
+    }
+
+    bool init(int num = 0){ return cal(num);} // O(m log m)
+    cost ret(){ // O(1)
+        assert(built);
+        return result; 
     }
 };
 
