@@ -489,42 +489,39 @@ public:
     }
 };
 
-class _pst{
-public:
-    ll n, q, lg, nc, vc;
-    vector <ll> lv, rv, root;
-    _pst(){}
-    _pst(ll n, ll q) : n(n), q(q){ // q -> update size
-        lg = __lg(n + 1) + 2; clear();
-    }
-
-    class node{
-    public:
+struct pst_policy{
+    struct node{
         ll v;
         node() : node(0){} // identity
         node(ll v) : v(v) {}
         operator ll() const{ // query
             return v;
         }
-    }; vector <node> seg;
+    };
 
-    node merge(const node& l, const node& r){
-        return{
+    static node op(const node& l, const node& r){
+        return node{
             l.v + r.v
         };
     }
+};
+
+template <class policy = pst_policy>
+class _pst{
+public:
+    using node = typename policy::node;
+    node op(const node& l, const node& r) const{ return policy::op(l, r); }
+    node id() const{ return node(); }
+private:
+    ll n, q, lg, nc, vc;
+    vector <ll> lv, rv, root;
+    vector <node> seg;
 
     ll clone(ll idx){
         ++nc;
         seg[nc] = seg[idx];
         lv[nc] = lv[idx]; rv[nc] = rv[idx];
         return nc;
-    }
-
-    void update(ll idx, const node& val){ update(vc, idx, val); }
-    void update(ll ver, ll idx, const node& val){
-        ++vc;
-        root[vc] = update(root[ver], 0, n, idx, val);
     }
 
     ll update(ll idx, ll s, ll e, ll pos, const node& val){
@@ -538,32 +535,42 @@ public:
         if(pos <= m) lv[cur] = update(lv[cur], s, m, pos, val);
         else rv[cur] = update(rv[cur], m + 1, e, pos, val);
 
-        seg[cur] = merge(seg[lv[cur]], seg[rv[cur]]);
+        seg[cur] = op(seg[lv[cur]], seg[rv[cur]]);
         return cur;
     }
 
-    node query(ll ver, ll idx){ return query(ver, idx, idx); }
-    node query(ll ver, ll l, ll r){
-        l = max(0ll, l); r = min(n, r);
-        if(l > r) return node();
-        return query(root[ver], 0, n, l, r);
-    }
-
     node query(ll idx, ll s, ll e, ll l, ll r){
-        if(!idx) return node();
-        if(r < s || e < l) return node();
+        if(!idx) return id();
+        if(r < s || e < l) return id();
         if(l <= s && r >= e) return seg[idx];
 
         ll m = (s + e) >> 1ll;
         node ln = query(lv[idx], s, m, l, r);
         node rn = query(rv[idx], m + 1, e, l, r);
-        return merge(ln, rn);
+        return op(ln, rn);
     }
+public:
+    _pst(ll n = 0, ll q = 0){ clear(n, q); } // q -> update size
 
-    void clear(){
+    void clear(ll n, ll q){
+        this->n = n; this->q = q;
+        lg = __lg(n + 1) + 2;
         nc = vc = 0;
         ll mx = (q + 1) * lg + 5;
         lv.assign(mx, 0); rv.assign(mx, 0);
-        root.assign(q + 1, 0); seg.assign(mx, node());
+        root.assign(q + 1, 0); seg.assign(mx, id());
+    }
+
+    void update(ll idx, const node& val){ update(vc, idx, val); }
+    void update(ll ver, ll idx, const node& val){
+        ++vc;
+        root[vc] = update(root[ver], 0, n, idx, val);
+    }
+
+    node query(ll ver, ll idx){ return query(ver, idx, idx); }
+    node query(ll ver, ll l, ll r){
+        l = max(0ll, l); r = min(n, r);
+        if(l > r) return id();
+        return query(root[ver], 0, n, l, r);
     }
 };
