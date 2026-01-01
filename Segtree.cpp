@@ -25,11 +25,12 @@ struct seg_policy{
 
 template <class policy = seg_policy>
 class _seg {
-private:
+public:
     using node = typename policy::node;
-    int n, sz; vector <node> seg;
     node op(const node& l, const node& r) const{ return policy::op(l, r); }
     node id() const{ return node(); }
+private:
+    int n, sz; vector <node> seg;
 public:
     _seg(int n = 0){ clear(n); } // O(n)
     void clear(int n){ // O(n)
@@ -96,12 +97,13 @@ struct prop_policy{
 
 template <class policy = prop_policy>
 class _prop { 
-private:
+public:
     using node = typename policy::node;
     using lazy = typename policy::lazy;
-    vector <node> seg; vector <lazy> lz; int sz, h, n;
     node op(const node& l, const node& r) const{ return policy::op(l, r); }
     node id() const{ return node(); }
+private:
+    vector <node> seg; vector <lazy> lz; int sz, h, n;
     lazy lz_id() const{ return lazy(); }
     bool is_lz_id(const lazy& now) const{ return policy::is_lz_id(now); }
     void prop(node& seg, const lazy& lz) const{ policy::apply(seg, lz); }
