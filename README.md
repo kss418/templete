@@ -39,7 +39,6 @@ PS/CP(Problem Solving / Competitive Programming)용 C++ 템플릿 모음입니�
   - SCC (`_scc`)
   - 2-SAT (`_2sat`)
   - Bipartite Matching (`_bm`)
-  - Topology Sort (`_tsort`)
   - BCC (`_bcc`)
   - 3/4-cycle Search (`_3cycle`, `_4cycle`)
 - `Hash.cpp`

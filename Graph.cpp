@@ -515,41 +515,6 @@ public:
     }
 };
 
-//위상 정렬
-class _tsort {
-public:
-    ll n; vector<vector<ll>> adj;
-    vector<ll> ind, sort;
-    _tsort(ll n) {
-        this->n = n; adj.resize(n + 1);
-        ind.resize(n + 1);
-    }
-
-    void addsol(ll st, ll en) {
-        adj[st].push_back(en);
-        ind[en]++;
-    }
-
-    void init() {
-        deque <ll> q;
-        for (int i = 1; i <= n; i++) {
-            if (ind[i]) continue;
-            q.push_back(i);
-        }
-
-        while (!q.empty()) {
-            ll cur = q.front(); q.pop_front();
-            sort.push_back(cur);
-
-            for (auto& nxt : adj[cur]) {
-                if (!--ind[nxt]) q.push_back(nxt);
-            }
-        }
-    }
-
-    vector <ll> ret() { return sort; }
-};
-
 //BCC
 class _bcc{ // 1-based index
 public:
