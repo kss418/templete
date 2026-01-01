@@ -10,7 +10,7 @@
     "    };",
     "",
     "    static node op(const node& l, const node& r){",
-    "        return node{",
+    "        return {",
     "            l.v + r.v",
     "        };",
     "    }",
