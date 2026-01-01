@@ -17,7 +17,7 @@ struct seg_policy{
     };
 
     static node op(const node& l, const node& r){
-        return node{
+        return {
             l.v + r.v
         };
     }
@@ -506,70 +506,85 @@ struct pst_policy{
     }
 };
 
-template <class policy = pst_policy>
+template <class policy = seg_policy>
 class _pst{
 public:
     using node = typename policy::node;
     node op(const node& l, const node& r) const{ return policy::op(l, r); }
     node id() const{ return node(); }
 private:
-    ll n, q, lg, nc, vc;
-    vector <ll> lv, rv, root;
+    vector <int> lv, rv, root;
     vector <node> seg;
-
-    ll clone(ll idx){
-        ++nc;
-        seg[nc] = seg[idx];
+    int n, q, lg, nc, vc;
+    int clone(int idx){
+        ++nc; seg[nc] = seg[idx];
         lv[nc] = lv[idx]; rv[nc] = rv[idx];
         return nc;
     }
 
-    ll update(ll idx, ll s, ll e, ll pos, const node& val){
-        ll cur = clone(idx);
+    int update(int idx, int s, int e, int pos, const node& v){
+        int cur = clone(idx);
         if(s == e){
-            seg[cur] = val;
+            seg[cur] = v;
             return cur;
         }
-
-        ll m = (s + e) >> 1ll;
-        if(pos <= m) lv[cur] = update(lv[cur], s, m, pos, val);
-        else rv[cur] = update(rv[cur], m + 1, e, pos, val);
-
+        int m = (s + e) >> 1;
+        if(pos <= m) lv[cur] = update(lv[cur], s, m, pos, v);
+        else rv[cur] = update(rv[cur], m + 1, e, pos, v);
         seg[cur] = op(seg[lv[cur]], seg[rv[cur]]);
         return cur;
     }
 
-    node query(ll idx, ll s, ll e, ll l, ll r){
+    int add(int idx, int s, int e, int pos, const node& v){
+        int cur = clone(idx);
+        if(s == e){
+            seg[cur] = op(seg[cur], v);
+            return cur;
+        }
+        int m = (s + e) >> 1;
+        if(pos <= m) lv[cur] = add(lv[cur], s, m, pos, v);
+        else rv[cur] = add(rv[cur], m + 1, e, pos, v);
+        seg[cur] = op(seg[lv[cur]], seg[rv[cur]]);
+        return cur;
+    }
+
+    node query(int idx, int s, int e, int l, int r) const{
         if(!idx) return id();
         if(r < s || e < l) return id();
         if(l <= s && r >= e) return seg[idx];
 
-        ll m = (s + e) >> 1ll;
+        int m = (s + e) >> 1;
         node ln = query(lv[idx], s, m, l, r);
         node rn = query(rv[idx], m + 1, e, l, r);
         return op(ln, rn);
     }
 public:
-    _pst(ll n = 0, ll q = 0){ clear(n, q); } // q -> update size
-
-    void clear(ll n, ll q){
+    _pst(int n = 0, int q = 0){ clear(n, q); } // q -> update size
+    void clear(int n, int q){ // O(q log n)
         this->n = n; this->q = q;
-        lg = __lg(n + 1) + 2;
-        nc = vc = 0;
-        ll mx = (q + 1) * lg + 5;
+        lg = __lg(n + 1) + 2; nc = vc = 0;
+        int mx = (q + 1) * lg + 5;
         lv.assign(mx, 0); rv.assign(mx, 0);
         root.assign(q + 1, 0); seg.assign(mx, id());
     }
 
-    void update(ll idx, const node& val){ update(vc, idx, val); }
-    void update(ll ver, ll idx, const node& val){
-        ++vc;
-        root[vc] = update(root[ver], 0, n, idx, val);
+    void update(int idx, const node& val){ update(vc, idx, val); } // O(log n)
+    void update(int ver, int idx, const node& val){ // O(log n)
+        assert(0 <= ver && ver <= vc);
+        assert(vc + 1 <= q); assert(0 <= idx && idx <= n);
+        root[++vc] = update(root[ver], 0, n, idx, val);
     }
 
-    node query(ll ver, ll idx){ return query(ver, idx, idx); }
-    node query(ll ver, ll l, ll r){
-        l = max(0ll, l); r = min(n, r);
+    void add(int idx, const node& val){ add(vc, idx, val); } // O(log n)
+    void add(int ver, int idx, const node& val){ // O(log n)
+        assert(0 <= ver && ver <= vc);
+        assert(vc + 1 <= q); assert(0 <= idx && idx <= n);
+        root[++vc] = add(root[ver], 0, n, idx, val);
+    }
+
+    node query(int ver, int idx) const{ return query(ver, idx, idx); } // O(log n)
+    node query(int ver, int l, int r) const{  // O(log n)
+        l = max(0, l); r = min(n, r);
         if(l > r) return id();
         return query(root[ver], 0, n, l, r);
     }
