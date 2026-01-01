@@ -633,27 +633,21 @@ public:
 };
 
 class _3cycle{ // 1-based index
-public:
-    vector <vector<ll>> tmp, adj;
-    vector <ll> cnt;
-    ll n;
-
-    _3cycle(){}
-    _3cycle(ll n) : n(n){
-        tmp.resize(n + 1); adj.resize(n + 1);
-        cnt.resize(n + 1);
+private:
+    vector <vector<int>> tmp, adj;
+    vector <int> cnt; int n; bool built = 0;
+public: 
+    _3cycle(int n = 0){ clear(n); } // O(n)
+    void clear(int n){ // O(n);
+        this->n = n; adj.assign(n + 1, {}); built = 0;
+        cnt.assign(n + 1, 0); tmp.assign(n + 1, {});
     }
 
-    void addsol(ll st, ll en){
-        tmp[st].push_back(en);
-    }
+    void addsol(int st, int en){ tmp[st].push_back(en); } // O(1)
+    void add(int st, int en){ addsol(st, en); addsol(en, st); } // O(1)
 
-    void add(ll st, ll en){
-        addsol(st, en);
-        addsol(en, st);
-    }
-
-    void init(){
+    void init(){ // O(n + m)
+        assert(!built); built = 1;
         for(int i = 1;i <= n;i++){
             for(auto& j : tmp[i]){
                 if(tmp[i].size() < tmp[j].size()) continue;
@@ -663,8 +657,8 @@ public:
         }
     }
 
-    ll ret(ll mod = 0){ // Counting 3-Cycle
-        ll c = 0; init();
+    ll ret(ll mod = 0){ // O(m sqrt m)
+        assert(built); ll c = 0;
         for(int i = 1;i <= n;i++){
             for(auto& j : adj[i]) cnt[j]++;
             for(auto& j : adj[i]){
@@ -675,7 +669,6 @@ public:
             }
             for(auto& j : adj[i]) cnt[j]--;
         }
-
         return c;
     } 
 };
