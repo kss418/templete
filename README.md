@@ -56,7 +56,6 @@ PS/CP(Problem Solving / Competitive Programming)용 C++ 템플릿 모음입니�
   - Prime Tower (`_pt`)
 - `Others.cpp`
   - Binary Search (`_bs`)
-  - LIS (`_lis`)
   - LCS (`_lcs`)
   - Mo’s Algorithm (`_mos`)
   - Ternary Search (`_ts`)
