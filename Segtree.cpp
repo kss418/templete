@@ -489,23 +489,6 @@ public:
     }
 };
 
-struct pst_policy{
-    struct node{
-        ll v;
-        node() : node(0){} // identity
-        node(ll v) : v(v) {}
-        operator ll() const{ // query
-            return v;
-        }
-    };
-
-    static node op(const node& l, const node& r){
-        return node{
-            l.v + r.v
-        };
-    }
-};
-
 template <class policy = seg_policy>
 class _pst{
 public:
