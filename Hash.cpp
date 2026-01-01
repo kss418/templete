@@ -10,7 +10,7 @@ constexpr ll INF = 0x3f3f3f3f3f3f3f3f;
 constexpr ll MINF = 0xc0c0c0c0c0c0c0c0;
 
 class _hash{ // 0-based index
-public:
+private:
     class _core {
     public:
         vector <_mint> pw, ipw, pre; 
@@ -47,9 +47,8 @@ public:
             ret *= ipw[l];
             return ret.v;
         }
-    };
-
-    vector <_core> arr; int m;
+    }; vector <_core> arr; int m;
+public:
     _hash() : m(0){} 
     _hash(const vector <ll>& key, const vector<ll>& mod){ // O(n)
         assert(key.size() == mod.size()); m = key.size(); arr.reserve(m);
@@ -72,7 +71,7 @@ public:
 };
 
 class _deque_hash{ // 0-based index
-public:
+private:
     class _core{ 
     public:
         vector <_mint> bit, arr, pw, ipw;
@@ -120,9 +119,8 @@ public:
             if(l) ret -= sum(l - 1);
             return (ret * ipw[l]).v;
         }
-    };
-
-    vector <_core> arr; int n, m;
+    }; vector <_core> arr; int n, m;
+public:
     _deque_hash() : n(0), m(0){} 
     _deque_hash(int n, const vector <ll>& key, const vector<ll>& mod) : n(n){ // O(n)
         assert(key.size() == mod.size()); m = key.size(); arr.reserve(m);
