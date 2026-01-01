@@ -100,20 +100,6 @@ public:
     }
 };
 
-class _pow {
-public:
-	_pow() {}
-
-	ll ret(ll a, ll b){
-        ll ret = 1;
-        while(b){
-            if(b & 1) ret *= a;
-            a *= a; b >>= 1;
-        }      
-        return ret;
-    }
-};
-
 class _gcd {
 public:
     _gcd() {}

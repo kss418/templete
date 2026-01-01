@@ -47,7 +47,6 @@ PS/CP(Problem Solving / Competitive Programming)용 C++ 템플릿 모음입니�
 - `Number_Theory.cpp`
   - Modint (`_mint`)
   - Sieve of Eratosthenes (`_es`)
-  - Binary Exponentiation (`_pow`)
   - Extended Euclidean (`_gcd`)
   - CRT (`_crt`)
   - Discrete Logarithm (`_dlog`)
