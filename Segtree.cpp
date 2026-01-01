@@ -186,83 +186,106 @@ public:
     }
 };
 
-template <typename T = ll> //query type
-class _hld { // m = 0 정점, m = 1 간선
+template <class policy>
+class _hld { // 1-based index, m=0 vertex, m=1 edge(child-index)
 public:
-    vector <vector <ll>> adj;
-    vector <ll> sz, top, d, in, out, p;
-    ll n, m, cnt = 0;
-
-    _hld() {}
-    _hld(ll n, ll m = 0){
-        this->n = n; this->m = m;
-        adj.resize(n + 1); sz.resize(n + 1);
-        in.resize(n + 1); out.resize(n + 1);
-        d.resize(n + 1); p.resize(n + 1);
-        top.resize(n + 1); 
+    using node = typename policy::node;
+    policy seg;
+private:
+    vector <vector <int>> adj, tmp;
+    vector <int> sz, top, d, in, out, p;
+    int n, m, cnt = 0; bool built = 0;
+    void build_tree(int cur, int pre = -1){
+        for(auto& nxt : tmp[cur]){
+            if(pre == nxt) continue;
+            adj[cur].push_back(nxt);
+            build_tree(nxt, cur);
+        }
+        tmp[cur].clear();
     }
 
-    void add(ll s, ll e){
-        addsol(s, e); addsol(e, s);
-    }   
-    void addsol(ll s, ll e, ll c = 1){ adj[s].push_back(e); }
-
-    void dfs1(ll cur, ll pre){
+    void dfs1(int cur){
         sz[cur] = 1;
         for(auto& nxt : adj[cur]){
-            if(nxt == pre) continue;
             d[nxt] = d[cur] + 1; p[nxt] = cur;
-            dfs1(nxt, cur); sz[cur] += sz[nxt];
+            dfs1(nxt); sz[cur] += sz[nxt];
             if(sz[nxt] > sz[adj[cur][0]]) swap(nxt, adj[cur][0]);
         }
     }
 
-    void dfs2(ll cur, ll pre){
+    void dfs2(int cur){
         in[cur] = ++cnt;
         for(auto& nxt : adj[cur]){
-            if(nxt == pre) continue;
             top[nxt] = (nxt == adj[cur][0] ? top[cur] : nxt);
-            dfs2(nxt, cur);
+            dfs2(nxt);
         }
         out[cur] = cnt;
     }
 
+    vector<pair<int,int>> get_path(int st, int en){
+        vector<pair<int,int>> ret;
+        while(top[st] != top[en]){
+            if(d[top[st]] < d[top[en]]) swap(st, en);
+            int cur = top[st], l = in[cur], r = in[st];
+            if(m == 1 && p[cur] == 0) l++; 
+            if(l <= r) ret.push_back({l, r});
+            st = p[cur];
+        }
+        if(d[st] > d[en]) swap(st, en);
+        int l = in[st] + m, r = in[en];
+        if(l <= r) ret.push_back({l, r});
+        return ret;
+    }
+public:
+    _hld(int n = 0, int m = 0){ clear(n, m); }
+    void clear(int n, int m = 0){
+        this->n = n; this->m = m; cnt = 0;
+        adj.assign(n + 1, {}); tmp.assign(n + 1, {}); 
+        top.assign(n + 1, 0); d.assign(n + 1, 0); 
+        in.assign(n + 1, 0); out.assign(n + 1, 0);
+        p.assign(n + 1, 0); sz.assign(n + 1, 0);
+        seg.clear(n); built = 0;
+    }
+
+    void addsol(int s, int e){ tmp[s].push_back(e); }
+    void add(int s, int e){ addsol(s, e); addsol(e, s); }
     void init(){
+        assert(!built); built = 1;
         for(int i = 1;i <= n;i++){
-            if(sz[i]) continue;
-            dfs1(i, -1); dfs2(i, -1);
+            if(sz[i]) continue; top[i] = i;
+            build_tree(i); dfs1(i); dfs2(i);
         }
+        tmp.clear(); tmp.shrink_to_fit();
     }
 
-    T query(ll st, ll en) { 
-        //_seg<>::node ret;
-        _prop<>::node ret;
-        while(top[st] != top[en]){
-            if(d[top[st]] < d[top[en]]) swap(st, en);
-            ll cur = top[st];
-            ret = seg.merge(ret, seg.query(in[cur], in[st], 0, n));
-            st = p[cur];
-        }
-
-        if(d[st] > d[en]) swap(st, en);
-        ret = seg.merge(ret, seg.query(in[st] + m, in[en], 0, n));
-        return ret; 
+    node query(int st, int en) { 
+        assert(built); node ret = seg.id();
+        auto path = get_path(st, en);
+        for(auto &[l, r] : path) ret = seg.op(ret, seg.query(l, r));
+        return ret;
     }
 
-    //void add_seg(ll idx, ll val) { seg.add(in[idx], val); }
-    /*
-    void add_lazy(ll st, ll en, ll val){
-        while(top[st] != top[en]){
-            if(d[top[st]] < d[top[en]]) swap(st, en);
-            ll cur = top[st];
-            seg.add(in[cur], in[st], val);
-            st = p[cur];
-        }
+    node query_sub(int x){ assert(built); return seg.query(in[x] + m, out[x]); }
+    void set(int x, const node& v)
+        requires requires(policy s, int i, const node& nv){ s.set(i, nv); }
+    { assert(built); seg.set(in[x], v); }
 
-        if(d[st] > d[en]) swap(st, en);
-        seg.add(in[st] + m, in[en], val);
+    void update(int x, const node& v)
+        requires requires(policy s, int i, const node& nv){ s.update(i, nv); }
+    { assert(built); seg.update(in[x], v); }
+
+    template<class P = policy>
+    void update(int st, int en, const typename P::lazy& lz)
+        requires requires(P s, int l, int r, const typename P::lazy& z){ s.update(l, r, z); }
+    {
+        auto path = get_path(st, en); assert(built);
+        for(auto &[l, r] : path) seg.update(l, r, lz);
     }
-    */
+
+    template<class P = policy>
+    void update_sub(int x, const typename P::lazy& lz)
+        requires requires(P s, int l, int r, const typename P::lazy& z){ s.update(l, r, z); }
+    { assert(built); seg.update(in[x] + m, out[x], lz); }
 }; 
 
 class _mt{ // 1-based index 
