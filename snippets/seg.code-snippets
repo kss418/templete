@@ -25,6 +25,7 @@
     "    node id() const{ return node(); }",
     "public:",
     "    _seg(int n = 0){ clear(n); } // O(n)",
+    "    _seg(const vector<node>& arr){ build(arr); } // O(n)",
     "    void clear(int n){ // O(n)",
     "        this->n = n;",
     "        sz = 1; while(sz < n + 1) sz <<= 1;",

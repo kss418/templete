@@ -33,6 +33,7 @@ private:
     int n, sz; vector <node> seg;
 public:
     _seg(int n = 0){ clear(n); } // O(n)
+    _seg(const vector<node>& arr){ build(arr); } // O(n)
     void clear(int n){ // O(n)
         this->n = n;
         sz = 1; while(sz < n + 1) sz <<= 1;
@@ -134,6 +135,7 @@ private:
     }
 public:
     _prop(int n = 0){ clear(n); } // O(n)
+    _prop(const vector<node>& arr){ build(arr); } // O(n)
     void clear(int n){ // O(n)
         this->n = n;
         sz = 1; while(sz < n + 1) sz <<= 1;
@@ -389,6 +391,7 @@ private:
     node inv(const node& a) const{ return policy::inv(a); }
 public:
     _fw(int n = 0){ clear(n); } // O(n)
+    _fw(const vector<node>& arr){ build(arr); } // O(n)
     void clear(int n){ // O(n)
         this->n = n;
         bit.assign(n + 2, id());
