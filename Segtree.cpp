@@ -288,61 +288,63 @@ public:
     { assert(built); seg.update(in[x] + m, out[x], lz); }
 }; 
 
-class _mt{ // 1-based index 
+class _mt{ // 1-based index
 public:
-    vector <ll> arr; ll n;
+    vector <ll> arr; int n;
     vector <vector <ll>> tree;
-    _mt(){} 
-    _mt(ll n) : n(n), arr(n + 1), tree(4 * n + 1){}
+    _mt() : n(0){} 
+    _mt(int n){ init(n); }
+    _mt(const vector <ll>& a){ build(a); }
 
-    void set(ll idx, ll val){
-        arr[idx] = val;
+    void init(int n){
+        this->n = n;
+        arr.assign(n + 1, 0);
+        tree.assign(4 * n + 4, {});
     }
 
-    void init(){ init(1, n); }
-    void init(ll l, ll r, ll node = 1){
+    void build(const vector <ll>& a){
+        n = (int)a.size() - 1;
+        arr = a;
+        tree.assign(4 * n + 4, {});
+        build(1, n);
+    }
+
+    void set(int idx, ll val){ arr[idx] = val; }
+    void build(){ if(n) build(1, n); }
+
+    ll greater(int s, int e, ll val){ return query(s, e, 1, n, val, true); }
+    ll less(int s, int e, ll val){ return query(s, e, 1, n, val, false); }
+
+private:
+    void build(int l, int r, int node = 1){
         vector <ll>& cur = tree[node];
+        cur.clear();
         if(l == r){
             cur.push_back(arr[l]);
             return;
         }
 
-        ll mid = (l + r) >> 1ll;
-        init(l, mid, node * 2);
-        init(mid + 1, r, node * 2 + 1);
+        int mid = (l + r) >> 1;
+        build(l, mid, node * 2);
+        build(mid + 1, r, node * 2 + 1);
 
         vector <ll>& lv = tree[node * 2], &rv = tree[node * 2 + 1];
         cur.resize(lv.size() + rv.size());
         merge(all(lv), all(rv), cur.begin());
     }
 
-    ll greater(ll s, ll e, ll val){ return greater(s, e, 1, n, val); }
-    ll greater(ll s, ll e, ll l, ll r, ll val, ll node = 1){
+    ll query(int s, int e, int l, int r, ll val, bool is_greater, int node = 1){
         if(s > e) return 0;
         if(l > e || r < s) return 0;
         if(l >= s && r <= e){
             vector <ll>& cur = tree[node];
-            return cur.end() - upper_bound(all(cur), val);
-        }
-
-        ll mid = (l + r) >> 1ll;
-        ll ret = greater(s, e, l, mid, val, node * 2);
-        ret += greater(s, e, mid + 1, r, val, node * 2 + 1);
-        return ret;
-    }
-
-    ll less(ll s, ll e, ll val){ return less(s, e, 1, n, val); }
-    ll less(ll s, ll e, ll l, ll r, ll val, ll node = 1){
-        if(s > e) return 0;
-        if(l > e || r < s) return 0;
-        if(l >= s && r <= e){
-            vector <ll>& cur = tree[node];
+            if(is_greater) return cur.end() - upper_bound(all(cur), val);
             return lower_bound(all(cur), val) - cur.begin();
         }
 
-        ll mid = (l + r) >> 1ll;
-        ll ret = less(s, e, l, mid, val, node * 2);
-        ret += less(s, e, mid + 1, r, val, node * 2 + 1);
+        int mid = (l + r) >> 1;
+        ll ret = query(s, e, l, mid, val, is_greater, node * 2);
+        ret += query(s, e, mid + 1, r, val, is_greater, node * 2 + 1);
         return ret;
     }
 };
