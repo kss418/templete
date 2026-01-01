@@ -674,36 +674,39 @@ public:
 };
 
 class _4cycle{ // 1-based index
+private:
+    vector <vector<int>> tmp, adj;
+    vector <int> cnt; int n; bool built = 0;
+    bool less(int a, int b){
+        if(tmp[a].size() < tmp[b].size()) return 1;
+        return tmp[a].size() == tmp[b].size() && a <= b;
+    }
 public:
-    vector <vector<ll>> adj;
-    vector <ll> cnt;
-    ll n;
-
-    _4cycle(){}
-    _4cycle(ll n) : n(n){
-        adj.resize(n + 1); cnt.resize(n + 1);
+    _4cycle(int n = 0){ clear(n); } // O(n)
+    void clear(int n){ // O(n)
+        this->n = n; adj.assign(n + 1, {}); built = 0;
+        cnt.assign(n + 1, 0); tmp.assign(n + 1, {});
     }
 
-    void addsol(ll st, ll en){
-        adj[st].push_back(en);
-    }
+    void addsol(int st, int en){ tmp[st].push_back(en); } // O(1)
+    void add(int st, int en){ addsol(st, en); addsol(en, st); } // O(1)
 
-    void add(ll st, ll en){
-        addsol(st, en);
-        addsol(en, st);
-    }
-
-    bool less(ll a, ll b){
-        if(adj[a].size() < adj[b].size()) return 1;
-        return adj[a].size() == adj[b].size() && a <= b;
-    }
-
-    ll ret(ll mod = 0){ // Counting 4-Cycle
-        ll c = 0;
+    void init(){ // O(n + m)
+        assert(!built); built = 1;
         for(int i = 1;i <= n;i++){
-            vector <ll> use;
+            for(auto& j : tmp[i]){
+                if(tmp[i].size() < tmp[j].size()) continue;
+                if(tmp[i].size() == tmp[j].size() && i <= j) continue;
+                adj[i].push_back(j);
+            }
+        }
+    }
+
+    ll ret(ll mod = 0){ // O(m sqrt m)
+        assert(built); ll c = 0;
+        for(int i = 1;i <= n;i++){
+            vector <int> use;
             for(auto& j : adj[i]){
-                if(less(i, j)) continue;
                 for(auto& k : adj[j]){
                     if(less(i, k)) continue;
                     if(!cnt[k]) use.push_back(k);
@@ -711,10 +714,8 @@ public:
                     if(mod) c %= mod;
                 }
             }
-
             for(auto& j : use) cnt[j] = 0;
         }
-
         return c;
     } 
 };
