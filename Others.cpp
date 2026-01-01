@@ -9,32 +9,49 @@ using pll = pair<ll, ll>; using tll = tuple<ll, ll, ll>;
 constexpr ll INF = 0x3f3f3f3f3f3f3f3f;
 constexpr ll MINF = 0xc0c0c0c0c0c0c0c0;
 
-//BINARY SEARCH
-template <typename T = ll>
+//Binary Search
 class _bs { // 0-based index
 public:
-    T l, r;
-    _bs(T l, T r) {
-        this->l = l; this->r = r;
-    }
-
-    bool f(T cur) {
+    ll l, r;
+    _bs(ll l = 0, ll r = 0) : l(l), r(r){}
+    bool f(ll cur) {
 
     }
 
-    T ret() {
-        T lo = l, hi = r, mid = -1;
+    ll ret() {
+        ll lo = l, hi = r, mid = -1;
         while (hi > lo) {
-            mid = (hi + lo + 1) / (T)2;
+            mid = (hi + lo + 1) >> 1ll;
             if (f(mid)) lo = mid;
             else hi = mid - 1;
         }
-
         return lo;
     }
 };
 
-//LCS
+//Ternary Search
+class _ts { // 0-based index
+public:
+    ll l, r;
+    _ts(ll l = 0, ll r = 0) : l(l), r(r){}
+    ll f(ll cur) {
+       
+       return 0;
+    }
+
+    ll ret() {
+        while (r - l > 3) {
+            ll st = (2 * l + r) / 3, en = (l + 2 * r) / 3;
+            if(f(st) < f(en)) l = st;
+            else r = en;
+        }
+
+        ll result = MINF;
+        for(ll cur = l; cur <= r;cur++) result = max(result, f(cur));
+        return result;
+    }
+};
+
 class _lcs {
 public:
     string a, b; vector<vector<ll>> dp;
@@ -139,34 +156,6 @@ public:
     }
 };
 
-//TERNARY SEARCH
-class _ts { // 0-based index
-public:
-    ll l, r;
-    _ts(ll l, ll r) {
-        this->l = l; this->r = r;
-    }
-
-    ll f(ll cur) {
-       
-       return 0;
-    }
-
-    ll ret() {
-        while (r - l > 3) {
-            ll st = (2 * l + r) / 3, en = (l + 2 * r) / 3;
-            if(f(st) < f(en)) l = st;
-            else r = en;
-        }
-
-        ll result = -INF;
-        for(ll cur = l; cur <= r;cur++) result = max(result, f(cur));
-
-        return result;
-    }
-};
-
-// CHT
 class _cht{
 public:
     class line{
@@ -234,7 +223,6 @@ public:
     }
 };
 
-// PBS
 class _pbs{
 public:
     ll lo, hi;
