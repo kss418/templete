@@ -1,0 +1,32 @@
+{
+	"fbs": {
+  "prefix": ">>fbs",
+  "body": [
+    "class _fbs { // real",
+    "public:",
+    "    template <class F>",
+    "    ld max_right(ld l, ld r, const F& f, int iter = 80) {",
+    "        ld lo = l, hi = r;",
+    "        for(int i = 0; i < iter; i++){",
+    "            ld mid = (lo + hi) / 2;",
+    "            if (f(mid)) lo = mid;",
+    "            else hi = mid;",
+    "        }",
+    "        return lo;",
+    "    }",
+    "",
+    "    template <class F>",
+    "    ld min_left(ld l, ld r, const F& f, int iter = 80) {",
+    "        ld lo = l, hi = r;",
+    "        for(int i = 0; i < iter; i++){",
+    "            ld mid = (lo + hi) / 2;",
+    "            if (f(mid)) hi = mid;",
+    "            else lo = mid;",
+    "        }",
+    "        return lo;",
+    "    }",
+    "};"
+  ],
+  "description": "fbs"
+}
+}
