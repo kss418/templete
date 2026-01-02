@@ -2,7 +2,7 @@
 "seg": {
   "prefix": ">>seg",
   "body": [
-    "struct seg_policy{",
+    "struct monoid{",
     "    struct node {",
     "        ll v;",
     "        node(ll v) : v(v){}",
@@ -16,7 +16,7 @@
     "    }",
     "};",
     "",
-    "template <class policy = seg_policy>",
+    "template <class policy = monoid>",
     "class _seg {",
     "private:",
     "    using node = typename policy::node;",
