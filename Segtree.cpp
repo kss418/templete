@@ -297,7 +297,7 @@ struct mt_policy {
 };
 
 template <class policy = mt_policy>
-class _mt{ // 1-based index
+class _mt{ // 0-based index
 public:
     using node = typename policy::node;
 private:
@@ -314,9 +314,9 @@ private:
     }
 
     int query(int st, int en, const node& v, bool is_greater, bool is_less, bool is_eq) const{
-        st = max(st, 1); en = min(en, n);
+        st = max(st, 0); en = min(en, n);
         if(n <= 0 || st > en) return 0;
-        int l = sz + st - 1, r = sz + en - 1, ret = 0;
+        int l = sz + st, r = sz + en, ret = 0;
         while(l <= r){
             if(l & 1) ret += count_node(seg[l++], v, is_greater, is_less, is_eq);
             if(!(r & 1)) ret += count_node(seg[r--], v, is_greater, is_less, is_eq);
@@ -328,13 +328,13 @@ public:
     _mt(int n = 0){ clear(n); } // O(n)
     _mt(const vector <node>& arr){ build(arr); } // O(n log n)
     void clear(int n){ // O(n)
-        this->n = n; sz = 1; while(sz < n) sz <<= 1; 
+        this->n = n; sz = 1; while(sz < n + 1) sz <<= 1; 
         arr.assign(n + 1, node()); seg.assign(2 * sz, {});
     }
 
     void build(const vector <node>& arr){ // O(n log n)
         clear((int)arr.size() - 1); this->arr = arr; 
-        for(int i = 1; i <= n; i++) seg[sz + i - 1].assign(1, arr[i]);
+        for(int i = 0; i <= n; i++) seg[sz + i].assign(1, arr[i]);
         for(int i = sz - 1; i >= 1; i--){
             auto &l = seg[i << 1], &r = seg[i << 1 | 1], &cur = seg[i];
             cur.resize(l.size() + r.size());
@@ -343,8 +343,8 @@ public:
     }
 
     void update(int idx, const node& v){ // O(n)
-        if(idx < 1 || idx > n) return; arr[idx] = v;
-        int p = sz + idx - 1; seg[p].assign(1, v); 
+        if(idx < 0 || idx > n) return; arr[idx] = v;
+        int p = sz + idx; seg[p].assign(1, v); 
         for(int i = p >> 1;i >= 1;i >>= 1){
             auto &l = seg[i << 1], &r = seg[i << 1 | 1], &cur = seg[i];
             cur.resize(l.size() + r.size());
@@ -605,15 +605,15 @@ public:
     _fw2d(int n = 0, int m = 0){ clear(n, m); } // O(nm)
     void clear(int n, int m){ // O(nm)
         this->n = n; this->m = m;
-        bit.assign(n + 1, vector<node>(m + 1, id()));
+        bit.assign(n + 2, vector<node>(m + 2, id()));
     }
 
-    // return (1,1) ~ (x,y)
+    // return (0,0) ~ (y,x)
     node pre(int y, int x){ // O(log n log m)
-        if(x <= 0 || y <= 0) return id();
+        if(x < 0 || y < 0) return id();
         node ret = id(); x = min(x, m); y = min(y, n);
-        for(int i = y; i > 0; i -= i & -i){
-            for(int j = x; j > 0; j -= j & -j){
+        for(int i = y + 1; i > 0; i -= i & -i){
+            for(int j = x + 1; j > 0; j -= j & -j){
                 ret = op(ret, bit[i][j]);
             }
         }
@@ -623,7 +623,7 @@ public:
     // range query -> need inv
     node query(int y, int x) requires has_inv<policy> { return query(y, x, y, x); } // O(log n log m)
     node query(int y1, int x1, int y2, int x2) requires has_inv<policy> { // O(log n log m)
-        x1 = max(x1, 1); y1 = max(y1, 1);
+        x1 = max(x1, 0); y1 = max(y1, 0);
         x2 = min(x2, m); y2 = min(y2, n);
         if(x1 > x2 || y1 > y2) return id();
         node a = pre(y2, x2), b = pre(y2, x1 - 1);
@@ -633,16 +633,16 @@ public:
     }
 
     void update(int y, int x, const node& v){ // O(log n log m)
-        if(x <= 0 || y <= 0 || x > m || y > n) return;
-        for(int i = y; i <= n; i += i & -i){
-            for(int j = x; j <= m; j += j & -j){
+        if(x < 0 || y < 0 || x > m || y > n) return;
+        for(int i = y + 1; i <= n + 1; i += i & -i){
+            for(int j = x + 1; j <= m + 1; j += j & -j){
                 bit[i][j] = op(bit[i][j], v);
             }
         }
     }
 
     void set(int y, int x, const node& v) requires has_inv<policy> { // O(log n log m)
-        if(x <= 0 || y <= 0 || x > m || y > n) return;
+        if(x < 0 || y < 0 || x > m || y > n) return;
         node cur = query(y, x), d = op(v, inv(cur));
         update(y, x, d);
     }
