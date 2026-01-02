@@ -492,63 +492,53 @@ private:
     { return op(seg[idx2], inv(seg[idx1])); }
 
     template<class F>
-    int max_right(int idx, int s, int e, int l, const F& f, node& v) const{
-        if(e < l) return l - 1;
-        if(!idx) return e;
-        if(l <= s){
-            node nxt = op(v, seg[idx]);
-            if(f(nxt)){ v = nxt; return e; }
-            if(s == e) return s - 1;
+    int bisect(int idx, int s, int e, int p, bool right, const F& f, node& v) const{
+        if(right){
+            if(e < p) return p - 1;
+        }else{
+            if(p < s) return p + 1;
         }
-        int m = (s + e) >> 1, ret = max_right(lv[idx], s, m, l, f, v);
-        if(ret < m) return ret;
-        return max_right(rv[idx], m + 1, e, l, f, v);
-    }
-
-    template<class F>
-    int min_left(int idx, int s, int e, int r, const F& f, node& v) const{
-        if(r < s) return r + 1;
-        if(!idx) return s;
-        if(e <= r){
-            node nxt = op(seg[idx], v);
-            if(f(nxt)){ v = nxt; return s; }
-            if(s == e) return s + 1;
+        if(!idx) return right ? e : s;
+        if((right && p <= s) || (!right && e <= p)){
+            node nxt = right ? op(v, seg[idx]) : op(seg[idx], v);
+            if(f(nxt)){ v = nxt; return right ? e : s; }
+            if(s == e) return right ? s - 1 : s + 1;
         }
-        int m = (s + e) >> 1, ret = min_left(rv[idx], m + 1, e, r, f, v);
+        int m = (s + e) >> 1;
+        if(right){
+            int ret = bisect(lv[idx], s, m, p, right, f, v);
+            if(ret < m) return ret;
+            return bisect(rv[idx], m + 1, e, p, right, f, v);
+        }
+        int ret = bisect(rv[idx], m + 1, e, p, right, f, v);
         if(ret > m + 1) return ret;
-        return min_left(lv[idx], s, m, r, f, v);
+        return bisect(lv[idx], s, m, p, right, f, v);
     }
 
     template<class F>
-    int max_right(int idx1, int idx2, int s, int e, int l, const F& f, node& v) const
+    int bisect_diff(int idx1, int idx2, int s, int e, int p, bool right, const F& f, node& v) const
         requires has_inv<policy>
     {
-        if(e < l) return l - 1;
-        if(!idx1 && !idx2) return e;
-        if(l <= s){
-            node nxt = op(v, diff_seg(idx1, idx2));
-            if(f(nxt)){ v = nxt; return e; }
-            if(s == e) return s - 1;
+        if(right){
+            if(e < p) return p - 1;
+        }else{
+            if(p < s) return p + 1;
         }
-        int m = (s + e) >> 1, ret = max_right(lv[idx1], lv[idx2], s, m, l, f, v);
-        if(ret < m) return ret;
-        return max_right(rv[idx1], rv[idx2], m + 1, e, l, f, v);
-    }
-
-    template<class F>
-    int min_left(int idx1, int idx2, int s, int e, int r, const F& f, node& v) const
-        requires has_inv<policy>
-    {
-        if(r < s) return r + 1;
-        if(!idx1 && !idx2) return s;
-        if(e <= r){
-            node nxt = op(diff_seg(idx1, idx2), v);
-            if(f(nxt)){ v = nxt; return s; }
-            if(s == e) return s + 1;
+        if(!idx1 && !idx2) return right ? e : s;
+        if((right && p <= s) || (!right && e <= p)){
+            node nxt = right ? op(v, diff_seg(idx1, idx2)) : op(diff_seg(idx1, idx2), v);
+            if(f(nxt)){ v = nxt; return right ? e : s; }
+            if(s == e) return right ? s - 1 : s + 1;
         }
-        int m = (s + e) >> 1, ret = min_left(rv[idx1], rv[idx2], m + 1, e, r, f, v);
+        int m = (s + e) >> 1;
+        if(right){
+            int ret = bisect_diff(lv[idx1], lv[idx2], s, m, p, right, f, v);
+            if(ret < m) return ret;
+            return bisect_diff(rv[idx1], rv[idx2], m + 1, e, p, right, f, v);
+        }
+        int ret = bisect_diff(rv[idx1], rv[idx2], m + 1, e, p, right, f, v);
         if(ret > m + 1) return ret;
-        return min_left(lv[idx1], lv[idx2], s, m, r, f, v);
+        return bisect_diff(lv[idx1], lv[idx2], s, m, p, right, f, v);
     }
 public:
     _pst(int n = 0, int q = 0){ clear(n, q); } // q -> update size
@@ -594,14 +584,14 @@ public:
     int max_right(int ver, int l, const F& f) const{
         assert(0 <= ver && ver <= vc); assert(0 <= l && l <= n);
         assert(f(id())); node v = id();
-        return max_right(root[ver], 0, n, l, f, v);
+        return bisect(root[ver], 0, n, l, 1, f, v);
     }
 
     template<class F>
     int min_left(int ver, int r, const F& f) const{
         assert(0 <= ver && ver <= vc); assert(0 <= r && r <= n);
         assert(f(id())); node v = id();
-        return min_left(root[ver], 0, n, r, f, v);
+        return bisect(root[ver], 0, n, r, 0, f, v);
     }
 
     template<class F>
@@ -610,7 +600,7 @@ public:
     {
         assert(0 <= ver1 && ver1 <= vc); assert(0 <= ver2 && ver2 <= vc);
         assert(0 <= l && l <= n); assert(f(id())); node v = id();
-        return max_right(root[ver1], root[ver2], 0, n, l, f, v);
+        return bisect_diff(root[ver1], root[ver2], 0, n, l, 1, f, v);
     }
 
     template<class F>
@@ -619,7 +609,7 @@ public:
     {
         assert(0 <= ver1 && ver1 <= vc); assert(0 <= ver2 && ver2 <= vc);
         assert(0 <= r && r <= n); assert(f(id())); node v = id();
-        return min_left(root[ver1], root[ver2], 0, n, r, f, v);
+        return bisect_diff(root[ver1], root[ver2], 0, n, r, 0, f, v);
     }
 };
 
