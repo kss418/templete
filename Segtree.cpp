@@ -12,10 +12,8 @@ constexpr ll MINF = 0xc0c0c0c0c0c0c0c0;
 struct monoid{
     struct node {
         ll v;
-        node(ll v) : v(v){}
-        node() : node(0){} // identity
+        node(ll v = 0) : v(v){}
     };
-
     static node op(const node& l, const node& r){
         return {
             l.v + r.v
@@ -101,15 +99,12 @@ public:
 struct action{
     struct node {
         ll v; int sz;
-        node(ll v, int sz) : v(v), sz(sz){}
-        node() : node(0, 0){} // identity
+        node(ll v = 0, int sz = 0) : v(v), sz(sz){}
     };
     struct lazy{
         ll v;
-        lazy(ll v) : v(v){}
-        lazy() : lazy(0){} // identity
+        lazy(ll v = 0) : v(v){}
     };
-
     static node op(const node& l, const node& r){
         return node{
             l.v + r.v,
@@ -360,8 +355,7 @@ public:
 struct mt_policy {
     struct node {
         ll v;
-        node(ll v) : v(v){}
-        node() : node(0){} // identity
+        node(ll v = 0) : v(v){}
         bool operator < (const node& ot) const{ return v < ot.v; }
     };
 };
@@ -437,8 +431,7 @@ concept has_inv = requires(const typename policy::node& a){
 struct group{
     struct node{
         ll v;
-        node(ll v) : v(v){}
-        node() : node(0){} // identity
+        node(ll v = 0) : v(v){}
     };
     static node op(const node& l, const node& r){
         return {l.v + r.v};
