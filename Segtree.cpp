@@ -67,7 +67,7 @@ public:
     }
 };
 
-struct prop_policy{
+struct action{
     struct node {
         ll v; int sz;
         node(ll v, int sz) : v(v), sz(sz){}
@@ -90,7 +90,7 @@ struct prop_policy{
     static void compose(lazy& s, const lazy& p){ s.v += p.v; }
 };
 
-template <class policy = prop_policy>
+template <class policy = action>
 class _prop { 
 public:
     using node = typename policy::node;
@@ -104,7 +104,7 @@ private:
     void prop(node& seg, const lazy& lz) const{ policy::apply(seg, lz); }
     void comp(lazy& s, const lazy& p) const{ policy::compose(s, p); }
 
-    void push(int idx){
+    void propagate(int idx){
         for(int i = h;i > 0;i--){
             int cur = idx >> i;
             if(is_lz_id(lz[cur])) continue;
@@ -119,7 +119,7 @@ private:
         if(idx < sz) comp(lz[idx], now); 
     }
 
-    void init(int idx){
+    void rebuild(int idx){
         while(idx > 1){
             idx >>= 1;
             seg[idx] = op(seg[idx << 1], seg[idx << 1 | 1]);
@@ -151,7 +151,7 @@ public:
         if(st > en) return id();
 
         int l = (int)st + sz, r = (int)en + sz;
-        push(l); push(r);
+        propagate(l); propagate(r);
 
         node nl = id(), nr = id();
         while(l <= r){
@@ -170,7 +170,7 @@ public:
 
         int l = (int)st + sz, r = (int)en + sz;
         int tl = l, tr = r;
-        push(l); push(r);
+        propagate(l); propagate(r);
 
         while(l <= r){
             if(l & 1) apply(l++, lz);
@@ -178,7 +178,7 @@ public:
             l >>= 1; r >>= 1;
         }
         
-        init(tl); init(tr);
+        rebuild(tl); rebuild(tr);
     }
 };
 
@@ -644,5 +644,3 @@ public:
         update(y, x, d);
     }
 };
-
-
