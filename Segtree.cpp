@@ -361,7 +361,7 @@ concept has_inv = requires(const typename policy::node& a){
     { policy::inv(a) } -> std::same_as<typename policy::node>;
 };
 
-struct fw_policy{
+struct group{
     struct node{
         ll v;
         node(ll v) : v(v){}
@@ -375,7 +375,7 @@ struct fw_policy{
     }
 };
 
-template <class policy = fw_policy>
+template <class policy = group>
 class _fw{ // 0-based index
 private:
     using node = typename policy::node;
@@ -428,7 +428,7 @@ public:
     }
 };
 
-template <class policy = fw_policy>
+template <class policy = group>
 class _fw2d{
 private:
     using node = typename policy::node;
@@ -483,12 +483,13 @@ public:
     }
 };
 
-template <class policy = seg_policy>
+template <class policy = group>
 class _pst{
 public:
     using node = typename policy::node;
     node op(const node& l, const node& r) const{ return policy::op(l, r); }
     node id() const{ return node(); }
+    node inv(const node& a) const requires has_inv<policy>{ return policy::inv(a); }
 private:
     vector <int> lv, rv, root;
     vector <node> seg;
@@ -513,14 +514,76 @@ private:
     }
 
     node query(int idx, int s, int e, int l, int r) const{
-        if(!idx) return id();
-        if(r < s || e < l) return id();
+        if(!idx || r < s || e < l) return id();
         if(l <= s && r >= e) return seg[idx];
-
         int m = (s + e) >> 1;
         node ln = query(lv[idx], s, m, l, r);
         node rn = query(rv[idx], m + 1, e, l, r);
         return op(ln, rn);
+    }
+
+    node diff_seg(int idx1, int idx2) const
+        requires has_inv<policy>
+    { return op(seg[idx2], inv(seg[idx1])); }
+
+    template<class F>
+    int max_right(int idx, int s, int e, int l, const F& f, node& v) const{
+        if(e < l) return l - 1;
+        if(!idx) return e;
+        if(l <= s){
+            node nxt = op(v, seg[idx]);
+            if(f(nxt)){ v = nxt; return e; }
+            if(s == e) return s - 1;
+        }
+        int m = (s + e) >> 1, ret = max_right(lv[idx], s, m, l, f, v);
+        if(ret < m) return ret;
+        return max_right(rv[idx], m + 1, e, l, f, v);
+    }
+
+    template<class F>
+    int min_left(int idx, int s, int e, int r, const F& f, node& v) const{
+        if(r < s) return r + 1;
+        if(!idx) return s;
+        if(e <= r){
+            node nxt = op(seg[idx], v);
+            if(f(nxt)){ v = nxt; return s; }
+            if(s == e) return s + 1;
+        }
+        int m = (s + e) >> 1, ret = min_left(rv[idx], m + 1, e, r, f, v);
+        if(ret > m + 1) return ret;
+        return min_left(lv[idx], s, m, r, f, v);
+    }
+
+    template<class F>
+    int max_right(int idx1, int idx2, int s, int e, int l, const F& f, node& v) const
+        requires has_inv<policy>
+    {
+        if(e < l) return l - 1;
+        if(!idx1 && !idx2) return e;
+        if(l <= s){
+            node nxt = op(v, diff_seg(idx1, idx2));
+            if(f(nxt)){ v = nxt; return e; }
+            if(s == e) return s - 1;
+        }
+        int m = (s + e) >> 1, ret = max_right(lv[idx1], lv[idx2], s, m, l, f, v);
+        if(ret < m) return ret;
+        return max_right(rv[idx1], rv[idx2], m + 1, e, l, f, v);
+    }
+
+    template<class F>
+    int min_left(int idx1, int idx2, int s, int e, int r, const F& f, node& v) const
+        requires has_inv<policy>
+    {
+        if(r < s) return r + 1;
+        if(!idx1 && !idx2) return s;
+        if(e <= r){
+            node nxt = op(diff_seg(idx1, idx2), v);
+            if(f(nxt)){ v = nxt; return s; }
+            if(s == e) return s + 1;
+        }
+        int m = (s + e) >> 1, ret = min_left(rv[idx1], rv[idx2], m + 1, e, r, f, v);
+        if(ret > m + 1) return ret;
+        return min_left(lv[idx1], lv[idx2], s, m, r, f, v);
     }
 public:
     _pst(int n = 0, int q = 0){ clear(n, q); } // q -> update size
@@ -532,18 +595,52 @@ public:
         root.assign(q + 1, 0); seg.assign(mx, id());
     }
 
-    void set(int idx, const node& v){ set(vc, idx, v); } // O(log n)
-    void set(int ver, int idx, const node& v){ // O(log n)
+    int version() const{ return vc; }
+    int set(int idx, const node& v){ return set(vc, idx, v); } // O(log n)
+    int set(int ver, int idx, const node& v){ // O(log n)
         assert(0 <= ver && ver <= vc);
         assert(vc + 1 <= q); assert(0 <= idx && idx <= n);
         root[++vc] = set(root[ver], 0, n, idx, v);
+        return vc;
     }
 
     node query(int ver, int idx) const{ return query(ver, idx, idx); } // O(log n)
-    node query(int ver, int l, int r) const{  // O(log n)
+    node query(int ver, int l, int r) const{ // O(log n)
         assert(0 <= ver && ver <= vc);
         l = max(0, l); r = min(n, r);
         if(l > r) return id();
         return query(root[ver], 0, n, l, r);
+    }
+
+    template<class F>
+    int max_right(int ver, int l, const F& f) const{
+        assert(0 <= ver && ver <= vc); assert(0 <= l && l <= n);
+        assert(f(id())); node v = id();
+        return max_right(root[ver], 0, n, l, f, v);
+    }
+
+    template<class F>
+    int min_left(int ver, int r, const F& f) const{
+        assert(0 <= ver && ver <= vc); assert(0 <= r && r <= n);
+        assert(f(id())); node v = id();
+        return min_left(root[ver], 0, n, r, f, v);
+    }
+
+    template<class F>
+    int max_right(int ver1, int ver2, int l, const F& f) const
+        requires has_inv<policy>
+    {
+        assert(0 <= ver1 && ver1 <= vc); assert(0 <= ver2 && ver2 <= vc);
+        assert(0 <= l && l <= n); assert(f(id())); node v = id();
+        return max_right(root[ver1], root[ver2], 0, n, l, f, v);
+    }
+
+    template<class F>
+    int min_left(int ver1, int ver2, int r, const F& f) const
+        requires has_inv<policy>
+    {
+        assert(0 <= ver1 && ver1 <= vc); assert(0 <= ver2 && ver2 <= vc);
+        assert(0 <= r && r <= n); assert(f(id())); node v = id();
+        return min_left(root[ver1], root[ver2], 0, n, r, f, v);
     }
 };
