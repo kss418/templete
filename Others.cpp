@@ -158,62 +158,70 @@ public:
 };
 
 //MO's
+struct mos_policy{
+    struct node{
+        ll v;
+        node(ll v = 0) : v(v){}
+    };
+    struct ret{
+        ll v;
+        ret(ll v = 0) : v(v){}
+    };
+    static void push_front(int idx, const node& v, ret& now){}
+    static void push_back(int idx, const node& v, ret& now){}
+    static void pop_front(int idx, const node& v, ret& now){}
+    static void pop_back(int idx, const node& v, ret& now){}
+};
+
+template <class policy = mos_policy>
 class _mos{
 public:
-    ll sq, n, m, cur; vector <ll> result, arr;
-    class query{
-    public:
-        ll l, r, n, sq;
-        bool operator <(const query& ot) const{
-            if((l / sq) == (ot.l / sq)) return r < ot.r;
-            return (l / sq < ot.l / sq);
+    using node = typename policy::node;
+    using ret  = typename policy::ret;
+private:
+    int n, b;
+    static void push_front(int idx, const node& v, ret& now){ policy::push_front(idx, v, now); }
+    static void push_back(int idx, const node& v, ret& now){ policy::push_back(idx, v, now); }
+    static void pop_front(int idx, const node& v, ret& now){ policy::pop_front(idx, v, now); }
+    static void pop_back(int idx, const node& v, ret& now){ policy::pop_back(idx, v, now); }
+    static node node_id(){ return node(); }
+    static ret ret_id(){ return ret();  }
+    struct query{ int l, r, idx; };
+    struct cmp {
+        int b;
+        bool operator()(const query& a, const query& c) const {
+            int ab = a.l / b, cb = c.l / b;
+            return (ab != cb ? ab < cb : a.r < c.r);
         }
     };
-    vector <query> q;
-
-    _mos(){}
-    _mos(ll n, ll m) : n(n), m(m){ // 배열 크기, 쿼리 크기
-        sq = sqrt(n); arr.resize(n + 1);
-        result.resize(m + 1);
+public:
+    vector <ret> result; vector <node> arr; vector <query> vq;
+    _mos(int n = 0, int b = 0){ clear(n, b); }
+    void clear(int n, int b = 0){
+        this->n = n; this->b = b;
+        if(!b) this->b = sqrt(n); vq.clear();
+        arr.assign(n + 1, node_id());
     }
 
-    void add(ll l, ll r, ll n){ // 쿼리 추가
-        q.push_back({l, r, n, sq});
-    }
-
-    void set(ll idx, ll val){ // 배열 삽입
-        arr[idx] = val;
-    }
-
-    void push(ll idx){
-
-    }   
-
-    void pop(ll idx){
-
-    }
-
-    void init(){
-        if(q.empty()) return;
-        sort(all(q));
-
-        ll s = q[0].l, e = s - 1;
-        while (e < q[0].r) push(++e);
-        while (s > q[0].l) push(--s);
-        while (s < q[0].l) pop(s++);
-        result[q[0].n] = cur;
-
-        for(int i = 1;i < m;i++){
-            while(q[i].l < s) push(--s);
-            while(q[i].r > e) push(++e);
-            while(q[i].l > s) pop(s++);
-            while(q[i].r < e) pop(e--);
-            result[q[i].n] = cur;
+    const vector<ret>& get_result() const{ return result; }
+    void add(int l, int r, int idx){ vq.push_back({l, r, idx}); }
+    void set(int idx, const node& v){ arr[idx] = v; }
+    void build(){
+        if (vq.empty()) { result.clear(); return; } 
+        sort(all(vq), cmp{b}); result.assign(vq.size() + 1, ret_id());
+        int s = vq[0].l, e = s - 1; ret cur = ret_id();
+        while(e < vq[0].r){ ++e; push_back(e, arr[e], cur); }
+        while(s > vq[0].l){ --s; push_front(s, arr[s], cur); }
+        while(s < vq[0].l){ pop_front(s, arr[s], cur); ++s; }
+        result[vq[0].idx] = cur;
+        for(int i = 1;i < (int)vq.size();i++){
+            auto&[l, r, idx] = vq[i];
+            while(l > s){ pop_front(s, arr[s], cur); ++s; }
+            while(r < e){ pop_back(e,  arr[e],  cur); --e; }
+            while(l < s){ --s; push_front(s, arr[s], cur); }
+            while(r > e){ ++e; push_back(e,  arr[e],  cur); }
+            result[idx] = cur;
         }
-    }
-
-    void print(){
-        for(int i = 1;i <= m;i++) cout << result[i] << "\n";
     }
 };
 
