@@ -10,15 +10,10 @@ constexpr ll INF = 0x3f3f3f3f3f3f3f3f;
 constexpr ll MINF = 0xc0c0c0c0c0c0c0c0;
 
 //Binary Search
-class _bs { // 0-based index
+class _bs { // integer
 public:
-    ll l, r;
-    _bs(ll l = 0, ll r = 0) : l(l), r(r){}
-    bool f(ll cur) {
-
-    }
-
-    ll ret() {
+    template <class F>
+    ll max_right(ll l, ll r, const F& f) {
         ll lo = l, hi = r, mid = -1;
         while (hi > lo) {
             mid = (hi + lo + 1) >> 1ll;
@@ -27,19 +22,49 @@ public:
         }
         return lo;
     }
+
+    template <class F>
+    ll min_left(ll l, ll r, const F& f) {
+        ll lo = l, hi = r, mid = -1;
+        while (hi > lo) {
+            mid = (hi + lo) >> 1ll;
+            if (f(mid)) hi = mid;
+            else lo = mid + 1;
+        }
+        return lo;
+    }
+};
+
+class _fbs { // real
+public:
+    template <class F>
+    ld max_right(ld l, ld r, const F& f, int iter = 80) {
+        ld lo = l, hi = r;
+        for(int i = 0; i < iter; i++){
+            ld mid = (lo + hi) / 2;
+            if (f(mid)) lo = mid;
+            else hi = mid;
+        }
+        return lo;
+    }
+
+    template <class F>
+    ld min_left(ld l, ld r, const F& f, int iter = 80) {
+        ld lo = l, hi = r;
+        for(int i = 0; i < iter; i++){
+            ld mid = (lo + hi) / 2;
+            if (f(mid)) hi = mid;
+            else lo = mid;
+        }
+        return lo;
+    }
 };
 
 //Ternary Search
-class _ts { // 0-based index
+class _ts { // integer
 public:
-    ll l, r;
-    _ts(ll l = 0, ll r = 0) : l(l), r(r){}
-    ll f(ll cur) {
-       
-       return 0;
-    }
-
-    ll ret() {
+    template <class F>
+    ll max(ll l, ll r, const F& f) {
         while (r - l > 3) {
             ll st = (2 * l + r) / 3, en = (l + 2 * r) / 3;
             if(f(st) < f(en)) l = st;
@@ -47,8 +72,44 @@ public:
         }
 
         ll result = MINF;
-        for(ll cur = l; cur <= r;cur++) result = max(result, f(cur));
+        for(ll cur = l; cur <= r;cur++) result = std::max(result, f(cur));
         return result;
+    }
+
+    template <class F>
+    ll min(ll l, ll r, const F& f) {
+        while (r - l > 3) {
+            ll st = (2 * l + r) / 3, en = (l + 2 * r) / 3;
+            if(f(st) > f(en)) l = st;
+            else r = en;
+        }
+
+        ll result = INF;
+        for(ll cur = l; cur <= r;cur++) result = std::min(result, f(cur));
+        return result;
+    }
+};
+
+class _fts { // real
+public:
+    template <class F>
+    ld max(ld l, ld r, const F& f, int iter = 120) {
+        for(int i = 0; i < iter; i++){
+            ld st = (2 * l + r) / 3, en = (l + 2 * r) / 3;
+            if(f(st) < f(en)) l = st;
+            else r = en;
+        }
+        return std::max(f(l), f(r));
+    }
+
+    template <class F>
+    ld min(ld l, ld r, const F& f, int iter = 120) {
+        for(int i = 0; i < iter; i++){
+            ld st = (2 * l + r) / 3, en = (l + 2 * r) / 3;
+            if(f(st) > f(en)) l = st;
+            else r = en;
+        }
+        return std::min(f(l), f(r));
     }
 };
 
