@@ -9,7 +9,7 @@ using pll = pair<ll, ll>; using tll = tuple<ll, ll, ll>;
 constexpr ll INF = 0x3f3f3f3f3f3f3f3f;
 constexpr ll MINF = 0xc0c0c0c0c0c0c0c0;
 
-struct seg_policy{
+struct monoid{
     struct node {
         ll v;
         node(ll v) : v(v){}
@@ -23,7 +23,7 @@ struct seg_policy{
     }
 };
 
-template <class policy = seg_policy>
+template <class policy = monoid>
 class _seg {
 public:
     using node = typename policy::node;
@@ -376,114 +376,6 @@ struct group{
 };
 
 template <class policy = group>
-class _fw{ // 0-based index
-private:
-    using node = typename policy::node;
-    vector <node> bit; int n;
-    node op(const node& l, const node& r) const{ return policy::op(l, r); }
-    node id() const{ return node(); }
-    node inv(const node& a) const{ return policy::inv(a); }
-public:
-    _fw(int n = 0){ clear(n); } // O(n)
-    _fw(const vector<node>& arr){ build(arr); } // O(n)
-    void clear(int n){ // O(n)
-        this->n = n;
-        bit.assign(n + 2, id());
-    }
-
-    void build(const vector<node>& arr){ // O(n)
-        if(arr.empty()){ clear(0); return; }
-        clear((int)arr.size() - 1);
-        for(int i = 0;i <= n;i++) bit[i + 1] = arr[i];
-        for(int i = 1;i <= n + 1;i++){
-            int j = i + (i & -i);
-            if(j <= n + 1) bit[j] = op(bit[j], bit[i]);
-        }
-    }
-
-    // range query -> need inv
-    node query(int idx) requires has_inv<policy> { return query(idx, idx); } // O(log n)
-    node query(int l, int r) requires has_inv<policy> { // O(log n)
-        l = max(l, 0); r = min(r, n);
-        if(l > r) return id();
-        return op(pre(r), inv(pre(l - 1))); 
-    }
-
-    // return 0 ~ idx
-    node pre(int idx){ // O(log n)
-        node ret = id(); idx = min(idx, n);
-        for(int i = idx + 1;i > 0;i -= i & -i) ret = op(ret, bit[i]);
-        return ret;
-    }
-
-    void set(int idx, const node& v) requires has_inv<policy> { // O(log n)
-        if(idx < 0 || idx > n) return;
-        node cur = query(idx, idx), d = op(v, inv(cur));         
-        update(idx, d);                
-    }
-
-    void update(int idx, const node& v){ // O(log n)
-        if(idx < 0 || idx > n) return;
-        for(int i = idx + 1;i <= n + 1;i += i & -i) bit[i] = op(bit[i], v);
-    }
-};
-
-template <class policy = group>
-class _fw2d{
-private:
-    using node = typename policy::node;
-    vector<vector<node>> bit; int n, m;
-    node op(const node& l, const node& r) const { return policy::op(l, r); }
-    node id() const { return node(); }
-    node inv(const node& a) const { return policy::inv(a); }
-public:
-    _fw2d(int n = 0, int m = 0){ clear(n, m); } // O(nm)
-    void clear(int n, int m){ // O(nm)
-        this->n = n; this->m = m;
-        bit.assign(n + 1, vector<node>(m + 1, id()));
-    }
-
-    // return (1,1) ~ (x,y)
-    node pre(int y, int x){ // O(log n log m)
-        if(x <= 0 || y <= 0) return id();
-        node ret = id(); x = min(x, m); y = min(y, n);
-        for(int i = y; i > 0; i -= i & -i){
-            for(int j = x; j > 0; j -= j & -j){
-                ret = op(ret, bit[i][j]);
-            }
-        }
-        return ret;
-    }
-
-    // range query -> need inv
-    node query(int y, int x) requires has_inv<policy> { return query(y, x, y, x); } // O(log n log m)
-    node query(int y1, int x1, int y2, int x2) requires has_inv<policy> { // O(log n log m)
-        x1 = max(x1, 1); y1 = max(y1, 1);
-        x2 = min(x2, m); y2 = min(y2, n);
-        if(x1 > x2 || y1 > y2) return id();
-        node a = pre(y2, x2), b = pre(y2, x1 - 1);
-        node c = pre(y1 - 1, x2), d = pre(y1 - 1, x1 - 1);
-        node ab = op(a, inv(b)), cd = op(inv(c), d);
-        return op(ab, cd);
-    }
-
-    void update(int y, int x, const node& v){ // O(log n log m)
-        if(x <= 0 || y <= 0 || x > m || y > n) return;
-        for(int i = y; i <= n; i += i & -i){
-            for(int j = x; j <= m; j += j & -j){
-                bit[i][j] = op(bit[i][j], v);
-            }
-        }
-    }
-
-    void set(int y, int x, const node& v) requires has_inv<policy> { // O(log n log m)
-        if(x <= 0 || y <= 0 || x > m || y > n) return;
-        node cur = query(y, x), d = op(v, inv(cur));
-        update(y, x, d);
-    }
-};
-
-template <class policy = group>
 class _pst{
 public:
     using node = typename policy::node;
@@ -644,3 +536,113 @@ public:
         return min_left(root[ver1], root[ver2], 0, n, r, f, v);
     }
 };
+
+template <class policy = group>
+class _fw{ // 0-based index
+private:
+    using node = typename policy::node;
+    vector <node> bit; int n;
+    node op(const node& l, const node& r) const{ return policy::op(l, r); }
+    node id() const{ return node(); }
+    node inv(const node& a) const{ return policy::inv(a); }
+public:
+    _fw(int n = 0){ clear(n); } // O(n)
+    _fw(const vector<node>& arr){ build(arr); } // O(n)
+    void clear(int n){ // O(n)
+        this->n = n;
+        bit.assign(n + 2, id());
+    }
+
+    void build(const vector<node>& arr){ // O(n)
+        if(arr.empty()){ clear(0); return; }
+        clear((int)arr.size() - 1);
+        for(int i = 0;i <= n;i++) bit[i + 1] = arr[i];
+        for(int i = 1;i <= n + 1;i++){
+            int j = i + (i & -i);
+            if(j <= n + 1) bit[j] = op(bit[j], bit[i]);
+        }
+    }
+
+    // range query -> need inv
+    node query(int idx) requires has_inv<policy> { return query(idx, idx); } // O(log n)
+    node query(int l, int r) requires has_inv<policy> { // O(log n)
+        l = max(l, 0); r = min(r, n);
+        if(l > r) return id();
+        return op(pre(r), inv(pre(l - 1))); 
+    }
+
+    // return 0 ~ idx
+    node pre(int idx){ // O(log n)
+        node ret = id(); idx = min(idx, n);
+        for(int i = idx + 1;i > 0;i -= i & -i) ret = op(ret, bit[i]);
+        return ret;
+    }
+
+    void set(int idx, const node& v) requires has_inv<policy> { // O(log n)
+        if(idx < 0 || idx > n) return;
+        node cur = query(idx, idx), d = op(v, inv(cur));         
+        update(idx, d);                
+    }
+
+    void update(int idx, const node& v){ // O(log n)
+        if(idx < 0 || idx > n) return;
+        for(int i = idx + 1;i <= n + 1;i += i & -i) bit[i] = op(bit[i], v);
+    }
+};
+
+template <class policy = group>
+class _fw2d{
+private:
+    using node = typename policy::node;
+    vector<vector<node>> bit; int n, m;
+    node op(const node& l, const node& r) const { return policy::op(l, r); }
+    node id() const { return node(); }
+    node inv(const node& a) const { return policy::inv(a); }
+public:
+    _fw2d(int n = 0, int m = 0){ clear(n, m); } // O(nm)
+    void clear(int n, int m){ // O(nm)
+        this->n = n; this->m = m;
+        bit.assign(n + 1, vector<node>(m + 1, id()));
+    }
+
+    // return (1,1) ~ (x,y)
+    node pre(int y, int x){ // O(log n log m)
+        if(x <= 0 || y <= 0) return id();
+        node ret = id(); x = min(x, m); y = min(y, n);
+        for(int i = y; i > 0; i -= i & -i){
+            for(int j = x; j > 0; j -= j & -j){
+                ret = op(ret, bit[i][j]);
+            }
+        }
+        return ret;
+    }
+
+    // range query -> need inv
+    node query(int y, int x) requires has_inv<policy> { return query(y, x, y, x); } // O(log n log m)
+    node query(int y1, int x1, int y2, int x2) requires has_inv<policy> { // O(log n log m)
+        x1 = max(x1, 1); y1 = max(y1, 1);
+        x2 = min(x2, m); y2 = min(y2, n);
+        if(x1 > x2 || y1 > y2) return id();
+        node a = pre(y2, x2), b = pre(y2, x1 - 1);
+        node c = pre(y1 - 1, x2), d = pre(y1 - 1, x1 - 1);
+        node ab = op(a, inv(b)), cd = op(inv(c), d);
+        return op(ab, cd);
+    }
+
+    void update(int y, int x, const node& v){ // O(log n log m)
+        if(x <= 0 || y <= 0 || x > m || y > n) return;
+        for(int i = y; i <= n; i += i & -i){
+            for(int j = x; j <= m; j += j & -j){
+                bit[i][j] = op(bit[i][j], v);
+            }
+        }
+    }
+
+    void set(int y, int x, const node& v) requires has_inv<policy> { // O(log n log m)
+        if(x <= 0 || y <= 0 || x > m || y > n) return;
+        node cur = query(y, x), d = op(v, inv(cur));
+        update(y, x, d);
+    }
+};
+
+

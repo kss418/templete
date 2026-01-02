@@ -2,6 +2,11 @@
 "pst": {
   "prefix": ">>pst",
   "body": [
+    "template <class policy>",
+    "concept has_inv = requires(const typename policy::node& a){",
+    "    { policy::inv(a) } -> std::same_as<typename policy::node>;",
+    "};",
+    "",
     "struct group{",
     "    struct node{",
     "        ll v;",
@@ -14,11 +19,6 @@
     "    static node inv(const node& a){",
     "        return {-a.v};",
     "    }",
-    "};",
-    "",
-    "template <class policy>",
-    "concept has_inv = requires(const typename policy::node& a){",
-    "    { policy::inv(a) } -> std::same_as<typename policy::node>;",
     "};",
     "",
     "template <class policy = group>",
