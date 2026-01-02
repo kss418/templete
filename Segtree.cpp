@@ -65,12 +65,6 @@ public:
         int p = idx + sz; seg[p] = v;
         for(p >>= 1; p; p >>= 1) seg[p] = op(seg[p << 1], seg[p << 1 | 1]);
     }
-
-    void update(int idx, const node& v){ // O(log n)
-        if(idx < 0 || idx > n) return;
-        int p = idx + sz; seg[p] = op(seg[p], v);
-        for(p >>= 1; p; p >>= 1) seg[p] = op(seg[p << 1], seg[p << 1 | 1]);
-    }
 };
 
 struct prop_policy{
