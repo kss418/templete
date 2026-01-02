@@ -182,6 +182,9 @@ public:
     }
 };
 
+template <class P>
+concept is_action = requires(P s, int l, int r, const typename P::lazy& z){ s.update(l, r, z); };
+
 template <class policy>
 class _hld { // 1-based index, m=0 vertex, m=1 edge(child-index)
 public:
@@ -272,7 +275,7 @@ public:
 
     template<class P = policy>
     void update(int st, int en, const typename P::lazy& lz)
-        requires requires(P s, int l, int r, const typename P::lazy& z){ s.update(l, r, z); }
+        requires is_action<P>
     {
         auto path = get_path(st, en); assert(built);
         for(auto &[l, r] : path) seg.update(l, r, lz);
@@ -280,7 +283,7 @@ public:
 
     template<class P = policy>
     void update_sub(int x, const typename P::lazy& lz)
-        requires requires(P s, int l, int r, const typename P::lazy& z){ s.update(l, r, z); }
+        requires is_action<P>
     { assert(built); seg.update(in[x] + m, out[x], lz); }
 }; 
 
