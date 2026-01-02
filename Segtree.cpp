@@ -456,8 +456,7 @@ public:
     node id() const{ return node(); }
     node inv(const node& a) const requires has_inv<policy>{ return policy::inv(a); }
 private:
-    vector <int> lv, rv, root;
-    vector <node> seg;
+    vector <int> lv, rv, root; vector <node> seg;
     int n, q, lg, nc, vc;
     int clone(int idx){
         ++nc; seg[nc] = seg[idx];
@@ -467,10 +466,7 @@ private:
 
     int set(int idx, int s, int e, int pos, const node& v){
         int cur = clone(idx);
-        if(s == e){
-            seg[cur] = v;
-            return cur;
-        }
+        if(s == e){ seg[cur] = v; return cur; }
         int m = (s + e) >> 1;
         if(pos <= m) lv[cur] = set(lv[cur], s, m, pos, v);
         else rv[cur] = set(rv[cur], m + 1, e, pos, v);
@@ -487,17 +483,13 @@ private:
         return op(ln, rn);
     }
 
-    node diff_seg(int idx1, int idx2) const
-        requires has_inv<policy>
+    node diff_seg(int idx1, int idx2) const requires has_inv<policy>
     { return op(seg[idx2], inv(seg[idx1])); }
 
     template<class F>
     int bisect(int idx, int s, int e, int p, bool right, const F& f, node& v) const{
-        if(right){
-            if(e < p) return p - 1;
-        }else{
-            if(p < s) return p + 1;
-        }
+        if(right && e < p) return p - 1;
+        if(!right && p < s) return p + 1;
         if(!idx) return right ? e : s;
         if((right && p <= s) || (!right && e <= p)){
             node nxt = right ? op(v, seg[idx]) : op(seg[idx], v);
@@ -516,14 +508,9 @@ private:
     }
 
     template<class F>
-    int bisect_diff(int idx1, int idx2, int s, int e, int p, bool right, const F& f, node& v) const
-        requires has_inv<policy>
-    {
-        if(right){
-            if(e < p) return p - 1;
-        }else{
-            if(p < s) return p + 1;
-        }
+    int bisect_diff(int idx1, int idx2, int s, int e, int p, bool right, const F& f, node& v) const requires has_inv<policy>{
+        if(right && e < p) return p - 1;
+        if(!right && p < s) return p + 1;
         if(!idx1 && !idx2) return right ? e : s;
         if((right && p <= s) || (!right && e <= p)){
             node nxt = right ? op(v, diff_seg(idx1, idx2)) : op(diff_seg(idx1, idx2), v);
@@ -567,13 +554,10 @@ public:
         return query(root[ver], 0, n, l, r);
     }
 
-    node diff_query(int ver1, int ver2, int idx) const
-        requires has_inv<policy>
+    node diff_query(int ver1, int ver2, int idx) const requires has_inv<policy>
     { return diff_query(ver1, ver2, idx, idx); } // O(log n)
 
-    node diff_query(int ver1, int ver2, int l, int r) const // O(log n)
-        requires has_inv<policy>
-    {
+    node diff_query(int ver1, int ver2, int l, int r) const requires has_inv<policy>{ // O(log n)
         assert(0 <= ver1 && ver1 <= vc); assert(0 <= ver2 && ver2 <= vc);
         l = max(0, l); r = min(n, r);
         if(l > r) return id();
@@ -595,18 +579,14 @@ public:
     }
 
     template<class F>
-    int diff_max_right(int ver1, int ver2, int l, const F& f) const
-        requires has_inv<policy>
-    {
+    int diff_max_right(int ver1, int ver2, int l, const F& f) const requires has_inv<policy>{
         assert(0 <= ver1 && ver1 <= vc); assert(0 <= ver2 && ver2 <= vc);
         assert(0 <= l && l <= n); assert(f(id())); node v = id();
         return bisect_diff(root[ver1], root[ver2], 0, n, l, 1, f, v);
     }
 
     template<class F>
-    int diff_min_left(int ver1, int ver2, int r, const F& f) const
-        requires has_inv<policy>
-    {
+    int diff_min_left(int ver1, int ver2, int r, const F& f) const requires has_inv<policy>{
         assert(0 <= ver1 && ver1 <= vc); assert(0 <= ver2 && ver2 <= vc);
         assert(0 <= r && r <= n); assert(f(id())); node v = id();
         return bisect_diff(root[ver1], root[ver2], 0, n, r, 0, f, v);
