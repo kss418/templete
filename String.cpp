@@ -28,27 +28,34 @@ private:
     }
 public:
     _kmp(){}
-    _kmp(const string& s){ set(s); }
-    _kmp(const vector <ll>& v){ set(v); }
-    void clear(){ pat.clear(); f.clear(); }
-    void set(const string& s){ pat = tf(s); build(); }
-    void set(const vector<ll>& v){ pat = v; build(); }
-    
-    const vector<int>& fail() const{ return f; }
-    vector <int> match(const string& s) const{ return match(tf(s));}
-    vector <int> match(const vector <ll>& v) const{
-        vector <int> result;
+    _kmp(const string& s){ set(s); } // O(|s|)
+    _kmp(const vector <ll>& v){ set(v); } // O(|v|)
+    void clear(){ pat.clear(); f.clear(); } // O(1)
+    void set(const string& s){ pat = tf(s); build(); } // O(|s|)
+    void set(const vector<ll>& v){ pat = v; build(); } // O(|v|)
+
+    const vector<int>& fail() const{ return f; } // O(1)
+    vector <int> match(const string& s) const{ return match(tf(s));} // O(|s| + m)
+    vector <int> match(const vector <ll>& v) const{ // O(|v| + m)
+        vector <int> ret;
         int n = (int)v.size(), m = (int)pat.size();
-        if(!m) return result; int nxt = 0;
+        if(!m) return ret; int nxt = 0;
         for(int cur = 0;cur < n;cur++){
             while(nxt && v[cur] != pat[nxt]) nxt = f[nxt - 1];
             if(v[cur] == pat[nxt]) nxt++;
             if(nxt == m){
-                result.push_back(cur - m + 1);
+                ret.push_back(cur - m + 1);
                 nxt = f[nxt - 1];
             }
         }
-        return result;
+        return ret;
+    }
+
+    vector<int> border() const{ // O(m)
+        vector <int> ret; int m = pat.size();
+        if(!m) return ret;
+        for(int x = f[m - 1];x > 0;x = f[x - 1]) ret.push_back(x);
+        return ret;
     }
 };
 
