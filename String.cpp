@@ -29,7 +29,7 @@ private:
 public:
     _kmp(){}
     _kmp(const string& s){ set(s); }
-    _kmp(const vector <ll>& arr){ set(arr); }
+    _kmp(const vector <ll>& v){ set(v); }
     void clear(){ pat.clear(); f.clear(); }
     void set(const string& s){ pat = tf(s); build(); }
     void set(const vector<ll>& v){ pat = v; build(); }
