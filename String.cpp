@@ -154,33 +154,32 @@ public:
 };
 
 //z
+template <class T = ll>
 class _z { // 0-based index
-public:
-    vector <ll> result, a; ll n;
-    ll l = 0, r = 0;
-        
-    _z(){}
-    _z(string& s) : _z(move(tf(s))){};
-    _z(const vector <ll>& a){ 
-        this->a = a; this->n = a.size();
-        result.resize(n); init(); 
-    }
-    
-    void init(){ // z array 계산
-        result[0] = n;
-        for(int i = 1;i < n;i++){
-            if(i <= r) result[i] = min(r - i + 1, result[i - l]);
-            else result[i] = 0;
-            while(i + result[i] < n && a[i + result[i]] == a[result[i]]) result[i]++;
-            if(i + result[i] - 1 > r){ l = i; r = i + result[i] - 1; }
+private:
+    vector<T> arr; vector<int> z; int n = 0;
+    void build(){
+        n = (int)arr.size(); z.assign(n, 0);
+        if(!n) return;
+        z[0] = n; int l = 0, r = 0;
+        for(int i = 1; i < n; i++){
+            if(i <= r) z[i] = min(r - i + 1, z[i - l]);
+            while(i + z[i] < n && arr[z[i]] == arr[i + z[i]]) z[i]++;
+            if(i + z[i] - 1 > r){ l = i; r = i + z[i] - 1; }
         }
     }
-        
-    vector <ll> tf(string& s){
-        vector <ll> ret;
-        for(auto& i : s) ret.push_back(i);
+
+    static vector<T> tf(const string& s){
+        vector<T> ret; ret.reserve(s.size());
+        for(unsigned char c : s) ret.push_back((T)c);
         return ret;
     }
-    
-    vector <ll> ret(){ return result; }
+public:
+    _z(){}
+    _z(const string& s){ set(s); } // O(|s|)
+    _z(const vector<T>& v){ set(v); } // O(|v|)
+    void clear(){ arr.clear(); z.clear(); n = 0; } // O(1)
+    void set(const string& s){ arr = tf(s); build(); } // O(|s|)
+    void set(const vector<T>& v){ arr = v; build(); } // O(|v|)
+    const vector<int>& result() const{ return z; } // O(1)
 };
