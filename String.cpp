@@ -10,50 +10,54 @@ constexpr ll INF = 0x3f3f3f3f3f3f3f3f;
 constexpr ll MINF = 0xc0c0c0c0c0c0c0c0;
 
 //KMP
+template <class T = ll>
 class _kmp{ // 0-based index
 private:
-    vector <ll> pat; vector <int> f;
+    int m;
+    vector <T> pat; vector <int> f;
     void build(){
-        int m = (int)pat.size(), nxt = 0; f.assign(m, 0);
+        m = (int)pat.size(); int nxt = 0; f.assign(m, 0);
         for(int cur = 1;cur < m;cur++){
             while(nxt && pat[cur] != pat[nxt]) nxt = f[nxt - 1];
             if(pat[cur] == pat[nxt]) f[cur] = ++nxt;
         }
     }
 
-    static vector <ll> tf(const string& s){
-        vector <ll> ret;
-        for(unsigned char c : s) ret.push_back(ll(c));
+    static vector <T> tf(const string& s){
+        vector <T> ret; ret.reserve(s.size());
+        for(unsigned char c : s) ret.push_back(T(c));
         return ret;
     }
 public:
-    _kmp(){}
+    _kmp() : m(0){}
     _kmp(const string& s){ set(s); } // O(|s|)
-    _kmp(const vector <ll>& v){ set(v); } // O(|v|)
-    void clear(){ pat.clear(); f.clear(); } // O(1)
+    _kmp(const vector <T>& v){ set(v); } // O(|v|)
+    void clear(){ pat.clear(); f.clear(); m = 0; } // O(1)
     void set(const string& s){ pat = tf(s); build(); } // O(|s|)
-    void set(const vector<ll>& v){ pat = v; build(); } // O(|v|)
+    void set(const vector<T>& v){ pat = v; build(); } // O(|v|)
 
     const vector<int>& fail() const{ return f; } // O(1)
     vector <int> match(const string& s) const{ return match(tf(s));} // O(|s| + m)
-    vector <int> match(const vector <ll>& v) const{ // O(|v| + m)
-        vector <int> ret;
-        int n = (int)v.size(), m = (int)pat.size();
-        if(!m) return ret; int nxt = 0;
-        for(int cur = 0;cur < n;cur++){
-            while(nxt && v[cur] != pat[nxt]) nxt = f[nxt - 1];
-            if(v[cur] == pat[nxt]) nxt++;
-            if(nxt == m){
-                ret.push_back(cur - m + 1);
-                nxt = f[nxt - 1];
-            }
+    vector <int> match(const vector <T>& v) const{ // O(|v| + m)
+        vector <int> ret; int n = (int)v.size();
+        if(!m) return ret; int state = 0; ret.reserve(n);
+        for(int i = 0;i < n;i++){
+            state = go(state, v[i]);
+            if(state == m) ret.push_back(i - m + 1);
         }
         return ret;
     }
 
+    int go(int state, const T& ch) const{ // amortized O(1)
+        if(!m) return 0;
+        if(state == m) state = f[m - 1];
+        while(state && ch != pat[state]) state = f[state - 1];
+        if(ch == pat[state]) state++;
+        return state;
+    }
+
     vector<int> border() const{ // O(m)
-        vector <int> ret; int m = pat.size();
-        if(!m) return ret;
+        vector <int> ret; if(!m) return ret;
         for(int x = f[m - 1];x > 0;x = f[x - 1]) ret.push_back(x);
         return ret;
     }
