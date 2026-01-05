@@ -208,10 +208,11 @@ public:
     }
 };
 
+template <int M>
 class _ac{
 private:
-    vector <vector<int>> adj;
-    vector <ll> cnt; vector<int> f; int m; bool built;
+    vector <array<int, M>> adj;
+    vector <ll> cnt; vector<int> f; bool built;
     vector <int> tf(const string& s) const{
         vector <int> ret; ret.reserve(s.size());
         for(auto& i : s){
@@ -221,15 +222,15 @@ private:
         }
         return ret;
     }
-    void ensure(int state){ if(adj[state].empty()) adj[state].assign(m, 0);}
+
     int new_node(){
-        adj.emplace_back(); f.push_back(0); cnt.push_back(0);
+        adj.push_back(array<int, M>{}); f.push_back(0); cnt.push_back(0);
         return (int)adj.size() - 1;
     }
 public:
-    _ac(int m = 0){ clear(m); } // O(1)
-    void clear(int m){ // O(1)
-        this->m = m; built = 0; adj.clear(); 
+    _ac(){ clear(); } // O(1)
+    void clear(){ // O(1)
+        built = 0; adj.clear(); 
         f.clear(); cnt.clear(); new_node();
     }
     
@@ -244,7 +245,7 @@ public:
     void insert(const vector <int>& v){ // O(|v|)
         assert(!built); int cur = 0;
         for(auto &c : v){
-            assert(0 <= c && c < m); ensure(cur);
+            assert(0 <= c && c < M);
             if(!adj[cur][c]) adj[cur][c] = new_node();
             cur = adj[cur][c];
         }
@@ -252,22 +253,21 @@ public:
     }
     
     void build(){ // O(max_node * m)
-        assert(!built); built = 1;
-        deque <int> q; ensure(0);
-        for(int c = 0;c < m;c++){
+        assert(!built); built = 1; deque <int> q;
+        for(int c = 0;c < M;c++){
             int nxt = adj[0][c];
             if(!nxt) continue;
             f[nxt] = 0; q.push_back(nxt);
         }
         
         while(!q.empty()){
-            int cur = q.front(); q.pop_front(); ensure(cur);
-            for(int c = 0;c < m;c++){
+            int cur = q.front(); q.pop_front();
+            for(int c = 0;c < M;c++){
                 int nxt = adj[cur][c];
                 if(!nxt) continue;
                 int dest = f[cur];
-                while(dest && (adj[dest].empty() || !adj[dest][c])) dest = f[dest];
-                if(!adj[dest].empty() && adj[dest][c]) dest = adj[dest][c];
+                while(dest && !adj[dest][c]) dest = f[dest];
+                if(adj[dest][c]) dest = adj[dest][c];
                 f[nxt] = dest; cnt[nxt] += cnt[f[nxt]]; q.push_back(nxt);
             }
         }
@@ -277,17 +277,17 @@ public:
     ll count(const vector <int>& v) const{ // O(|v|)
         assert(built); int cur = 0; ll ret = 0;
         for(auto& c : v){
-            assert(0 <= c && c < m);
+            assert(0 <= c && c < M);
             cur = go(cur, c);
             ret += cnt[cur];
         }
         return ret;
     }
 
-    int go(int state, int c) const{ // O(1)
-        assert(0 <= c && c < m && built);
-        while(state && (adj[state].empty() || !adj[state][c])) state = f[state];
-        if(!adj[state].empty() && adj[state][c]) state = adj[state][c];
+    int go(int state, int c) const{ // amortized O(1)
+        assert(0 <= c && c < M && built);
+        while(state && !adj[state][c]) state = f[state];
+        if(adj[state][c]) state = adj[state][c];
         else state = 0;
         return state;
     }
