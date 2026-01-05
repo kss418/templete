@@ -15,8 +15,8 @@ private:
     public:
         vector <_mint> pw, ipw, pre; 
         _mint key, inv; ll mod; 
-        _core() : mod(1), key(1, 0), inv(1, 0){}
-        _core(ll key, ll mod) : mod(mod), key(mod, key){ // O(n)
+        _core() : mod(1), key(0, 1), inv(0, 1){}
+        _core(ll key, ll mod) : mod(mod), key(key, mod){ // O(n)
             assert(mod > 1); assert(this->key.v > 0);
             inv = this->key.inv();
             pw.push_back(_mint(1, mod)); ipw.push_back(_mint(1, mod));
@@ -76,8 +76,8 @@ private:
     public:
         vector <_mint> bit, arr, pw, ipw;
         _mint key, inv; ll mod; int n, s, e;
-        _core() : mod(1), key(1, 0), inv(1, 0), n(0), s(0), e(-1){}
-        _core(int n, ll key, ll mod) : n(n), mod(mod), key(mod, key) { // mod == prime
+        _core() : mod(1), key(0, 1), inv(0, 1), n(0), s(0), e(-1){}
+        _core(int n, ll key, ll mod) : n(n), mod(mod), key(key, mod) { // mod == prime
             assert(mod > 1); assert(this->key.v > 0);
             inv = this->key.inv();
             n = 2 * n + 5, s = n / 2; e = s - 1; this->n = n;
