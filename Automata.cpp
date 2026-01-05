@@ -180,6 +180,22 @@ public:
     u64 min(u64 x) const{ return x ^ argmin(x); } // O(max_bit)
     u64 argmin(u64 x) const{ return arg(x, 0); } // O(max_bit)
 
+    int greater(u64 x, u64 k){ return size() - less(x, k + 1); } // O(max_bit)
+    int eqaul(u64 x, u64 k){ return less(x, k + 1) - less(x, k); } // O(max_bit)
+    int less(u64 x, u64 k){ // O(max_bit)
+        int cur = 0, ret = 0;
+        for(int i = m;i >= 0;i--){
+            bool kb = (k >> i) & 1ull, xb = (x >> i) & 1ull;
+            if(kb){   
+                if(adj[cur][xb]) ret += pass[adj[cur][xb]];
+                if(!adj[cur][xb ^ 1]) return ret;
+            }
+            else if(!adj[cur][xb]) return ret;
+            cur = adj[cur][xb ^ kb];
+        }
+        return ret;
+    }
+
     int count(u64 x) const{ return count_state(get_state(x)); } // O(max_bit)
     int count_state(int state) const{ return (state == -1 ? 0 : cnt[state]); } // O(1);
     int sub(u64 x) const{ return sub_state(get_state(x)); } // O(max_bit)
