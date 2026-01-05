@@ -7,6 +7,7 @@ PS/CP(Problem Solving / Competitive Programming)용 C++ 템플릿 모음입니�
 
 - `Automata.cpp`
   - Trie (`_trie`)
+  - XOR Trie (`_xor_trie`)
   - Aho–Corasick (`_ac`)
 - `Combinatorics.cpp`
   - Combination Table (`_comb`)
