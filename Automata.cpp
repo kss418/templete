@@ -9,11 +9,15 @@ using pll = pair<ll, ll>; using tll = tuple<ll, ll, ll>;
 constexpr ll INF = 0x3f3f3f3f3f3f3f3f;
 constexpr ll MINF = 0xc0c0c0c0c0c0c0c0;
 
+template <int M>
 class _trie { // 0-based index
 private:
-    vector <vector<int>> adj;
-    vector <int> cnt, pass; int n, m, seq = 1;
-    int push(){ assert(seq < n); return seq++; }
+    vector <array<int, M>> adj;
+    vector <int> cnt, pass;
+    int new_node(){
+        adj.push_back(array<int, M>{}); cnt.push_back(0); pass.push_back(0);
+        return (int)adj.size() - 1;
+    }
     vector <int> tf(const string& s) const{  
         vector <int> ret;
         for(auto& i : s){
@@ -27,17 +31,22 @@ private:
     int get_state(const vector <int>& v) const{
         int cur = 0;
         for(auto& c : v){
-            assert(0 <= c && c < m);
-            if (adj[cur].empty() || !adj[cur][c]) return -1;
+            assert(0 <= c && c < M);
+            if (!adj[cur][c]) return -1;
             cur = adj[cur][c];
         }
         return cur;
     }
 public:
-    _trie(int n = 0, int m = 0){ clear(n, m); } // O(n)
-    void clear(int n, int m){ // O(n)
-        this->m = m; this->n = n; seq = 1;
-        cnt.assign(n, 0); adj.assign(n, {}); pass.assign(n, 0);
+    _trie(){ clear(); } // O(1)
+    void clear(){ // O(1)
+        adj.clear(); cnt.clear(); pass.clear(); new_node();
+    }
+
+    void reserve(int max_node){ // O(1)
+        adj.reserve(max_node);
+        cnt.reserve(max_node);
+        pass.reserve(max_node);
     }
 
     int size() const { return pass.empty() ? 0 : pass[0]; } // O(1)
@@ -45,9 +54,8 @@ public:
     void insert(const vector <int>& v){ // O(|v|)
         int cur = 0; pass[cur]++;
         for(auto &c : v){
-            assert(0 <= c && c < m);
-            if(adj[cur].empty()) adj[cur].resize(m);
-            if(!adj[cur][c]) adj[cur][c] = push();
+            assert(0 <= c && c < M);
+            if(!adj[cur][c]) adj[cur][c] = new_node();
             cur = adj[cur][c]; pass[cur]++;
         }
         cnt[cur]++;
@@ -74,17 +82,14 @@ public:
     int rank(const vector <int>& v) const{ // O(|v| * m)
         int ret = 0, cur = 0;
         for(auto& c : v){
-            assert(0 <= c && c < m);
+            assert(0 <= c && c < M);
             ret += cnt[cur];
-            if(!adj[cur].empty()){
-                for(int x = 0;x < c;x++){
-                    int nxt = adj[cur][x];
-                    if(nxt) ret += pass[nxt];
-                }
-                int nxt = adj[cur][c];
-                if(!nxt) return ret; cur = nxt;
+            for(int x = 0;x < c;x++){
+                int nxt = adj[cur][x];
+                if(nxt) ret += pass[nxt];
             }
-            else return ret;
+            int nxt = adj[cur][c];
+            if(!nxt) return ret; cur = nxt;
         }
         return ret;
     }
@@ -95,7 +100,7 @@ public:
         while(1){
             if(k <= cnt[cur]) break;
             k -= cnt[cur];
-            for(int c = 0;c < m;c++){
+            for(int c = 0;c < M;c++){
                 int nxt = adj[cur][c];
                 if(!nxt) continue;
                 if(pass[nxt] >= k){
@@ -109,9 +114,8 @@ public:
     }
 
     int go(int state, int c) const{ // O(1)
-        if(state < 0 || state >= seq) return -1;
-        assert(0 <= c && c < m);
-        if(adj[state].empty()) return -1;
+        if(state < 0 || state >= (int)adj.size()) return -1;
+        assert(0 <= c && c < M);
         int nxt = adj[state][c];
         return nxt ? nxt : -1;
     }
