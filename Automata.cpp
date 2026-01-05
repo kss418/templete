@@ -210,11 +210,8 @@ public:
 
 class _ac{
 private:
-    int n, m, seq = 1;
     vector <vector<int>> adj;
-    vector <int> chk, f;
-
-    int push(){ assert(seq < n); return seq++; }
+    vector <ll> cnt; vector<int> f; int m; bool built;
     vector <int> tf(const string& s) const{
         vector <int> ret; ret.reserve(s.size());
         for(auto& i : s){
@@ -224,65 +221,74 @@ private:
         }
         return ret;
     }
-public:
-    _ac(ll k = 0, ll n = 0, ll m = 26){ clear(k, n, m); } // 문자열 개수, 문자열 길이, 문자 개수
-    void clear(ll k, ll n, ll m = 26){
-        this->m = (int)m; this->n = (int)(n * k + 1); seq = 1;
-        adj.assign(this->n, {}); chk.assign(this->n, 0); f.assign(this->n, 0);
+    void ensure(int state){ if(adj[state].empty()) adj[state].assign(m, 0);}
+    int new_node(){
+        adj.emplace_back(); f.push_back(0); cnt.push_back(0);
+        return (int)adj.size() - 1;
     }
-
-    void insert(const string& s){ insert(tf(s)); }
-    void insert(const vector <int>& v){
-        int cur = 0;
-        for(auto &c : v){
-            assert(0 <= c && c < m);
-            if(adj[cur].empty()) adj[cur].resize(m);
-            if(!adj[cur][c]) adj[cur][c] = push();
-            cur = adj[cur][c];
-        }
-        chk[cur] = 1;
+public:
+    _ac(int m = 0){ clear(m); } // O(1)
+    void clear(int m){ // O(1)
+        this->m = m; built = 0; adj.clear(); 
+        f.clear(); cnt.clear(); new_node();
     }
     
-    void init(){
-        deque <int> q;
-        if(adj[0].empty()) adj[0].resize(m);
+    void reserve(int max_node){ // O(1)
+        adj.reserve(max_node);
+        f.reserve(max_node);
+        cnt.reserve(max_node);
+    }
+
+    int size() const{ return (int)adj.size(); } // O(1)
+    void insert(const string& s){ insert(tf(s)); } // O(|s|)
+    void insert(const vector <int>& v){ // O(|v|)
+        assert(!built); int cur = 0;
+        for(auto &c : v){
+            assert(0 <= c && c < m); ensure(cur);
+            if(!adj[cur][c]) adj[cur][c] = new_node();
+            cur = adj[cur][c];
+        }
+        cnt[cur]++;
+    }
+    
+    void build(){ // O(max_node * m)
+        assert(!built); built = 1;
+        deque <int> q; ensure(0);
         for(int c = 0;c < m;c++){
             int nxt = adj[0][c];
             if(!nxt) continue;
-            f[nxt] = 0;
-            q.push_back(nxt);
+            f[nxt] = 0; q.push_back(nxt);
         }
         
         while(!q.empty()){
-            int cur = q.front(); q.pop_front();
-            if(adj[cur].empty()) adj[cur].resize(m);
-
-            for(int i = 0;i < m;i++){
-                int nxt = adj[cur][i];
+            int cur = q.front(); q.pop_front(); ensure(cur);
+            for(int c = 0;c < m;c++){
+                int nxt = adj[cur][c];
                 if(!nxt) continue;
-
                 int dest = f[cur];
-                while(dest && (adj[dest].empty() || !adj[dest][i])) dest = f[dest];
-                if(adj[dest].empty()) adj[dest].resize(m);
-                if(adj[dest][i]) dest = adj[dest][i];
-                f[nxt] = dest;
-                if(chk[f[nxt]]) chk[nxt] = 1;
-                q.push_back(nxt);
+                while(dest && (adj[dest].empty() || !adj[dest][c])) dest = f[dest];
+                if(!adj[dest].empty() && adj[dest][c]) dest = adj[dest][c];
+                f[nxt] = dest; cnt[nxt] += cnt[f[nxt]]; q.push_back(nxt);
             }
         }
     }
 
-    bool find(const string& s){ return find(tf(s)); }
-    bool find(const vector <int>& v){
-        int cur = 0;
+    ll count(const string& s) const{ return count(tf(s)); } // O(|s|)
+    ll count(const vector <int>& v) const{ // O(|v|)
+        assert(built); int cur = 0; ll ret = 0;
         for(auto& c : v){
             assert(0 <= c && c < m);
-            while(cur && (adj[cur].empty() || !adj[cur][c])) cur = f[cur];
-            if(adj[cur].empty()) adj[cur].resize(m);
-            int nxt = adj[cur][c];
-            if(nxt) cur = nxt;
-            if(chk[cur]) return 1;
+            cur = go(cur, c);
+            ret += cnt[cur];
         }
-        return 0;
+        return ret;
+    }
+
+    int go(int state, int c) const{ // O(1)
+        assert(0 <= c && c < m && built);
+        while(state && (adj[state].empty() || !adj[state][c])) state = f[state];
+        if(!adj[state].empty() && adj[state][c]) state = adj[state][c];
+        else state = 0;
+        return state;
     }
 };
