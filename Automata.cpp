@@ -24,7 +24,7 @@ private:
         return ret;
     }
 
-    int get_node(const vector <int>& v) const{
+    int get_state(const vector <int>& v) const{
         int cur = 0;
         for(auto& c : v){
             assert(0 <= c && c < m);
@@ -55,24 +55,20 @@ public:
 
     bool erase(const string& s) { return erase(tf(s)); } // O(|s|)
     bool erase(const vector <int>& v){ // O(|v|)
-        int node = get_node(v);
-        if(node == -1 || !cnt[node]) return 0; 
-        int cur = 0; cnt[node]--; pass[cur]--;
+        int state = get_state(v);
+        if(state == -1 || !cnt[state]) return 0; 
+        int cur = 0; cnt[state]--; pass[cur]--;
         for(auto &c : v){ cur = adj[cur][c]; pass[cur]--; }
         return 1;
     }
 
     int count(const string& s) const{ return count(tf(s)); } // O(|s|)
-    int count(const vector <int>& v) const{ // O(|v|)
-        int node = get_node(v);
-        return (node == -1 ? 0 : cnt[node]);
-    }
+    int count(const vector <int>& v) const{ return count(get_state(v)); } // O(|v|)
+    int count(int state) const{ return (state == -1 ? 0 : cnt[state]); } // O(1);
 
     int prefix_count(const string& prefix) const { return prefix_count(tf(prefix)); } // O(|s|)
-    int prefix_count(const vector<int>& v) const { // O(|v|)
-        int node = get_node(v);
-        return (node == -1 ? 0 : pass[node]);
-    }
+    int prefix_count(const vector<int>& v) const { return prefix_count(get_state(v)); } // O(|v|)
+    int prefix_count(int state) const{ return (state == -1 ? 0 : pass[state]); } // O(1)
 
     int rank(const string& s) const{ return rank(tf(s)); } // O(|s| * m)
     int rank(const vector <int>& v) const{ // O(|v| * m)
@@ -112,11 +108,11 @@ public:
         return ret;
     }
 
-    int go(int cur, int c) const{ // O(1)
-        if(cur < 0 || cur >= seq) return -1;
+    int go(int state, int c) const{ // O(1)
+        if(state < 0 || state >= seq) return -1;
         assert(0 <= c && c < m);
-        if(adj[cur].empty()) return -1;
-        int nxt = adj[cur][c];
+        if(adj[state].empty()) return -1;
+        int nxt = adj[state][c];
         return nxt ? nxt : -1;
     }
 };
