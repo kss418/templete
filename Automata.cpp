@@ -209,73 +209,80 @@ public:
 };
 
 class _ac{
-public:
-    ll n, m, seq = 2;
-        vector <vector<ll>> adj;
-        vector <ll> chk, f;
+private:
+    int n, m, seq = 1;
+    vector <vector<int>> adj;
+    vector <int> chk, f;
 
-    _ac(ll k, ll n, ll m = 26) { // 문자열 개수, 문자열 길이, 문자 개수
-        this->m = m; this->n = n; 
-        chk.resize(n * k + 1); adj.resize(n * k + 1);
-        f.resize(n * k + 1);
+    int push(){ assert(seq < n); return seq++; }
+    vector <int> tf(const string& s) const{
+        vector <int> ret; ret.reserve(s.size());
+        for(auto& i : s){
+            if('a' <= i && i <= 'z') ret.push_back(i - 'a');
+            else if('A' <= i && i <= 'Z') ret.push_back(i - 'A');
+            else ret.push_back(i - '0');
+        }
+        return ret;
+    }
+public:
+    _ac(ll k = 0, ll n = 0, ll m = 26){ clear(k, n, m); } // 문자열 개수, 문자열 길이, 문자 개수
+    void clear(ll k, ll n, ll m = 26){
+        this->m = (int)m; this->n = (int)(n * k + 1); seq = 1;
+        adj.assign(this->n, {}); chk.assign(this->n, 0); f.assign(this->n, 0);
     }
 
-    void insert(string& s){
-        ll cur = 1;
-        for(auto &st : s){
-            if(adj[cur].empty()) adj[cur].resize(m + 1);
-            if(!adj[cur][st - 'a']) adj[cur][st - 'a'] = seq++;
-            cur = adj[cur][st - 'a'];
+    void insert(const string& s){ insert(tf(s)); }
+    void insert(const vector <int>& v){
+        int cur = 0;
+        for(auto &c : v){
+            assert(0 <= c && c < m);
+            if(adj[cur].empty()) adj[cur].resize(m);
+            if(!adj[cur][c]) adj[cur][c] = push();
+            cur = adj[cur][c];
         }
         chk[cur] = 1;
     }
     
     void init(){
-        deque <ll> q;
-        q.push_back(1);
-        f[1] = 1;
+        deque <int> q;
+        if(adj[0].empty()) adj[0].resize(m);
+        for(int c = 0;c < m;c++){
+            int nxt = adj[0][c];
+            if(!nxt) continue;
+            f[nxt] = 0;
+            q.push_back(nxt);
+        }
         
         while(!q.empty()){
-            ll cur = q.front(); q.pop_front();
-            if(adj[cur].empty()) adj[cur].resize(m + 1);
+            int cur = q.front(); q.pop_front();
+            if(adj[cur].empty()) adj[cur].resize(m);
 
             for(int i = 0;i < m;i++){
-                ll nxt = adj[cur][i];
+                int nxt = adj[cur][i];
                 if(!nxt) continue;
 
-                if(cur == 1) f[nxt] = 1;
-                else{
-                    ll dest = f[cur];
-
-                    if(adj[dest].empty()) adj[dest].resize(m + 1);
-                    while(dest != 1 && !adj[dest][i]) {
-                        dest = f[dest];               
-                        if(adj[dest].empty()) adj[dest].resize(m + 1);
-                    }
-                    if(adj[dest][i]) dest = adj[dest][i];
-                    f[nxt] = dest;
-                }
-
+                int dest = f[cur];
+                while(dest && (adj[dest].empty() || !adj[dest][i])) dest = f[dest];
+                if(adj[dest].empty()) adj[dest].resize(m);
+                if(adj[dest][i]) dest = adj[dest][i];
+                f[nxt] = dest;
                 if(chk[f[nxt]]) chk[nxt] = 1;
                 q.push_back(nxt);
             }
         }
     }
 
-    bool find(string& s){
-        ll cur = 1;
-        for(auto& st : s){
-            if(adj[cur].empty()) adj[cur].resize(m + 1);
-            while(cur != 1 && !adj[cur][st - 'a']) {
-                cur = f[cur];
-                if(adj[cur].empty()) adj[cur].resize(m + 1);
-            }
-
-            ll nxt = adj[cur][st - 'a'];
+    bool find(const string& s){ return find(tf(s)); }
+    bool find(const vector <int>& v){
+        int cur = 0;
+        for(auto& c : v){
+            assert(0 <= c && c < m);
+            while(cur && (adj[cur].empty() || !adj[cur][c])) cur = f[cur];
+            if(adj[cur].empty()) adj[cur].resize(m);
+            int nxt = adj[cur][c];
             if(nxt) cur = nxt;
             if(chk[cur]) return 1;
         }
-
         return 0;
     }
 };
