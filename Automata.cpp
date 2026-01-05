@@ -216,11 +216,11 @@ public:
     }
 };
 
-template <int M>
+template <int M = 26>
 class _ac{
 private:
     vector <array<int, M>> adj;
-    vector <ll> cnt; vector<int> f; bool built;
+    vector<int> cnt, f; bool built;
     vector <int> tf(const string& s) const{
         vector <int> ret; ret.reserve(s.size());
         for(auto& i : s){
@@ -263,19 +263,19 @@ public:
         assert(!built); built = 1; deque <int> q;
         for(int c = 0;c < M;c++){
             int nxt = adj[0][c];
-            if(!nxt) continue;
-            f[nxt] = 0; q.push_back(nxt);
+            if(nxt) f[nxt] = 0, q.push_back(nxt);
         }
         
         while(!q.empty()){
             int cur = q.front(); q.pop_front();
+            cnt[cur] += cnt[f[cur]];
             for(int c = 0;c < M;c++){
                 int nxt = adj[cur][c];
-                if(!nxt) continue;
-                int dest = f[cur];
-                while(dest && !adj[dest][c]) dest = f[dest];
-                if(adj[dest][c]) dest = adj[dest][c];
-                f[nxt] = dest; cnt[nxt] += cnt[f[nxt]]; q.push_back(nxt);
+                if(!nxt) adj[cur][c] = adj[f[cur]][c];
+                else{
+                    f[nxt] = adj[f[cur]][c];
+                    q.push_back(nxt);
+                }
             }
         }
     }
@@ -291,11 +291,8 @@ public:
         return ret;
     }
 
-    int go(int state, int c) const{ // amortized O(1)
+    int go(int state, int c) const{ // O(1)
         assert(0 <= c && c < M && built);
-        while(state && !adj[state][c]) state = f[state];
-        if(adj[state][c]) state = adj[state][c];
-        else state = 0;
-        return state;
+        return adj[state][c];
     }
 };
