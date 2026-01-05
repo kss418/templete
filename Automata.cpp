@@ -147,14 +147,14 @@ private:
         return ret;
     }
 public:
-    _xor_trie(int n = 0, int m = 0){ clear(n, m); } // O(n)
-    void clear(int n, int m){ // O(n)
-        this->m = m; this->n = n; seq = 1;
-        cnt.assign(n, 0); adj.assign(n, {0, 0}); pass.assign(n, 0);
+    _xor_trie(int items = 0, int max_bit = 0){ clear(items, max_bit); } // O(max_items)
+    void clear(int items, int max_bit){ // O(items)
+        this->m = max_bit; int sz = items * (m + 1) + 1; this->n = sz; seq = 1;
+        cnt.assign(sz, 0); adj.assign(sz, {0, 0}); pass.assign(sz, 0);
     }
 
     int size() const { return pass.empty() ? 0 : pass[0]; } // O(1)
-    void insert(u64 x){ // O(m)
+    void insert(u64 x){ // O(max_bit)
         int cur = 0; pass[cur]++;
         for(int i = m;i >= 0;i--){
             bool bit = (x >> i) & 1ull;
@@ -164,7 +164,7 @@ public:
         cnt[cur]++;
     }
 
-    bool erase(u64 x){ // O(m)
+    bool erase(u64 x){ // O(max_bit)
         int state = get_state(x);
         if(state == -1 || !cnt[state]) return 0; 
         int cur = 0; cnt[state]--; pass[cur]--;
@@ -175,14 +175,14 @@ public:
         return 1;
     }
 
-    u64 max(u64 x) const{ return x ^ argmax(x); } // O(m)
-    u64 argmax(u64 x) const{ return arg(x, 1); } // O(m)
-    u64 min(u64 x) const{ return x ^ argmin(x); } // O(m)
-    u64 argmin(u64 x) const{ return arg(x, 0); } // O(m)
+    u64 max(u64 x) const{ return x ^ argmax(x); } // O(max_bit)
+    u64 argmax(u64 x) const{ return arg(x, 1); } // O(max_bit)
+    u64 min(u64 x) const{ return x ^ argmin(x); } // O(max_bit)
+    u64 argmin(u64 x) const{ return arg(x, 0); } // O(max_bit)
 
-    int count(u64 x) const{ return count_state(get_state(x)); } // O(m)
+    int count(u64 x) const{ return count_state(get_state(x)); } // O(max_bit)
     int count_state(int state) const{ return (state == -1 ? 0 : cnt[state]); } // O(1);
-    int sub(u64 x) const{ return sub_state(get_state(x)); } // O(m)
+    int sub(u64 x) const{ return sub_state(get_state(x)); } // O(max_bit)
     int sub_state(int state) const{ return (state == -1 ? 0 : pass[state]); } // O(1)
 
     int go(int state, bool bit) const{ // O(1)
