@@ -11,29 +11,30 @@ constexpr ll MINF = 0xc0c0c0c0c0c0c0c0;
 
 class _hash{ // 0-based index
 private:
+    using pi = pair<int, int>;
     class _core {
     public:
-        vector <_mint> pw, ipw, pre; 
-        _mint key, inv; ll mod; 
-        _core() : mod(1), key(0, 1), inv(0, 1){}
-        _core(ll key, ll mod) : mod(mod), key(key, mod){ // O(n)
+        vector <int> pw, pre, ipw; 
+        _mint key, inv; int mod; 
+        _core(){};
+        _core(int key, int mod) : mod(mod), key(key, mod){ // O(n)
             assert(mod > 1); assert(this->key.v > 0);
-            inv = this->key.inv();
-            pw.push_back(_mint(1, mod)); ipw.push_back(_mint(1, mod));
+            pre.clear(); pw.clear(); ipw.clear();
+            pw.push_back(1); ipw.push_back(1); inv = this->key.inv();
         }
 
         void ensure_pw(int k){ 
             while((int)pw.size() <= k){
-                pw.push_back(pw.back() * key); 
-                ipw.push_back(ipw.back() * inv);
+                pw.push_back((_mint(pw.back(), mod) * key).v); 
+                ipw.push_back((_mint(ipw.back(), mod) * inv).v); 
             }
         }
 
         int size() const{ return (int)pre.size(); }
-        void push_back(ll v){ // O(1)
+        void push_back(int v){ // O(1)
             _mint now = _mint(v, mod); ensure_pw(size());
-            if(pre.empty()) pre.push_back(now);
-            else pre.push_back(pre.back() + now * pw[size()]);
+            if(pre.empty()) pre.push_back(now.v);
+            else pre.push_back((_mint(pre.back(), mod) + now * pw[size()]).v);
         }
 
         void pop_back(){ // O(1)
@@ -42,26 +43,24 @@ private:
         }
 
         ll ret(int l, int r) const{ // O(1)
-            _mint ret = pre[r];
-            if(l > 0) ret -= pre[l - 1];
+            _mint ret = _mint(pre[r], mod);
+            if(l > 0) ret -= _mint(pre[l - 1], mod);
             ret *= ipw[l];
             return ret.v;
         }
-    }; vector <_core> arr; int m;
+    }; array <_core, 2> arr; 
 public:
-    _hash() : m(0){} 
-    _hash(const vector <ll>& key, const vector<ll>& mod){ // O(n)
-        assert(key.size() == mod.size()); m = key.size(); arr.reserve(m);
-        for(int i = 0; i < mod.size(); i++) arr.emplace_back(key[i], mod[i]);
-    }
+    _hash(pi key = {1, 1}, pi mod = {2, 2}){ clear(key, mod); }
+    void clear(pi key, pi mod){
+        arr[0] = {key.x, mod.x}; arr[1] = {key.y, mod.y};
+    } 
 
-    void push_back(ll v){ for(auto& c : arr) c.push_back(v); } // O(1)
+    void reset(){ arr[0].pre.clear(); arr[1].pre.clear(); }
+    void push_back(int v){ for(auto& c : arr) c.push_back(v); } // O(1)
     void pop_back(){ for(auto& c : arr) c.pop_back(); } // O(1)
     int size() const{ return arr.empty() ? 0 : arr[0].size(); } // O(1)
-    vector<ll> ret(int l, int r) const{ // O(1)
-        vector<ll> ret; ret.reserve(m);
-        for(const auto& c : arr) ret.push_back(c.ret(l, r));
-        return ret;
+    ll ret(int l, int r) const{ // O(1)
+        return ((ll)arr[0].ret(l, r) << 32) + arr[1].ret(l, r);
     }
 
     bool same(int l1, int r1, int l2, int r2) const{ // O(1)
