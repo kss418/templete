@@ -51,14 +51,14 @@ private:
     }; array <_core, 2> arr; 
 public:
     _hash(pi key = {1, 1}, pi mod = {2, 2}){ clear(key, mod); }
-    void clear(pi key, pi mod){
+    void clear(pi key, pi mod){ // O(1)
         arr[0] = {key.x, mod.x}; arr[1] = {key.y, mod.y};
     } 
 
     void reset(){ arr[0].pre.clear(); arr[1].pre.clear(); }
     void push_back(int v){ for(auto& c : arr) c.push_back(v); } // O(1)
     void pop_back(){ for(auto& c : arr) c.pop_back(); } // O(1)
-    int size() const{ return arr.empty() ? 0 : arr[0].size(); } // O(1)
+    int size() const{ return arr[0].size(); } // O(1)
     ll ret(int l, int r) const{ // O(1)
         return ((ll)arr[0].ret(l, r) << 32) + arr[1].ret(l, r);
     }
@@ -82,7 +82,6 @@ private:
             n = 2 * n + 5, s = n / 2; e = s - 1; this->n = n;
             bit.assign(n, 0); arr.assign(n, 0);
             pw.assign(n, 1); ipw.assign(n, 1);
-            
             for(int i = 1;i < n;i++){
                 pw[i] = (_mint(pw[i - 1], mod) * key).v;
                 ipw[i] = (_mint(ipw[i - 1], mod) * inv).v;
@@ -101,41 +100,42 @@ private:
 
         void add(int idx, int v){ // O(log n)
             for(int i = idx;i < n;i = (i | (i + 1))){
-                bit[i] = (_mint(bit[i], mod) + _mint(v, mod)).v;
+                bit[i] += v; bit[i] %= mod;
             }
         }
-        _mint sum(int idx) const{ // O(log n)
-            _mint ret(0, mod);
-            for(int i = idx;i >= 0;i = (i & (i + 1)) - 1) ret += _mint(bit[i], mod);
+
+        int sum(int idx) const{ // O(log n)
+            int ret = 0;
+            for(int i = idx;i >= 0;i = (i & (i + 1)) - 1) ret += bit[i], ret %= mod;
             return ret;
         }
 
         int size() const{ return e - s + 1; } // O(1)
-        void push_back(ll v){ set(++e, v); } // O(log n)
-        void push_front(ll v){ set(--s, v); } // O(log n)
+        void push_back(int v){ set(++e, v); } // O(log n)
+        void push_front(int v){ set(--s, v); } // O(log n)
         void pop_back(){ clear(e--); } // O(log n)
         void pop_front(){ clear(s++); } // O(log n)
 
-        ll ret(int l, int r) const{ // O(log n)
+        int ret(int l, int r) const{ // O(log n)
             l += s; r += s;
-            _mint ret = sum(r);
+            int ret = sum(r);
             if(l) ret -= sum(l - 1);
-            return (ret * _mint(ipw[l], mod)).v;
+            if(ret < 0) ret += mod;
+            return (_mint(ipw[l], mod) * ret).v;
         }
     }; array <_core, 2> arr; int n;
 public:
     using pi = pair<int, int>;
-    _deque_hash() : n(0){} 
-    _deque_hash(int n, pi key, pi mod) : n(n){ // O(n)
+    _deque_hash(int n = 0, pi key = {1, 1}, pi mod = {2, 2}){ clear(n, key, mod); } 
+    void clear(int n, pi key, pi mod){ // O(n)
         arr[0] = {n, key.x, mod.x}; arr[1] = {n, key.y, mod.y};
-    }
+    } 
 
-    void push_back(ll v){ for(auto& c : arr) c.push_back(v); } // O(log n)
-    void push_front(ll v){ for(auto& c : arr) c.push_front(v); } // O(log n)
+    void push_back(int v){ for(auto& c : arr) c.push_back(v); } // O(log n)
+    void push_front(int v){ for(auto& c : arr) c.push_front(v); } // O(log n)
     void pop_back(){ for(auto& c : arr) c.pop_back(); } // O(log n)
     void pop_front(){ for(auto& c : arr) c.pop_front(); } // O(log n)
-
-    int size() const{ return arr.empty() ? 0 : arr[0].size(); } // O(1)
+    int size() const{ return arr[0].size(); } // O(1)
     ll ret(int l, int r) const{ // O(log n)
         return ((ll)arr[0].ret(l, r) << 32) + arr[1].ret(l, r);
     }
