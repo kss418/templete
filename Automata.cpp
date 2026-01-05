@@ -39,17 +39,13 @@ private:
     }
 public:
     _trie(){ clear(); } // O(1)
-    void clear(){ // O(1)
-        adj.clear(); cnt.clear(); pass.clear(); new_node();
-    }
-
+    void clear(){ adj.clear(); cnt.clear(); pass.clear(); new_node(); } // O(1)
     void reserve(int max_node){ // O(1)
-        adj.reserve(max_node);
-        cnt.reserve(max_node);
+        adj.reserve(max_node); cnt.reserve(max_node);
         pass.reserve(max_node);
     }
 
-    int size() const { return pass.empty() ? 0 : pass[0]; } // O(1)
+    int size() const{ return pass.empty() ? 0 : pass[0]; } // O(1)
     void insert(const string& s){ insert(tf(s)); } // O(|s|)
     void insert(const vector <int>& v){ // O(|v|)
         int cur = 0; pass[cur]++;
@@ -61,7 +57,7 @@ public:
         cnt[cur]++;
     }
 
-    bool erase(const string& s) { return erase(tf(s)); } // O(|s|)
+    bool erase(const string& s){ return erase(tf(s)); } // O(|s|)
     bool erase(const vector <int>& v){ // O(|v|)
         int state = get_state(v);
         if(state == -1 || !cnt[state]) return 0; 
@@ -161,8 +157,7 @@ public:
     }
 
     void reserve(int max_node){ // O(1)
-        adj.reserve(max_node);
-        cnt.reserve(max_node);
+        adj.reserve(max_node); cnt.reserve(max_node);
         pass.reserve(max_node);
     }
 
@@ -248,8 +243,7 @@ public:
     }
     
     void reserve(int max_node){ // O(1)
-        adj.reserve(max_node);
-        f.reserve(max_node);
+        adj.reserve(max_node); f.reserve(max_node);
         cnt.reserve(max_node);
     }
 
