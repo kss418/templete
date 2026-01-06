@@ -9,6 +9,7 @@ PS/CP(Problem Solving / Competitive Programming)용 C++ 템플릿 모음입니�
   - Trie (`_trie`)
   - XOR Trie (`_xor_trie`)
   - Aho–Corasick (`_ac`)
+  - Sparse Aho–Corasick (`_sparse_ac`)
 - `Combinatorics.cpp`
   - Combination Table (`_comb`)
   - Lucas's Theorem (`_lucas`)
