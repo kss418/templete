@@ -333,21 +333,12 @@ public:
     }
 };
 
-template <int M = 26>
+template <class T = ll>
 class _sparse_ac{
 private:
-    vector <int> f, dep, dict, cnt; 
-    vector <int> head, to, next, ch;
-    vector <bool> end; bool built;
-    vector <int> tf(const string& s) const{
-        vector <int> ret; ret.reserve(s.size());
-        for(auto& i : s){
-            if('a' <= i && i <= 'z') ret.push_back(i - 'a');
-            else if('A' <= i && i <= 'Z') ret.push_back(i - 'A');
-            else ret.push_back(i - '0');
-        }
-        return ret;
-    }
+    vector <ll> cnt; 
+    vector <int> f, dep, dict, head, to, next;
+    vector <T> ch; vector <bool> end; bool built;
     
     int new_node(){
         f.push_back(0); cnt.push_back(0); head.push_back(0);
@@ -355,18 +346,18 @@ private:
         return (int)head.size() - 1;
     }
 
-    void add_edge(int cur, int c, int nxt){
+    void add_edge(int cur, const T& c, int nxt){
         to.push_back(nxt); ch.push_back(c);
         next.push_back(head[cur]);
         head[cur] = (int)to.size() - 1;
     }
 
-    int child(int state, int c) const{
+    int child(int state, const T& c) const{
         for(int e = head[state];e > 0;e = next[e]) if(ch[e] == c) return to[e];
         return 0;
     }
 
-    int set_child(int state, int c){
+    int set_child(int state, const T& c){
         int nxt = child(state, c);
         if(nxt) return nxt;
         int ret = new_node(); add_edge(state, c, ret);
@@ -378,8 +369,14 @@ public:
         built = 0; end.clear(); dep.clear();
         f.clear(); dict.clear(); cnt.clear(); 
         to.clear(); next.clear(); ch.clear(); head.clear();
-        to.push_back(0); next.push_back(0); ch.push_back(0);
+        to.push_back(0); next.push_back(0); ch.push_back(T{});
         new_node();
+    }
+
+    vector <T> tf(const string& s) const{
+        vector <T> ret; ret.reserve(s.size());
+        for(unsigned char c : s) ret.push_back((T)c);
+        return ret;
     }
     
     void reserve(int max_node, int max_edge = -1){ // O(1)
@@ -393,10 +390,9 @@ public:
     const vector<bool>& terminal() const{ return end; } // O(1)
     int size() const{ return (int)head.size(); } // O(1)
     void insert(const string& s){ insert(tf(s)); } // O(|s|)
-    void insert(const vector <int>& v){ // O(|v|)
+    void insert(const vector <T>& v){ // O(|v|)
         assert(!built); int cur = 0;
         for(auto &c : v){
-            assert(0 <= c && c < M);
             int nxt = child(cur, c);
             if(!nxt){
                 nxt = set_child(cur, c);
@@ -419,7 +415,7 @@ public:
             cnt[cur] += cnt[f[cur]];
             dict[cur] = end[f[cur]] ? f[cur] : dict[f[cur]];
             for(int e = head[cur];e > 0;e = next[e]){
-                int c = ch[e], p = f[cur], u = child(p, c);
+                auto c = ch[e]; int p = f[cur], u = child(p, c);
                 while(p && !u) p = f[p], u = child(p, c);
                 int nxt = to[e]; f[nxt] = u; q.push_back(nxt);
             }
@@ -427,39 +423,38 @@ public:
     }
 
     ll count(const string& s) const{ return count(tf(s)); } // O(|s|)
-    ll count(const vector <int>& v) const{ // O(|v|)
+    ll count(const vector <T>& v) const{ // O(|v|)
         assert(built); int cur = 0; ll ret = 0;
         for(auto& c : v){
-            assert(0 <= c && c < M);
             cur = go(cur, c);
             ret += cnt[cur];
         }
         return ret;
     }
 
-    int go(int state, int c) const{
-        assert(0 <= c && c < M && built);
+    int go(int state, const T& c) const{
+        assert(built);
         int nxt = child(state, c);
         while(state && !nxt) state = f[state], nxt = child(state, c);
         return nxt;
     }
 
     vector<int> max_match_len(const string& s) const{ return max_match_len(tf(s)); } // O(|s|)
-    vector<int> max_match_len(const vector<int>& v) const{ // O(|v|)
+    vector<int> max_match_len(const vector<T>& v) const{ // O(|v|)
         assert(built); vector<int> ret(v.size(), 0); int cur = 0;
         for(int i = 0; i < (int)v.size(); i++){
-            int c = v[i]; assert(0 <= c && c < M); cur = go(cur, c);
+            cur = go(cur, v[i]);
             ret[i] = end[cur] ? dep[cur] : (dict[cur] ? dep[dict[cur]] : 0);
         }
         return ret;
     }
 
     vector<vector<int>> match_lens(const string& s, int k = 0x3f3f3f3f) const{ return match_lens(tf(s), k); } // O(|s| + matches)
-    vector<vector<int>> match_lens(const vector<int>& v, int k = 0x3f3f3f3f) const{ // O(|v| + matches)
+    vector<vector<int>> match_lens(const vector<T>& v, int k = 0x3f3f3f3f) const{ // O(|v| + matches)
         assert(built); if(k <= 0) return vector<vector<int>>(v.size());
         vector<vector<int>> ret(v.size()); int cur = 0;
         for(int i = 0; i < (int)v.size(); i++){
-            int c = v[i]; assert(0 <= c && c < M); cur = go(cur, c);
+            cur = go(cur, v[i]);
             if(end[cur]){
                 ret[i].push_back(dep[cur]);
                 if((int)ret[i].size() == k) continue;
