@@ -422,11 +422,8 @@ public:
 
     ll count(const string& s) const{ return count(tf(s)); } // O(|s|)
     ll count(const vector <T>& v) const{ // O(|v|)
-        assert(built); int cur = 0; ll ret = 0;
-        for(auto& c : v){
-            cur = go(cur, c);
-            ret += cnt[cur];
-        }
+        assert(built); ll ret = 0;
+        it_state(v, [&](int st){ ret += cnt[st]; });
         return ret;
     }
 
@@ -437,28 +434,29 @@ public:
         return nxt;
     }
 
-    vector<int> max_match_len(const string& s) const{ return max_match_len(tf(s)); } // O(|s|)
-    vector<int> max_match_len(const vector<T>& v) const{ // O(|v|)
-        assert(built); vector<int> ret(v.size(), 0); int cur = 0;
-        for(int i = 0; i < (int)v.size(); i++){
-            cur = go(cur, v[i]);
-            ret[i] = end[cur] ? dep[cur] : (dict[cur] ? dep[dict[cur]] : 0);
+    template <class F>
+    void it_state(const string& s, const F& f) const{ it_state(tf(s), f); } // O(|s|)
+    template <class F>
+    void it_state(const vector <T>& v, const F& f) const{ // O(|v|)
+        assert(built); int cur = 0;
+        for(auto& c : v){
+            cur = go(cur, c), f(cur);
         }
-        return ret;
     }
 
-    vector<vector<int>> match_lens(const string& s, int k = 0x3f3f3f3f) const{ return match_lens(tf(s), k); } // O(|s| + matches)
-    vector<vector<int>> match_lens(const vector<T>& v, int k = 0x3f3f3f3f) const{ // O(|v| + matches)
-        assert(built); if(k <= 0) return vector<vector<int>>(v.size());
-        vector<vector<int>> ret(v.size()); int cur = 0;
-        for(int i = 0; i < (int)v.size(); i++){
-            cur = go(cur, v[i]);
-            if(end[cur]){
-                ret[i].push_back(dep[cur]);
-                if((int)ret[i].size() == k) continue;
-            }
-            for(int x = dict[cur];x > 0 && (int)ret[i].size() < k;x = dict[x]) ret[i].push_back(dep[x]);
+    int max_match_len(int state) const{ // O(1)
+        assert(built);
+        return end[state] ? dep[state] : (dict[state] ? dep[dict[state]] : 0);
+    }
+
+    template <class F>
+    void it_match_lens(int state, const F& f) const{ it_match_lens(state, 0x3f3f3f3f, f); } // O(min(k, matches))
+    template <class F>
+    void it_match_lens(int state, int k, const F& f) const{ // O(min(k, matches))
+        assert(built); if(k <= 0) return; int cnt = 0;
+        if(end[state]){
+            f(dep[state]); if(++cnt >= k) return;
         }
-        return ret;
+        for(int x = dict[state];x > 0 && cnt < k;x = dict[x]) f(dep[x]), ++cnt;
     }
 };
