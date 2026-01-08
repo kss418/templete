@@ -135,14 +135,14 @@ public:
 template <class T = ll>
 class _mnc { // 0-based index
 private:
-    vector <T> rad, arr; int n, m = 0; ll sum = 0;
+    vector <T> arr; vector <int> rad; int n, m = 0; ll sum = 0;
     void build(){
         this->n = arr.size(); rad.assign(n, 0);
         int r = -1, c = -1; sum = m = 0;
         for(int i = 0;i < n;i++){
             if(i <= r) rad[i] = min(r - i, rad[2 * c - i]);
             while(i + rad[i] + 1 < n && i - rad[i] - 1 >= 0){
-                if(arr[i + rad[i] + 1] == arr[i - rad[i] - 1]) rad[i]++;
+                if(arr[i + rad[i] + 1] == arr[i - rad[i] - 1] ^ 1) rad[i]++;
                 else break;
             }
             if(i + rad[i] > r) c = i, r = i + rad[i];
