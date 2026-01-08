@@ -152,8 +152,8 @@ private:
     }
 
     static constexpr T inf() {
-        if constexpr (std::is_same_v<T, int>) return 0x3f3f3f3f;       
-        else if constexpr (std::is_same_v<T, char>) return (char)255;
+        if constexpr (is_same_v<T, int>) return 0x3f3f3f3f;       
+        else if constexpr (is_same_v<T, char>) return (char)255;
         else return INF; 
     }
 
