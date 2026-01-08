@@ -147,7 +147,8 @@ private:
                 else break;
             }
             if(i + rad[i] > r) c = i, r = i + rad[i];
-            (arr[i] == inf() ? even : odd) += rad[i] / 2 + (arr[i] != inf());
+            if(i % 2 == 0) even += rad[i] / 2;
+            else odd += rad[i] / 2 + 1;
             m = max(m, rad[i]);
         }
     }
