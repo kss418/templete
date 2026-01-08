@@ -176,6 +176,10 @@ public:
 
     ll cnt() const{ return sum; } // 팰린드롬 개수
     int max_len() const{ return m; } // 가장 긴 팰린드롬 길이
+    bool is_pal(int l, int r) const{
+        int m = l + r;
+        return rad[m] >= r - l;
+    }
 };
 
 //z
