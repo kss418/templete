@@ -137,7 +137,7 @@ public:
     }
 };
 
-// 희소 배열
+// Sparse Table
 class _st { // 0-base index
 private:
     vector <vector<ll>> sum;
