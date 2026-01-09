@@ -138,40 +138,40 @@ public:
 };
 
 // 희소 배열
-class _st { // 1-base index
+class _st { // 0-base index
+private:
+    vector <vector<ll>> sum;
+    vector <vector<int>> lift; ll m; int n, lg; 
 public:
-    ll n, m; vector <vector<ll>> lift, sum;
-    _st(){};
-    _st(ll n, ll m) : n(n), m(m) { //n 개수 m 깊이
-        lift.resize(log2(m + 1) + 1, vector<ll>(n + 1, 0));
-        sum.resize(log2(m + 1) + 1, vector<ll>(n + 1, 0));
+    _st(int n = 0, ll max_step = 0){ clear(n, max_step); }; // O(n log m)
+    void clear(int n, ll m = 60){ // O(n log m)
+        lg = 1; this->n = n; this->m = m;
+        while((1ll << lg) <= m) lg++;
+        lift.assign(lg + 1, vector<int>(n + 2, n + 1));
+        sum.assign(lg + 1, vector<ll>(n + 2, INF));
     }
 
-    void add(ll st, ll en, ll co = 1) {
-        lift[0][st] = en;
-        sum[0][st] = co;
-    }
-
-    void init() {
-        for (int i = 1; i <= log2(m + 1); i++) {
-            for (int j = 1; j <= n;j++){
-                ll mid = lift[i - 1][j];
+    void add(int st, int en, ll co = 1) { lift[0][st] = en; sum[0][st] = co; } // O(1)
+    void build(){ // O(n log m)
+        for(int i = 1;i <= lg;i++){
+            for(int j = 0;j <= n;j++){
+                int mid = lift[i - 1][j];
+                if(mid == n + 1 || lift[i - 1][mid] == n + 1) continue;
                 lift[i][j] = lift[i - 1][mid];
                 sum[i][j] = min(sum[i - 1][j] + sum[i - 1][mid], INF);
             }
         }
     }
 
-    pll ret(ll n, ll d) { //n 노드 d 깊이
+    int next(int v) const{ return (lift[0][v] == n + 1 ? -1 : lift[0][v]); } // O(1)
+    pair<int, ll> ret(int cur, ll k) const{ // O(log m)
         ll co = 0;
-        for (int i = log2(m + 1); i >= 0; i--) {
-            if (d < sum[i][n]) continue;
-            co += sum[i][n];
-            d -= sum[i][n];
-            n = lift[i][n];
+        for(int i = lg; i >= 0; i--){
+            if(cur == n + 1) break;
+            if(k < sum[i][cur]) continue;
+            co += sum[i][cur]; k -= sum[i][cur]; cur = lift[i][cur];
         }
-
-        return {n, co}; // 정점, 연산 횟수
+        return {(cur == n + 1 ? -1 : cur), co}; // 도착 정점, 사용한 비용
     }
 };
 
