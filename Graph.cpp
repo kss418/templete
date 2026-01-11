@@ -159,7 +159,7 @@ public:
         lg = 1; this->n = n; this->m = m;
         while((1ll << lg) <= m) lg++;
         lift.assign(lg + 1, vector<int>(n + 2, n + 1));
-        sum.assign(lg + 1, vector<ll>(n + 2, 1));
+        sum.assign(lg + 1, vector<ll>(n + 2, INF));
     }
 
     void add(int st, int en, ll co = 1) { lift[0][st] = en; sum[0][st] = co; } // O(1)
@@ -167,20 +167,22 @@ public:
         for(int i = 1;i <= lg;i++){
             for(int j = 0;j <= n;j++){
                 int mid = lift[i - 1][j];
+                if(mid == n + 1 || lift[i - 1][mid] == n + 1) continue;
                 lift[i][j] = lift[i - 1][mid];
-                sum[i][j] = min<int>(sum[i - 1][j] + sum[i - 1][mid], 0x3f3f3f3f);
+                sum[i][j] = min(sum[i - 1][j] + sum[i - 1][mid], INF);
             }
         }
     }
 
-    int next(int v) const{ return lift[0][v]; } // O(1)
+    int next(int v) const{ return (lift[0][v] == n + 1 ? -1 : lift[0][v]); } // O(1)
     pair<int, ll> ret(int cur, ll k) const{ // O(log m)
         ll co = 0;
         for(int i = lg; i >= 0; i--){
+            if(cur == n + 1) break;
             if(k < sum[i][cur]) continue;
             co += sum[i][cur]; k -= sum[i][cur]; cur = lift[i][cur];
         }
-        return {cur, co}; // 도착 정점, 사용한 비용
+        return {(cur == n + 1 ? -1 : cur), co}; // 도착 정점, 사용한 비용
     }
 };
 
