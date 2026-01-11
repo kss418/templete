@@ -337,7 +337,7 @@ public:
 
     template <class F, class G, bool REV = true>
     void it_top(const F& merge, const G& done) const{ // O(n + m)
-        vector<vector<int> adj(cc); vector<int> ind(cc, 0);
+        vector<vector<int>> adj(cc); vector<int> ind(cc, 0);
         it_dag([&](int a, int b){ 
             if constexpr (REV) swap(a, b);
             adj[a].push_back(b), ind[b]++; 
@@ -346,7 +346,8 @@ public:
         while(!q.empty()){
             auto cur = q.front(); q.pop_front(); done(cur);
             for(auto& nxt : adj[cur]){
-                merge(cur, nxt);
+                if constexpr (!REV) merge(nxt, cur);
+                else merge(cur, nxt);
                 if(!--ind[nxt]) q.push_back(nxt);
             }
         }
