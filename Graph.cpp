@@ -322,6 +322,18 @@ public:
             }
         }
     }
+
+    vector <int> ind() const{ // O(n + m)
+        vector<int> ret(cc, 0);
+        it_dag([&](int a, int b){ ret[b]++; });
+        return ret;
+    }
+
+    vector <int> outd() const{ // O(n + m)
+        vector<int> ret(cc, 0);
+        it_dag([&](int a, int b){ ret[a]++; });
+        return ret;
+    }
 };
 
 //2SAT
