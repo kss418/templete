@@ -293,6 +293,18 @@ public:
     int comp_cnt() const{ return cc; } // O(1)
     int root(int cid) const{ return group[cid][0]; } // O(1)
 
+    vector <int> ind() const{ // O(n + m)
+        vector<int> ret(cc, 0);
+        it_dag([&](int a, int b){ ret[b]++; });
+        return ret;
+    }
+
+    vector <int> outd() const{ // O(n + m)
+        vector<int> ret(cc, 0);
+        it_dag([&](int a, int b){ ret[a]++; });
+        return ret;
+    }
+
     template <bool REV = false, class F>
     void it_cid(const F& f) const{ // O(n)
         if constexpr(!REV) for(int i = 0;i < cc;i++) f(i);
@@ -323,16 +335,21 @@ public:
         }
     }
 
-    vector <int> ind() const{ // O(n + m)
-        vector<int> ret(cc, 0);
-        it_dag([&](int a, int b){ ret[b]++; });
-        return ret;
-    }
-
-    vector <int> outd() const{ // O(n + m)
-        vector<int> ret(cc, 0);
-        it_dag([&](int a, int b){ ret[a]++; });
-        return ret;
+    template <class F, class G, bool REV = true>
+    void it_top(const F& merge, const G& done) const{ // O(n + m)
+        vector<vector<int> adj(cc); vector<int> ind(cc, 0);
+        it_dag([&](int a, int b){ 
+            if constexpr (REV) swap(a, b);
+            adj[a].push_back(b), ind[b]++; 
+        });
+        deque <int> q; for(int i = 0;i < cc;i++) if(!ind[i]) q.push_back(i);
+        while(!q.empty()){
+            auto cur = q.front(); q.pop_front(); done(cur);
+            for(auto& nxt : adj[cur]){
+                merge(cur, nxt);
+                if(!--ind[nxt]) q.push_back(nxt);
+            }
+        }
     }
 };
 
