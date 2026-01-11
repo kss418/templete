@@ -346,8 +346,7 @@ public:
         while(!q.empty()){
             auto cur = q.front(); q.pop_front(); done(cur);
             for(auto& nxt : adj[cur]){
-                if constexpr (!REV) merge(nxt, cur);
-                else merge(cur, nxt);
+                merge(cur, nxt);
                 if(!--ind[nxt]) q.push_back(nxt);
             }
         }
