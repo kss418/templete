@@ -335,7 +335,7 @@ public:
         }
     }
 
-    template <class F, class G, bool REV = true>
+    template <bool REV = true, class F, class G>
     void it_top(const F& merge, const G& done) const{ // O(n + m)
         vector<vector<int>> adj(cc); vector<int> ind(cc, 0);
         it_dag([&](int a, int b){ 
