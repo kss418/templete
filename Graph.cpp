@@ -159,7 +159,7 @@ public:
         lg = 1; this->n = n; this->m = m;
         while((1ll << lg) <= m) lg++;
         lift.assign(lg + 1, vector<int>(n + 2, n + 1));
-        sum.assign(lg + 1, vector<ll>(n + 2, INF));
+        sum.assign(lg + 1, vector<ll>(n + 2, 1));
     }
 
     void add(int st, int en, ll co = 1) { lift[0][st] = en; sum[0][st] = co; } // O(1)
@@ -167,22 +167,20 @@ public:
         for(int i = 1;i <= lg;i++){
             for(int j = 0;j <= n;j++){
                 int mid = lift[i - 1][j];
-                if(mid == n + 1 || lift[i - 1][mid] == n + 1) continue;
                 lift[i][j] = lift[i - 1][mid];
-                sum[i][j] = min(sum[i - 1][j] + sum[i - 1][mid], INF);
+                sum[i][j] = min<int>(sum[i - 1][j] + sum[i - 1][mid], 0x3f3f3f3f);
             }
         }
     }
 
-    int next(int v) const{ return (lift[0][v] == n + 1 ? -1 : lift[0][v]); } // O(1)
+    int next(int v) const{ return lift[0][v]; } // O(1)
     pair<int, ll> ret(int cur, ll k) const{ // O(log m)
         ll co = 0;
         for(int i = lg; i >= 0; i--){
-            if(cur == n + 1) break;
             if(k < sum[i][cur]) continue;
             co += sum[i][cur]; k -= sum[i][cur]; cur = lift[i][cur];
         }
-        return {(cur == n + 1 ? -1 : cur), co}; // 도착 정점, 사용한 비용
+        return {cur, co}; // 도착 정점, 사용한 비용
     }
 };
 
@@ -256,97 +254,71 @@ public:
 };
 
 //SCC
-class _scc { // 1-based index
+class _scc{ // 0-based index
+private:
+    vector <vector<int>> adj, rev, group;
+    vector <int> comp, ord; vector <bool> v; int n, cc;
+    void dfs1(int cur){
+        v[cur] = 1;
+        for(auto& nxt : adj[cur]) if(!v[nxt]) dfs1(nxt);
+        ord.push_back(cur);
+    }
+
+    void dfs2(int cur, int cid){
+        comp[cur] = cid; group[cid].push_back(cur);
+        for(auto& nxt : rev[cur]) if(comp[nxt] == -1) dfs2(nxt, cid);
+    }
 public:
-    ll n, dcnt = 0, scnt = 0;
-    vector <ll> d, sn, ind; // dfsn, scc번호, ind
-    vector<vector<ll>> adj, scc; // 간선, scc
-    vector <bool> fin;
-    stack <ll> st;
-    vector <set <ll>> sccset; // 위상정렬 간선
-
-    _scc(ll n) {
-        this->n = n;
-        d.resize(n + 1); fin.resize(n + 1);
-        adj.resize(n + 1); sn.resize(n + 1);
+    _scc(int n = 0){ clear(n); } // O(n)
+    void clear(int n){ // O(n)
+        this->n = n; cc = 0; adj.assign(n + 1, {}); rev.assign(n + 1, {});
+        comp.assign(n + 1, -1); group.clear(); ord.clear(); 
+        v.assign(n + 1, false); ord.reserve(n + 1);
     }
 
-    void add(ll st, ll en) {
-        adj[st].push_back(en);
-    }
-
-    ll dfs(ll cur) {
-        d[cur] = ++dcnt;
-        st.push(cur);
-
-        ll mn = d[cur];
-        for (auto& nxt : adj[cur]) {
-            if (!d[nxt]) mn = min(mn, dfs(nxt));
-            else if (!fin[nxt]) mn = min(mn, d[nxt]);
-        }
-
-        if (mn == d[cur]) {
-            vector <ll> curscc;
-            while (1) {
-                ll t = st.top(); st.pop();
-                curscc.push_back(t);
-                fin[t] = 1; sn[t] = scnt;
-                if (t == cur) break;
-            }
-
-            sort(curscc.begin(), curscc.end());
-            scc.push_back(curscc); scnt++;
-        }
-
-        return mn;
-    }
-
-    void init() {
-        for (int i = 1; i <= n; i++) {
-            if (d[i]) continue;
-            dfs(i);
+    void addsol(int s, int e){ adj[s].push_back(e); rev[e].push_back(s); } // O(1)
+    void build(){ // O(n + m)
+        for(int i = 0;i <= n;i++) if(!v[i]) dfs1(i);
+        for(int i = (int)ord.size() - 1;i >= 0;i--){
+            int cur = ord[i]; if(comp[cur] != -1) continue;
+            group.push_back({});
+            dfs2(cur, cc); cc++;
         }
     }
 
-    vector <vector <ll>> ret() { // scc 반환
-        return scc;
+    int component(int x) const{ return comp[x]; } // O(1)
+    bool same(int a, int b) const{ return comp[a] == comp[b]; } // O(1)
+    int comp_cnt() const{ return cc; } // O(1)
+    int root(int cid) const{ return group[cid][0]; } // O(1)
+
+    template <bool REV = false, class F>
+    void it_cid(const F& f) const{ // O(n)
+        if constexpr(!REV) for(int i = 0;i < cc;i++) f(i);
+        else for(int i = cc - 1;i >= 0;i--) f(i);
     }
 
-    ll num(ll a) { // scc 번호 반환
-        return sn[a];
+    template <bool REV = false, class F>
+    void it_all(const F& f) const{ // O(n)
+        it_cid<REV>([&](int cid){ for(auto& i : group[cid]) f(i); });
     }
 
-    vector <ll> top() { //위상정렬
-        deque <ll> q; vector <ll> ts;
-        sccset.resize(n + 1); ind.resize(n + 1);
+    template<class F>
+    void it_group(int cid, const F& f) const{ // O(n)
+        for(auto& cur : group[cid]) f(cur);
+    }
 
-        for (auto& i : scc) {
-            for (auto& cur : i) {
-                for (auto nxt : adj[cur]) {
-                    if (num(cur) == num(nxt)) continue;
-                    if (sccset[num(cur)].count(num(nxt))) continue;
-                    sccset[num(cur)].insert(num(nxt));
-                    ind[num(nxt)]++;
+    template <class F>
+    void it_dag(const F& f) const{ // O(n + m)
+        vector<int> num(cc, -1);
+        for(int i = 0;i < cc;i++){
+            for(auto& cur : group[i]){
+                for(auto& nxt : adj[cur]){
+                    int j = comp[nxt];
+                    if(i == j || i == num[j]) continue;
+                    num[j] = i; f(i, j);
                 }
             }
         }
-
-        for (int i = 0; i < scnt; i++) {
-            if (ind[i]) continue;
-            q.push_back(i);
-        }
-
-        while (!q.empty()) {
-            ll cur = q.front(); q.pop_front();
-            ts.push_back(cur);
-
-            for (auto& nxt : sccset[cur]) {
-
-                if (!--ind[nxt]) q.push_back(nxt);
-            }
-        }
-
-        return ts;
     }
 };
 
