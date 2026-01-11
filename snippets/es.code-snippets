@@ -21,6 +21,8 @@
     "    }",
     "",
     "    const vector<int>& ret() { return prime; } // 소수 벡터 반환",
+    "    template <class F>",
+    "    void it_prime(const F& f) const{ for(auto& p : prime) f(p); } // O(pi(n))",
     "    bool is_prime(int x) const { // 소수 판별",
     "        if(x == 2) return 1;",
     "        if(x < 2 || x % 2 == 0) return 0;",
