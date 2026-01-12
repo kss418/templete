@@ -56,14 +56,14 @@ private:
     }
 public:
     _seg(int n = 0){ clear(n); } // O(n)
-    _seg(const vector<node>& arr){ build(arr); } // O(n)
+    _seg(span<const node> arr){ build(arr); } // O(n)
     void clear(int n){ // O(n)
         this->n = n;
         sz = 1; while(sz < n + 1) sz <<= 1;
         seg.assign(2 * sz, id());
     }
 
-    void build(const vector<node>& arr){ // O(n)
+    void build(span<const node> arr){ // O(n)
         if(arr.empty()){ clear(0); return; }
         clear((int)arr.size() - 1);
         for(int i = 0;i < (int)arr.size();i++) seg[i + sz] = arr[i];
