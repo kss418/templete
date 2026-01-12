@@ -265,16 +265,10 @@ public:
     }
 
     template<class F>
-    void it_path(int st, int en, const F& f) const{ // O(n) 
-        chk(en); assert(st >= 0 && st <= n);
-        assert(reachable(en)); assert(!is_cycle(en));
+    void it_path(int x, const F& f) const{ // O(n) 
+        chk(x); assert(reachable(x)); assert(!is_cycle(x));
         vector <int> ret;
-        for(int cur = en; cur != -1; cur = pre[cur]){
-            ret.push_back(cur);
-            if(cur == st) break;
-        }
-        assert(!ret.empty() && ret.back() == st);
-        reverse(ret.begin(), ret.end());
-        for(const auto& v : ret) f(v);
+        for(int cur = x; cur != -1; cur = pre[cur]) ret.push_back(cur);
+        for(auto it = ret.rbegin(); it != ret.rend(); ++it) f(*it);
     }
 };
