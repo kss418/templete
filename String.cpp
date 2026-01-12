@@ -37,15 +37,16 @@ public:
     void set(span<const T> v){ pat.assign(all(v)); build(); } // O(|v|)
 
     const vector<int>& fail() const{ return f; } // O(1)
-    vector <int> match(const string& s) const{ return match(tf(s));} // O(|s| + m)
-    vector <int> match(span<const T> v) const{ // O(|v| + m)
-        vector <int> ret; int n = (int)v.size();
-        if(!m) return ret; int state = 0; ret.reserve(n);
+    template <class F>
+    void it_match(const string& s, const F& f) const{ it_match(tf(s), f);} // O(|s| + m)
+    template <class F>
+    void it_match(span<const T> v, const F& f) const{ // O(|v| + m)
+        int n = (int)v.size();
+        if(!m) return; int state = 0;
         for(int i = 0;i < n;i++){
             state = go(state, v[i]);
-            if(state == m) ret.push_back(i - m + 1);
+            if(state == m) f(i - m + 1);
         }
-        return ret;
     }
 
     int go(int state, const T& ch) const{ // amortized O(1)
@@ -56,10 +57,10 @@ public:
         return state;
     }
 
-    vector<int> border() const{ // O(m)
-        vector <int> ret; if(!m) return ret;
-        for(int x = f[m - 1];x > 0;x = f[x - 1]) ret.push_back(x);
-        return ret;
+    template <class F>
+    void it_border(const F& f) const{ // O(m)
+        if(!m) return;
+        for(int x = f[m - 1];x > 0;x = f[x - 1]) f(x);
     }
 };
 
