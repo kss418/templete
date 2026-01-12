@@ -31,14 +31,14 @@ private:
 public:
     _kmp() : m(0){}
     _kmp(const string& s){ set(s); } // O(|s|)
-    _kmp(const vector <T>& v){ set(v); } // O(|v|)
+    _kmp(span<const T> v){ set(v); } // O(|v|)
     void clear(){ pat.clear(); f.clear(); m = 0; } // O(1)
     void set(const string& s){ pat = tf(s); build(); } // O(|s|)
-    void set(const vector<T>& v){ pat = v; build(); } // O(|v|)
+    void set(span<const T> v){ pat.assign(all(v)); build(); } // O(|v|)
 
     const vector<int>& fail() const{ return f; } // O(1)
     vector <int> match(const string& s) const{ return match(tf(s));} // O(|s| + m)
-    vector <int> match(const vector <T>& v) const{ // O(|v| + m)
+    vector <int> match(span<const T> v) const{ // O(|v| + m)
         vector <int> ret; int n = (int)v.size();
         if(!m) return ret; int state = 0; ret.reserve(n);
         for(int i = 0;i < n;i++){
@@ -117,9 +117,11 @@ private:
 public:
     _sa(){ clear(0); }
     _sa(const string& s){ set(s); }
-    _sa(const vector <T>& v) { set(v); }
+    _sa(span<const T> v) { set(v); }
     void set(const string& s){ clear(s.size()); for(auto& i : s) arr.push_back((T)i); build(); }
-    void set(const vector <T>& v){ clear(v.size()); this->arr = v; build(); }
+    void set(span<const T> v){
+        clear(v.size()); this->arr.assign(all(v)); build();
+    }
 
     void clear(int n){
         this->n = n; d = 1; sa.assign(n, 0); arr.clear(); arr.reserve(n);
@@ -171,9 +173,9 @@ private:
 public:
     _mnc(){} // O(1)
     _mnc(const string& s){ set(s); } // O(n)
-    _mnc(const vector <T>& v){ set(v); } // O(n)
+    _mnc(span<const T> v){ set(v); } // O(n)
     void set(const string& s){ build(all(s), [&](char c){ return (unsigned char)c; }); } // O(n)
-    void set(const vector<T>& v){ build(all(v), [&](const T& x){ return x; }); } // O(n)
+    void set(span<const T> v){ build(all(v), [&](const T& x){ return x; }); } // O(n)
 
     const vector<int>& get_rad() const{ return rad; } // O(1)
     ll cnt() const{ return odd + even; } // O(1)
@@ -221,9 +223,9 @@ private:
 public:
     _z(){}
     _z(const string& s){ set(s); } // O(|s|)
-    _z(const vector<T>& v){ set(v); } // O(|v|)
+    _z(span<const T> v){ set(v); } // O(|v|)
     void clear(){ arr.clear(); z.clear(); n = 0; } // O(1)
     void set(const string& s){ arr = tf(s); build(); } // O(|s|)
-    void set(const vector<T>& v){ arr = v; build(); } // O(|v|)
+    void set(span<const T> v){ arr.assign(all(v)); build(); } // O(|v|)
     const vector<int>& result() const{ return z; } // O(1)
 };
