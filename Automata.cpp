@@ -28,7 +28,7 @@ private:
         return ret;
     }
 
-    int get_state(const vector <int>& v) const{
+    int get_state(span<const int> v) const{
         int cur = 0;
         for(auto& c : v){
             assert(0 <= c && c < M);
@@ -46,8 +46,8 @@ public:
     }
 
     int size() const{ return pass.empty() ? 0 : pass[0]; } // O(1)
-    void insert(const string& s){ insert(tf(s)); } // O(|s|)
-    void insert(const vector <int>& v){ // O(|v|)
+    void insert(const string& s){ auto v = tf(s); insert(v); } // O(|s|)
+    void insert(span<const int> v){ // O(|v|)
         int cur = 0; pass[cur]++;
         for(auto &c : v){
             assert(0 <= c && c < M);
@@ -57,8 +57,8 @@ public:
         cnt[cur]++;
     }
 
-    bool erase(const string& s){ return erase(tf(s)); } // O(|s|)
-    bool erase(const vector <int>& v){ // O(|v|)
+    bool erase(const string& s){ auto v = tf(s); return erase(v); } // O(|s|)
+    bool erase(span<const int> v){ // O(|v|)
         int state = get_state(v);
         if(state == -1 || !cnt[state]) return 0; 
         int cur = 0; cnt[state]--; pass[cur]--;
@@ -66,16 +66,16 @@ public:
         return 1;
     }
 
-    int count(const string& s) const{ return count(tf(s)); } // O(|s|)
-    int count(const vector <int>& v) const{ return count(get_state(v)); } // O(|v|)
+    int count(const string& s) const{ auto v = tf(s); return count(v); } // O(|s|)
+    int count(span<const int> v) const{ return count(get_state(v)); } // O(|v|)
     int count(int state) const{ return (state == -1 ? 0 : cnt[state]); } // O(1);
 
-    int prefix_count(const string& prefix) const { return prefix_count(tf(prefix)); } // O(|s|)
-    int prefix_count(const vector<int>& v) const { return prefix_count(get_state(v)); } // O(|v|)
+    int prefix_count(const string& prefix) const { auto v = tf(prefix); return prefix_count(v); } // O(|s|)
+    int prefix_count(span<const int> v) const { return prefix_count(get_state(v)); } // O(|v|)
     int prefix_count(int state) const{ return (state == -1 ? 0 : pass[state]); } // O(1)
 
-    int rank(const string& s) const{ return rank(tf(s)); } // O(|s| * m)
-    int rank(const vector <int>& v) const{ // O(|v| * m)
+    int rank(const string& s) const{ auto v = tf(s); return rank(v); } // O(|s| * m)
+    int rank(span<const int> v) const{ // O(|v| * m)
         int ret = 0, cur = 0;
         for(auto& c : v){
             assert(0 <= c && c < M);
@@ -252,8 +252,8 @@ public:
     const vector<int>& depth() const{ return dep; }
     const vector<bool>& terminal() const{ return end; }
     int size() const{ return (int)adj.size(); } // O(1)
-    void insert(const string& s){ insert(tf(s)); } // O(|s|)
-    void insert(const vector <int>& v){ // O(|v|)
+    void insert(const string& s){ auto v = tf(s); insert(v); } // O(|s|)
+    void insert(span<const int> v){ // O(|v|)
         assert(!built); int cur = 0;
         for(auto &c : v){
             assert(0 <= c && c < M);
@@ -291,8 +291,8 @@ public:
         }
     }
 
-    ll count(const string& s) const{ return count(tf(s)); } // O(|s|)
-    ll count(const vector <int>& v) const{ // O(|v|)
+    ll count(const string& s) const{ auto v = tf(s); return count(v); } // O(|s|)
+    ll count(span<const int> v) const{ // O(|v|)
         assert(built); ll ret = 0;
         it_state(v, [&](int st){ ret += cnt[st]; });
         return ret;
@@ -304,9 +304,9 @@ public:
     }
 
     template <class F> 
-    void it_state(const string& s, const F& f) const{ it_state(tf(s), f); } // O(|s|)
+    void it_state(const string& s, const F& f) const{ auto v = tf(s); it_state(v, f); } // O(|s|)
     template <class F> 
-    void it_state(const vector <int>& v, const F& f) const{ // O(|v|)
+    void it_state(span<const int> v, const F& f) const{ // O(|v|)
         assert(built); int cur = 0;
         for(auto& c : v){
             assert(0 <= c && c < M);
@@ -387,8 +387,8 @@ public:
     const vector<int>& depth() const{ return dep; } // O(1)
     const vector<bool>& terminal() const{ return end; } // O(1)
     int size() const{ return (int)head.size(); } // O(1)
-    void insert(const string& s){ insert(tf(s)); } // O(|s|)
-    void insert(const vector <T>& v){ // O(|v|)
+    void insert(const string& s){ auto v = tf(s); insert(v); } // O(|s|)
+    void insert(span<const T> v){ // O(|v|)
         assert(!built); int cur = 0;
         for(auto &c : v){
             int nxt = child(cur, c);
@@ -420,8 +420,8 @@ public:
         }
     }
 
-    ll count(const string& s) const{ return count(tf(s)); } // O(|s|)
-    ll count(const vector <T>& v) const{ // O(|v|)
+    ll count(const string& s) const{ auto v = tf(s); return count(v); } // O(|s|)
+    ll count(span<const T> v) const{ // O(|v|)
         assert(built); ll ret = 0;
         it_state(v, [&](int st){ ret += cnt[st]; });
         return ret;
@@ -435,9 +435,9 @@ public:
     }
 
     template <class F>
-    void it_state(const string& s, const F& f) const{ it_state(tf(s), f); } // O(|s|)
+    void it_state(const string& s, const F& f) const{ auto v = tf(s); it_state(v, f); } // O(|s|)
     template <class F>
-    void it_state(const vector <T>& v, const F& f) const{ // O(|v|)
+    void it_state(span<const T> v, const F& f) const{ // O(|v|)
         assert(built); int cur = 0;
         for(auto& c : v){
             cur = go(cur, c), f(cur);

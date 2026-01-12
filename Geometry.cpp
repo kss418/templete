@@ -186,7 +186,7 @@ class _area{
 public:
     _area() {}
 
-    ll ret(vector <pll>& v){ // div by 2
+    ll ret(span<const pll> v){ // div by 2
         ll num = 0;
         for(int i = 0;i < v.size();i++){
             auto [x1, y1] = v[i];
@@ -264,7 +264,7 @@ public:
     }; _li li;
 
     _inter(){}
-    bool ret(vector<pll>& p, pll now){
+    bool ret(span<const pll> p, pll now){
         ll cnt = 0, flag = 0, sz = p.size();
         if(sz < 3) return 0;
         pll nxt = {1e12, now.y + 1};
