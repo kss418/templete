@@ -91,12 +91,13 @@ public:
         return !eq(d[x], policy::inf());
     }
 
-    vector <int> get_path(int x) const{ // O(n)
+    template<class F>
+    void it_path(int x, const F& f) const{ // O(n)
         chk(x); assert(reachable(x));
         vector<int> ret;
         for(int cur = x; cur != -1; cur = pre[cur]) ret.push_back(cur);
         reverse(all(ret));
-        return ret;
+        for(const auto& v : ret) f(v);
     }
 };
 
@@ -155,12 +156,13 @@ public:
         return !eq(d[st][en], policy::inf());
     }
 
-    vector <int> get_path(int st, int en) const{ // O(n)
+    template<class F>
+    void it_path(int st, int en, const F& f) const{ // O(n)
         chk(st, en); assert(reachable(st, en));
-        vector <int> ret;
-        for(int cur = st;cur != en; cur = nxt[cur][en]) ret.push_back(cur);
-        ret.push_back(en);
-        return ret;
+        for(int cur = st;; cur = nxt[cur][en]){
+            f(cur);
+            if(cur == en) break;
+        }
     }
 };
 
@@ -262,11 +264,17 @@ public:
         return cy[x];
     }
 
-    vector <int> get_path(int x) const{ // O(n) 
-        chk(x); assert(reachable(x)); assert(!is_cycle(x));
+    template<class F>
+    void it_path(int st, int en, const F& f) const{ // O(n) 
+        chk(en); assert(st >= 0 && st <= n);
+        assert(reachable(en)); assert(!is_cycle(en));
         vector <int> ret;
-        for(int cur = x; cur != -1; cur = pre[cur]) ret.push_back(cur);
+        for(int cur = en; cur != -1; cur = pre[cur]){
+            ret.push_back(cur);
+            if(cur == st) break;
+        }
+        assert(!ret.empty() && ret.back() == st);
         reverse(ret.begin(), ret.end());
-        return ret;
+        for(const auto& v : ret) f(v);
     }
 };
