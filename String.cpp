@@ -115,23 +115,21 @@ private:
         }
     }
 public:
-    _sa(){ clear(0); }
-    _sa(const string& s){ set(s); }
-    _sa(span<const T> v) { set(v); }
-    void set(const string& s){ clear(s.size()); for(auto& i : s) arr.push_back((T)i); build(); }
-    void set(span<const T> v){
-        clear(v.size()); this->arr.assign(all(v)); build();
-    }
+    _sa(){ clear(0); } // O(1)
+    _sa(const string& s){ set(s); } // O(n log n)
+    _sa(span<const T> v) { set(v); } // O(n log n)
+    void set(const string& s){ clear(s.size()); for(auto& i : s) arr.push_back((T)i); build(); } // O(n log n)
+    void set(span<const T> v){ clear(v.size()); this->arr.assign(all(v)); build(); } // O(n log n)
 
-    void clear(int n){
+    void clear(int n){ // O(n)
         this->n = n; d = 1; sa.assign(n, 0); arr.clear(); arr.reserve(n);
         iota(all(sa), 0); lcp.assign(n, 0); pos.assign(n, 0);
     }
 
-    const vector<int>& get_sa() const{ return sa; }
-    const vector<int>& get_pos() const{ return pos; }
-    const vector<int>& get_lcp() const{ return lcp; }
-};
+    const vector<int>& get_sa() const{ return sa; } // O(1)
+    const vector<int>& get_pos() const{ return pos; } // O(1)
+    const vector<int>& get_lcp() const{ return lcp; } // O(1)
+}; 
 
 //MANACHER
 template <class T = ll>
