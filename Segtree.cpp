@@ -188,7 +188,7 @@ private:
     }
 public:
     _prop(int n = 0){ clear(n); } // O(n)
-    _prop(const vector<node>& arr){ build(arr); } // O(n)
+    _prop(span<const node> arr){ build(arr); } // O(n)
     void clear(int n){ // O(n)
         this->n = n;
         sz = 1; while(sz < n + 1) sz <<= 1;
@@ -197,7 +197,7 @@ public:
         lz.assign(2 * sz, lz_id());
     }
 
-    void build(const vector<node>& arr){ // O(n)
+    void build(span<const node> arr){ // O(n)
         if(arr.empty()){ clear(0); return; }
         clear((int)arr.size() - 1);
         for(int i = 0;i < (int)arr.size();i++) seg[i + sz] = arr[i];
@@ -395,13 +395,13 @@ private:
     }
 public:
     _mt(int n = 0){ clear(n); } // O(n)
-    _mt(const vector <node>& arr){ build(arr); } // O(n log n)
+    _mt(span<const node> arr){ build(arr); } // O(n log n)
     void clear(int n){ // O(n)
         this->n = n; sz = 1; while(sz < n + 1) sz <<= 1; 
         arr.assign(n + 1, node()); seg.assign(2 * sz, {});
     }
 
-    void build(const vector <node>& arr){ // O(n log n)
+    void build(span<const node> arr){ // O(n log n)
         clear((int)arr.size() - 1); this->arr = arr; 
         for(int i = 0; i <= n; i++) seg[sz + i].assign(1, arr[i]);
         for(int i = sz - 1; i >= 1; i--){
@@ -601,13 +601,13 @@ private:
     node inv(const node& a) const{ return policy::inv(a); }
 public:
     _fw(int n = 0){ clear(n); } // O(n)
-    _fw(const vector<node>& arr){ build(arr); } // O(n)
+    _fw(span<const node> arr){ build(arr); } // O(n)
     void clear(int n){ // O(n)
         this->n = n;
         bit.assign(n + 2, id());
     }
 
-    void build(const vector<node>& arr){ // O(n)
+    void build(span<const node> arr){ // O(n)
         if(arr.empty()){ clear(0); return; }
         clear((int)arr.size() - 1);
         for(int i = 0;i <= n;i++) bit[i + 1] = arr[i];
