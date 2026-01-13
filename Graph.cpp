@@ -644,3 +644,58 @@ public:
         return c;
     } 
 };
+
+template <class T>
+class _clist{
+private:
+    vector <T> to;
+    vector <int> head, nxt, deg; int n;
+
+    template <class G>
+    struct view_base{
+        G* g; int u, ei;
+        struct it{
+            G* g; int ei;
+            using ref_t = conditional_t<is_const_v<G>, const T&, T&>;
+            ref_t operator*() const{ return g->to[ei]; }
+            it& operator++(){ ei = g->nxt[ei]; return *this; }
+            bool operator!=(const it& ot) const{ return ei != ot.ei; }
+        };
+        it begin() const{ return {g, ei}; }
+        it end() const{ return {g, -1}; }
+        int size() const{ return g->deg[u]; }
+        bool empty() const{ return g->deg[u] == 0; }
+
+        auto front() const -> conditional_t<is_const_v<G>, const T&, T&>{
+            return g->to[ei];
+        }
+    };
+
+    struct view : view_base<_clist>{
+        void clear() const{ this->g->clear_node(this->u); }
+        void push_front(const T& v) const{ this->g->push_front(this->u, v); }
+        void pop_front() const{ this->g->pop_front(this->u); }
+    };
+
+    void clear_node(int u){ head[u] = -1; deg[u] = 0; }
+public:
+    _clist(int n = 0){ clear(n); } // O(n)
+    void clear(int n){ // O(n)
+        this->n = n; deg.assign(n + 1, 0);
+        head.assign(n + 1, -1); to.clear(); nxt.clear();
+    }
+
+    int size() const{ return n; } // O(1)
+    void push_front(int x, const T& v){ // O(1)
+        nxt.push_back(head[x]); to.push_back(v);
+        head[x] = (int)to.size() - 1; deg[x]++;
+    }
+
+    void pop_front(int x){ // O(1)
+        int h = head[x]; if(h == -1) return;
+        head[x] = nxt[h]; deg[x]--;
+    }
+
+    view_base <const _clist> operator[](int u) const{ return {this, u, head[u]}; } // O(1)
+    view operator[](int u){ return {this, u, head[u]}; } // O(1)
+};
