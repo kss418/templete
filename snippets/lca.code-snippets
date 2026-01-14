@@ -97,7 +97,7 @@
     "    int ancestor(int v, int k){  // O(log n)",
     "        if(k < 0 || k > d[v]) return -1;",
     "        return shift<false>(v, k); ",
-    "    } ",
+    "    }",
     "",
     "    // REV == true / child -> parent, REV == false / parent -> child",
     "    template<bool REV = true, class F>",
