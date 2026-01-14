@@ -4,8 +4,7 @@
   "body": [
     "class _wuf { ",
     "public:",
-    "    ll n; vector <ll> p, d, dis;",
-    "    ",
+    "    vector <ll> p, d, dis; ll n; ",
     "    _wuf(){}",
     "    _wuf(ll n) { ",
     "        this->n = n; dis.resize(n + 1);",
