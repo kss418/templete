@@ -17,7 +17,7 @@
     "        for(auto& nxt : rev[cur]) if(comp[nxt] == -1) dfs2(nxt, cid);",
     "    }",
     "public:",
-    "    _scc(int max_index = 0, int base = 1){ clear(n, base); } // O(n)",
+    "    _scc(int max_index = 0, int base = 1){ clear(max_index, base); } // O(n)",
     "    void clear(int max_index, int base = 1){ // O(n)",
     "        this->n = max_index; this->base = base;",
     "        cc = 0; adj.assign(n + 1, {}); rev.assign(n + 1, {});",
