@@ -453,6 +453,16 @@ public:
         }
         return result;
     }
+
+    template <class F>
+    void it_all(const F& f) const{
+        for(int i = 0;i <= as;i++) f(i, av[i]);
+    }
+
+    template <class F>
+    void it_matched(const F& f) const{
+        for(int i = 0;i <= as;i++) if(av[i] != -1) f(u, av[i]);
+    }
 };
 
 //BCC
