@@ -400,14 +400,14 @@ public:
 
 
 //이분 매칭
-class _bm { // 0-based index
+class _bm { // 1-based index
 private:
     vector<vector<int>> adj; int as, bs;
     vector<int> av, bv, dist;
     static constexpr int INF = 0x3f3f3f3f;
     bool bfs(){
         queue <int> q;
-        for(int i = 0;i <= as;i++){
+        for(int i = 1;i <= as;i++){
             if(av[i] == -1) dist[i] = 0, q.push(i);
             else dist[i] = INF;
         }
@@ -446,7 +446,7 @@ public:
     int ret(){ // O(m sqrt n)
         int result = 0;
         while(bfs()){
-            for(int i = 0;i <= as;i++){
+            for(int i = 1;i <= as;i++){
                 if(av[i] != -1) continue;
                 result += dfs(i);
             }
