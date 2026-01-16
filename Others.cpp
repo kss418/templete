@@ -13,7 +13,7 @@ constexpr ll MINF = 0xc0c0c0c0c0c0c0c0;
 class _bs { // integer
 public:
     template <class F>
-    ll max_right(ll l, ll r, const F& f) {
+    static ll max_right(ll l, ll r, const F& f) {
         ll lo = l, hi = r, mid = -1;
         while (hi > lo) {
             mid = (hi + lo + 1) >> 1ll;
@@ -24,7 +24,7 @@ public:
     }
 
     template <class F>
-    ll min_left(ll l, ll r, const F& f) {
+    static ll min_left(ll l, ll r, const F& f) {
         ll lo = l, hi = r, mid = -1;
         while (hi > lo) {
             mid = (hi + lo) >> 1ll;
@@ -38,7 +38,7 @@ public:
 class _fbs { // real
 public:
     template <class F>
-    ld max_right(ld l, ld r, const F& f, int iter = 80) {
+    static ld max_right(ld l, ld r, const F& f, int iter = 80) {
         ld lo = l, hi = r;
         for(int i = 0; i < iter; i++){
             ld mid = (lo + hi) / 2;
@@ -49,7 +49,7 @@ public:
     }
 
     template <class F>
-    ld min_left(ld l, ld r, const F& f, int iter = 80) {
+    static ld min_left(ld l, ld r, const F& f, int iter = 80) {
         ld lo = l, hi = r;
         for(int i = 0; i < iter; i++){
             ld mid = (lo + hi) / 2;
@@ -64,7 +64,7 @@ public:
 class _ts { // integer
 public:
     template <class F>
-    ll max(ll l, ll r, const F& f) {
+    static ll max(ll l, ll r, const F& f) {
         while (r - l > 3) {
             ll st = (2 * l + r) / 3, en = (l + 2 * r) / 3;
             if(f(st) < f(en)) l = st;
@@ -77,7 +77,7 @@ public:
     }
 
     template <class F>
-    ll min(ll l, ll r, const F& f) {
+    static ll min(ll l, ll r, const F& f) {
         while (r - l > 3) {
             ll st = (2 * l + r) / 3, en = (l + 2 * r) / 3;
             if(f(st) > f(en)) l = st;
@@ -93,7 +93,7 @@ public:
 class _fts { // real
 public:
     template <class F>
-    ld max(ld l, ld r, const F& f, int iter = 120) {
+    static ld max(ld l, ld r, const F& f, int iter = 120) {
         for(int i = 0; i < iter; i++){
             ld st = (2 * l + r) / 3, en = (l + 2 * r) / 3;
             if(f(st) < f(en)) l = st;
@@ -103,7 +103,7 @@ public:
     }
 
     template <class F>
-    ld min(ld l, ld r, const F& f, int iter = 120) {
+    static ld min(ld l, ld r, const F& f, int iter = 120) {
         for(int i = 0; i < iter; i++){
             ld st = (2 * l + r) / 3, en = (l + 2 * r) / 3;
             if(f(st) > f(en)) l = st;
