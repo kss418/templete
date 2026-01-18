@@ -10,21 +10,50 @@ constexpr ll INF = 0x3f3f3f3f3f3f3f3f;
 constexpr ll MINF = 0xc0c0c0c0c0c0c0c0;
 
 class _flow {
-public:
-    int n;
-    vector <int> d, w;
-
+private:
+    vector <int> d, w; int n;
     class edge {
     public:
         int nxt, rev; ll c;
-        edge(){}
+        edge() = default;
         edge(int nxt, int rev, ll c) : nxt(nxt), rev(rev), c(c) {}
     };
     vector <vector<edge>> adj;
+    bool bfs(int st, int en) { 
+        memset(d.data(), -1, sizeof(int) * (n + 1));
+        queue <int> q; q.push(st); d[st] = 0;
+        while (!q.empty()) {
+            int cur = q.front(); q.pop();
+            for (auto& e : adj[cur]) {
+                if(e.c <= 0) continue;
+                int nxt = e.nxt;
+                if (d[nxt] != -1) continue;
+                d[nxt] = d[cur] + 1; q.push(nxt);
+            }
+        }
+        return d[en] != -1;
+    }
 
-    _flow(int n) : n(n) {
-        d.resize(n + 1); w.resize(n + 1);
-        adj.resize(n + 1);
+    ll dfs(int cur, int en, ll val) { 
+        if (cur == en) return val;
+        int &i = w[cur], sz = (int)adj[cur].size();
+        for(;i < sz;++i){
+            edge &e = adj[cur][i];
+            if(e.c <= 0) continue;
+            int nxt = e.nxt;
+            if(d[nxt] != d[cur] + 1) continue;
+            ll mn = dfs(nxt, en, min(val, e.c));
+            if(mn <= 0) continue;
+            e.c -= mn; adj[nxt][e.rev].c += mn;
+            return mn;
+        }
+        return 0;
+    }
+public:
+    _flow(int n = 0){ clear(n); }
+    void clear(int n){
+        this->n = n; adj.assign(n + 1, {});
+        d.assign(n + 1, -1); w.assign(n + 1, 0);
     }
 
     void addsol(int st, int en, ll c = 1) {
@@ -34,61 +63,15 @@ public:
         adj[en].push_back({st, rs, 0});
     }
 
-
-    bool bfs(int st, int en) { // sink 도달 여부 반환
-        memset(d.data(), -1, sizeof(int) * (n + 1));
-        d[st] = 0;
-
-        queue <int> q;
-        q.push(st);
-        while (!q.empty()) {
-            int cur = q.front(); q.pop();
-            for (auto& e : adj[cur]) {
-                if(e.c <= 0) continue;
-                int nxt = e.nxt;
-                if (d[nxt] != -1) continue;
-
-                d[nxt] = d[cur] + 1; 
-                if(nxt == en) return 1;
-                q.push(nxt);
-            }
-        }
-
-        return d[en] != -1;
-    }
-
-    ll dfs(int cur, int en, ll val) { // sink 도달 최대 유량 반환
-        if (cur == en) return val;
-
-        int &i = w[cur], sz = adj[cur].size();
-        for(;i < sz;++i){
-            edge &e = adj[cur][i];
-            if(e.c <= 0) continue;
-            int nxt = e.nxt;
-            if(d[nxt] != d[cur] + 1) continue;
-
-            ll mn = dfs(nxt, en, min(val, e.c));
-            if(mn <= 0) continue;
-
-            e.c -= mn;
-            adj[nxt][e.rev].c += mn;
-            return mn;
-        }
-
-        return 0;
-    }
-
     ll ret(int st, int en) {
         ll r = 0;
-        while (bfs(st, en)) {
+        while(bfs(st, en)){
             memset(w.data(), 0, sizeof(int) * (n + 1));
-            while (1) {
+            while(1){
                 ll f = dfs(st, en, INF);
-                if (!f) break;
-                r += f;
+                if(!f) break; r += f;
             }
         }
-
         return r;
     }
 };
