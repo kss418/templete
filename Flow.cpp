@@ -14,9 +14,8 @@ private:
     vector <int> d, w; int n;
     class edge {
     public:
-        int nxt, rev; ll c;
-        edge() = default;
-        edge(int nxt, int rev, ll c) : nxt(nxt), rev(rev), c(c) {}
+        int nxt, rev; ll c, cap;
+        edge(int nxt, int rev, ll c) : nxt(nxt), rev(rev), c(c), cap(c){}
     };
     vector <vector<edge>> adj;
     bool bfs(int st, int en) { 
@@ -76,6 +75,19 @@ public:
             }
         }
         return r;
+    }
+
+    template <class F>
+    void it_idx(int idx, const F& f) const{ // O(|adj[idx]|)
+        for(auto& [nxt, rev, c, cap] : adj[idx]){
+            if(!cap || cap - c < 0) continue;
+            f(idx, nxt, cap - c);
+        }
+    }
+
+    template <class F>
+    void it_all(const F& f) const{ // O(m)
+        for(int i = 0;i <= n;i++) it_idx(i, f);
     }
 };
 
