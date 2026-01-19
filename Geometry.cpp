@@ -244,34 +244,50 @@ public:
 };
 
 //LINE
-class _line{ // a >= 1e12 예외 처리 하기
+class _line{ 
 public:
-    ld a, b;
-    _line(){}
-    _line(pld v1, pld v2){
-        ld dx = v2.x - v1.x;
-        ld dy = v2.y - v1.y;
-        if(v2.x == v1.x) a = 1e12 + 1;
-        else a = dy / dx;
-
-        if(a >= 1e12) b = v1.x;
-        else b = -a * v1.x + v1.y;
-    }
-    _line(ld slope, pld v){ 
-        a = slope; 
-        b = (a >= 1e12) ? v.x : -a * v.x + v.y; 
+    _frac a, b; i128 x = 0; bool vert = false;
+    _line() = default;
+    _line(const pll& p1, const pll& p2){
+        if(p1.x == p2.x){
+            vert = true; x = p1.x;
+            a = _frac(), b = _frac();
+        }
+        else{
+            vert = false;
+            ll dx = p2.x - p1.x, dy = p2.y - p1.y;
+            a = _frac(dy, dx), b = _frac(p1.y) - a * _frac(p1.x);
+        }
     }
 
-    ld integral(ld s, ld e){ return integral(e) - integral(s); }
-    ld integral(ld x){ return (a * x * x) / (ld)2 + b * x; }
-    ld f(ld x) { return a * x + b; }
-    pld intersect(_line& ot){
-        if(a == ot.a) return {1e12, 1e12};
-        if(a == 1e12 + 1){ return {b, ot.f(b)}; }
-        if(ot.a == 1e12 + 1){ return {ot.b, f(ot.b)}; }
+    _line(const _frac& slope, const pll& p){
+        vert = false; x = 0;
+        a = slope; b = _frac(p.y) - a * _frac(p.x);
+    }
 
-        ld rx = (ot.b - b) / (a - ot.a), ry = f(rx);
-        return {rx, ry};
+    _frac f(const _frac& x) const{
+        assert(!vert);
+        return a * x + b;
+    }
+
+    bool intersect(const _line& ot, pair<_frac, _frac>& ret) const{
+        if(vert && ot.vert) return false;
+        if(vert){
+            _frac p1 = _frac(x), p2 = ot.f(p1); ret = {p1, p2};
+            return true;
+        }
+        if(ot.vert){
+            _frac p1 = _frac(ot.x), p2 = f(p1); ret = {p1, p2};
+            return true;
+        }
+        if(a == ot.a) return false;
+        _frac p1 = (ot.b - b) / (a - ot.a), p2 = f(p1); ret = {p1, p2};
+        return true;
+    }
+
+    bool same(const _line& ot) const{
+        if(vert && ot.vert) return x == ot.x;
+        return a == ot.a && b == ot.b;
     }
 };
 
