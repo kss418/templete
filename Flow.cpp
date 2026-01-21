@@ -69,14 +69,14 @@ public:
         }
     }
 
-    handle addsol(int st, int en, T c = 1){  // O(1)
+    handle addsol(int st, int en, T c = INF){  // O(1)
         int re = (int)adj[en].size(), rs = (int)adj[st].size();
         adj[st].push_back({en, re, c});
         adj[en].push_back({st, rs, 0});
         return {st, rs};
     }
 
-    pair <handle, handle> add(int st, int en, T c){ // O(1)
+    pair <handle, handle> add(int st, int en, T c = INF){ // O(1)
         auto h1 = addsol(st, en, c); auto h2 = addsol(en, st, c);
         return {h1, h2};
     }
